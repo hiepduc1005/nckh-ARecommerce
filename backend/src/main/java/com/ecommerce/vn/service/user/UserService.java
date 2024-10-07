@@ -16,5 +16,9 @@ public interface UserService {
 	
 	void deleteUser(UUID userId);
 	
+	User registerUser(String email,String username,String password);
+	
+	User loginUser(String email,String passowrd);
+	
 
 }
