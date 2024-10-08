@@ -1,15 +1,17 @@
 # Compiled class file
 *.class
 
+backend/.mvn/
+backend/.settings
+backend/mvnw
+backend/mvnw.cmd
+
 .metadata
 
-.mvn
 
-.settings
+backend/.claspath
 
-.claspath
-
-.project
+backend/.project
 
 # Log file
 *.log
