@@ -27,5 +27,4 @@ public class AttributeResponse {
 	
 	private UUID updatedBy;
 	
-	private 
 }
