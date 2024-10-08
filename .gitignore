@@ -3,6 +3,13 @@
 
 .metadata
 
+.mvn
+
+.settings
+
+.claspath
+
+.project
 
 # Log file
 *.log
