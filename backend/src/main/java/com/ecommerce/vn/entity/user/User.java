@@ -2,6 +2,7 @@ package com.ecommerce.vn.entity.user;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,6 +21,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -68,6 +70,19 @@ public class User {
 			)
 	private Set<Role> roles = new HashSet<Role>();
 	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserAddress> addresses;
+	
+	
+	
+	public List<UserAddress> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<UserAddress> addresses) {
+		this.addresses = addresses;
+	}
+
 	public Set<Role> getRoles() {
 		return roles;
 	}

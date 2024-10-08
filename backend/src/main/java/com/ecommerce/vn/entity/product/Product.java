@@ -37,6 +37,9 @@ public class Product {
 	
 	private String description;
 	
+	@Column(name = "image_path")
+	private String imagePath;
+	
 	@Column(name = "short_description")
 	private String shortDescription;
 	
@@ -81,6 +84,15 @@ public class Product {
 	
 	
 	
+	
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
+
 	public Set<Attribute> getAttributes() {
 		return attributes;
 	}

@@ -29,6 +29,8 @@ public class Tag {
 	@Column(name = "tag_name")
 	private String tagName;
 	
+	private Boolean active;
+	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -53,6 +55,16 @@ public class Tag {
 
 	public void setProducts(Set<Product> products) {
 		this.products = products;
+	}
+	
+	
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 	public UUID getId() {

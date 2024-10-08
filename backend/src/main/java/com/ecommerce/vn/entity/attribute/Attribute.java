@@ -31,6 +31,8 @@ public class Attribute {
 	
 	private String attributeName;
 	
+	private Boolean active;
+	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -52,6 +54,14 @@ public class Attribute {
     private Set<AttributeValue> attributeValues = new HashSet<>();
 	
 	
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
 
 	public Set<Product> getProducts() {
 		return products;
