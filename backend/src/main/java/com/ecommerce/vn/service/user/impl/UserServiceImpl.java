@@ -2,18 +2,30 @@ package com.ecommerce.vn.service.user.impl;
 
 import java.util.UUID;
 
-import org.apache.catalina.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.vn.entity.user.User;
+import com.ecommerce.vn.repository.UserRepository;
 import com.ecommerce.vn.service.user.UserService;
 
 @Service
 public class UserServiceImpl  implements UserService{
+	@Autowired
+	private UserRepository userRepository;
+
+
 
 	@Override
 	public User findUserByUuId(UUID userId) {
-		// TODO Auto-generated method stub
+		User user = userRepository.findById(userId).orElseThrow(RuntimeException);
+		
+		
+		
+		
 		return null;
+
+
 	}
 
 	@Override
@@ -24,7 +36,11 @@ public class UserServiceImpl  implements UserService{
 
 	@Override
 	public User createUser(User user) {
-		// TODO Auto-generated method stub
+		
+		if (userRepository.exexistsByEmail(user.getEmail())) {
+			throw new RuntimeException();
+		}
+
 		return null;
 	}
 

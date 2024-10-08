@@ -9,5 +9,5 @@ import com.ecommerce.vn.entity.user.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID>{
-
+    boolean exexistsByEmail(String email);
 }

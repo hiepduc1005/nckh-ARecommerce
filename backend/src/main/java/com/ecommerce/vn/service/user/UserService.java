@@ -2,7 +2,7 @@ package com.ecommerce.vn.service.user;
 
 import java.util.UUID;
 
-import org.apache.catalina.User;
+import com.ecommerce.vn.entity.user.User;
 
 public interface UserService {
 	
