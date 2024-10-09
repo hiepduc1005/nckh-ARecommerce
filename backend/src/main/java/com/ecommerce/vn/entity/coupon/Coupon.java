@@ -1,5 +1,6 @@
 package com.ecommerce.vn.entity.coupon;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -71,6 +72,9 @@ public class Coupon {
 	@Column(name = "updated_by")
 	private UUID updatedBy;
 
+	@Column(name = "discount")
+    private BigDecimal discount;
+	
 	public UUID getId() {
 		return id;
 	}
@@ -190,6 +194,14 @@ public class Coupon {
 	public void setUpdatedBy(UUID updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
 	
 	
  
