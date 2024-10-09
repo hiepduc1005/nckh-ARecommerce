@@ -25,22 +25,22 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Order> getCustomerOrders(UUID customerId) {
-        Customer customer = getCustomerById(customerId);
+    public List<Order> getCustomerOrders(UUID customerId, String email) {
+        Customer customer = getCustomerById(customerId,null,email);
         return new ArrayList<>(customer.getOrders()); // Trả về danh sách đơn hàng
     }
 
     @Override
-    public void addLoyaltyPoints(UUID customerId, int points) {
-        Customer customer = getCustomerById(customerId);
+    public void addLoyaltyPoints(UUID customerId, int points, String email) {
+        Customer customer = getCustomerById(customerId,null,email);
         customer.setLoyaltyPoint(customer.getLoyaltyPoint() + points);
         customerRepository.save(customer); 
     }
 
     @Override
-    public void redeemLoyaltyPoints(UUID customerId, int points) {
+    public void redeemLoyaltyPoints(UUID customerId, int points, String email) {
         // Đổi điểm thưởng cho khách hàng
-        Customer customer = getCustomerById(customerId);
+        Customer customer = getCustomerById(customerId, null, email);
         if (customer.getLoyaltyPoint() < points) {
             throw new IllegalArgumentException("Not enough loyalty points"); 
         }
@@ -49,12 +49,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer getCustomerById(UUID customerId, UUID UserId, String email) {
-         // Lấy thông tin khách hàng theo ID, User ID và email
-         return customerRepository.findById(customerId)
-         .filter(customer -> 
-             customer.getUser().getId().equals(userId) && 
-             customer.getUser().getEmail().equals(email))
-         .orElseThrow(() -> new ResourceNotFoundException("Customer", "id, userId or email", customerId));
+    public Customer getCustomerById(UUID customerId, UUID userId, String email) {
+         return customerRepository.findByUserIdAndEmail(userId, email)
+         .orElseThrow(() -> new ResourceNotFoundException("Customer", "userId or email", userId));
     }
+
 }

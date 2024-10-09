@@ -14,16 +14,12 @@ import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderItem;
 import com.ecommerce.vn.entity.order.OrderStatus;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
-import com.ecommerce.vn.repository.CouponRepository;
 import com.ecommerce.vn.repository.OrderRepository;
 import com.ecommerce.vn.service.order.OrderService;
 
 public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
-
-    @Autowired
-    private CouponRepository couponRepository;
 
     @Override
     @Transactional
@@ -74,6 +70,7 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
+    @SuppressWarnings("null")
     @Override
     @Transactional
     public Order addCouponToOrder(UUID orderId, Coupon coupon) {
@@ -82,7 +79,7 @@ public class OrderServiceImpl implements OrderService {
             throw new ResourceNotFoundException("Coupon", "id", coupon.getId());
         }
         order.setCoupon(coupon);
-        BigDecimal discountAmount = coupon.getDiscount();
+        BigDecimal discountAmount = coupon.getDiscountValue();
         BigDecimal totalAmount = calculateTotalAmount(orderId);
         order.setTotalAmount(totalAmount.subtract(discountAmount));
         return orderRepository.save(order);

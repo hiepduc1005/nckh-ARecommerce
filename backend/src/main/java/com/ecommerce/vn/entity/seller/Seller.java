@@ -15,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -41,6 +42,7 @@ public class Seller {
 	@Column(name = "updated_at")
 	private LocalDateTime updateAt;
 
+	
 	public UUID getId() {
 		return id;
 	}
@@ -80,7 +82,5 @@ public class Seller {
 	public void setUpdateAt(LocalDateTime updateAt) {
 		this.updateAt = updateAt;
 	}
-	
-	
 
 }

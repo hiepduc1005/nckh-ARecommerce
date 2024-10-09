@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ecommerce.vn.entity.seller.Seller;
 
+
 @Repository
 public interface SellerRepository extends JpaRepository<Seller, UUID>{
     Optional<Seller> findByShopName(String shopName);
