@@ -3,8 +3,10 @@ package com.ecommerce.vn.service.user.impl;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.repository.UserRepository;
 import com.ecommerce.vn.service.user.UserService;
@@ -30,8 +32,8 @@ public class UserServiceImpl  implements UserService{
 
 	@Override
 	public User findUserByEmail(String email) {
-		// TODO Auto-generated method stub
-		return null;
+		return userRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "email", email)); 
 	}
 
 	@Override
@@ -46,25 +48,50 @@ public class UserServiceImpl  implements UserService{
 
 	@Override
 	public User updateUser(User userUpdate) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			findUserByUuId(userUpdate.getId());
+			
+			return userRepository.save(userUpdate);
+		}catch (Exception e) {
+			throw new ResourceNotFoundException("User", "id", userUpdate.getId());
+		}
 	}
 
 	@Override
 	public void deleteUser(UUID userId) {
-		// TODO Auto-generated method stub
+		try {
+			findUserByUuId(userId);
+			
+			userRepository.deleteById(userId);
+		}catch (Exception e) {
+			throw new ResourceNotFoundException("User", "id", userId);
+		}
 		
 	}
 
 	@Override
 	public User registerUser(String email, String username, String password) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if (findUserByEmail(email) != null) {
+        throw new ResourceAlreadyExistException("User", "email", email);
+		}
+   		if (userRepository.findByUsername(username) != null) {
+        throw new ResourceAlreadyExistException("User", "username", username);
+   		 }
+
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    String encodedPassword = passwordEncoder.encode(password);
+
+    User newUser = new User();
+    newUser.setEmail(email);
+    newUser.setUserName(username);
+    newUser.setPassword(encodedPassword);
+
+    return createUser(newUser);
 	}
 
 	@Override
 	public User loginUser(String email, String passowrd) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
