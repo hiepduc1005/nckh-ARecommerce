@@ -10,7 +10,6 @@ import com.ecommerce.vn.entity.seller.Seller;
 import com.ecommerce.vn.exception.ResourceAlreadyExistException;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.repository.SellerRepository;
-import com.ecommerce.vn.repository.UserRepository;
 import com.ecommerce.vn.service.seller.SellerService;
 
 @Service

@@ -6,28 +6,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.vn.entity.user.User;
+import com.ecommerce.vn.exception.ResourceAlreadyExistException;
+import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.repository.UserRepository;
 import com.ecommerce.vn.service.user.UserService;
 
 @Service
 public class UserServiceImpl  implements UserService{
+	
 	@Autowired
 	private UserRepository userRepository;
 
 
-
 	@Override
 	public User findUserByUuId(UUID userId) {
-		User user = userRepository.findById(userId).orElseThrow(RuntimeException);
-		
-		
-		
-		
-		return null;
-
-
+		return userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId)); 
 	}
 
 	@Override
@@ -39,11 +34,11 @@ public class UserServiceImpl  implements UserService{
 	@Override
 	public User createUser(User user) {
 		
-		if (userRepository.exexistsByEmail(user.getEmail())) {
-			throw new RuntimeException();
+		if (findUserByEmail(user.getEmail()) != null) {
+			throw new ResourceAlreadyExistException("User","email", user.getId());
 		}
 
-		return null;
+		return userRepository.save(user);
 	}
 
 	@Override
