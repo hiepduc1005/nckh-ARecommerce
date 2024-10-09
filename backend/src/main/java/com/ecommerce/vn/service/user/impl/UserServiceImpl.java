@@ -17,7 +17,7 @@ public class UserServiceImpl  implements UserService{
 	
 	@Autowired
 	private UserRepository userRepository;
-	
+
 
 	@Override
 	public User findUserByUuId(UUID userId) {
@@ -33,10 +33,11 @@ public class UserServiceImpl  implements UserService{
 
 	@Override
 	public User createUser(User user) {
-		if(findUserByUuId(user.getId()) != null) {
-			throw new ResourceAlreadyExistException("User","id", user.getId());
-		}
 		
+		if (findUserByEmail(user.getEmail()) != null) {
+			throw new ResourceAlreadyExistException("User","email", user.getId());
+		}
+
 		return userRepository.save(user);
 	}
 
