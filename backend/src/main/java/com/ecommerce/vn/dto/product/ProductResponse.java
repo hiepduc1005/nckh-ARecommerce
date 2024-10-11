@@ -26,8 +26,6 @@ public class ProductResponse {
 	
 	private Set<TagResponse> tags = new HashSet<TagResponse>();
 	
-	
-	
 	private LocalDateTime createdAt;
 	
 	private LocalDateTime updatedAt;
