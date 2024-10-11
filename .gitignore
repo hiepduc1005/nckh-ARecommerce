@@ -2,11 +2,11 @@
 *.class
 
 backend/.mvn/
-backend/.settings
-backend/mvnw
+backend/.settings/
+backend/mvnw/
 backend/mvnw.cmd
-
-.metadata
+backend/target/
+.metadata/
 
 .mvn
 
