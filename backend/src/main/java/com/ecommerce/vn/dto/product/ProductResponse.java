@@ -25,9 +25,7 @@ public class ProductResponse {
 	private Set<CategoryResponse> categories = new HashSet<CategoryResponse>();
 	
 	private Set<TagResponse> tags = new HashSet<TagResponse>();
-	
-	
-	
+
 	private LocalDateTime createdAt;
 	
 	private LocalDateTime updatedAt;

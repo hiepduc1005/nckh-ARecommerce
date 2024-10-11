@@ -1,7 +1,6 @@
-
 package com.ecommerce.vn.dto.attribute;
 
-public class AttributeValueCreateRequest {
+public class AttributeValueResponse {
 	private String attributeValue;
 
 	public String getAttributeValue() {

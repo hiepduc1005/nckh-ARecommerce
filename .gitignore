@@ -1,7 +1,6 @@
 # Compiled class file
 *.class
 
-
 backend/.metadata/
 
 backend/.mvn/
@@ -9,16 +8,10 @@ backend/.mvn/
 backend/.settings/
 backend/target/
 
-backend/.mvn/
-backend/.settings
-backend/mvnw
-backend/mvnw.cmd
-
 .metadata
 
 
 backend/.claspath
-
 
 backend/.project
 
