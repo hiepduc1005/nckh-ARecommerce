@@ -62,7 +62,7 @@ public class User {
 	@Column(name = "updated_at")
 	private LocalDateTime updateAt;
 	
-	@OneToOne(mappedBy = "customer")
+	@OneToOne(mappedBy = "customer",cascade = CascadeType.ALL)
 	private Cart cart;
 	
 	@ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})

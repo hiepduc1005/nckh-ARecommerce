@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.vn.entity.cart.Cart;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.exception.ResourceAlreadyExistException;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
@@ -67,12 +68,12 @@ public class UserServiceImpl  implements UserService{
 	@Override
 	public User registerUser(String email, String username, String password) {
 		
-		if (findUserByEmail(email) != null) {
+	if (findUserByEmail(email) != null) {
         throw new ResourceAlreadyExistException("User", "email", email);
-		}
-   		if (userRepository.findByUsername(username) != null) {
+	}
+   	if (userRepository.findByUsername(username) != null) {
         throw new ResourceAlreadyExistException("User", "username", username);
-   		 }
+   	}
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     String encodedPassword = passwordEncoder.encode(password);
@@ -81,6 +82,7 @@ public class UserServiceImpl  implements UserService{
     newUser.setEmail(email);
     newUser.setUserName(username);
     newUser.setPassword(encodedPassword);
+    newUser.setCart(new Cart());
 
     return createUser(newUser);
 	}

@@ -18,11 +18,16 @@ public interface ProductRepository extends JpaRepository<Product, UUID>{
     List<Product> findByKeywordProducts(@Param("keyword") String keyword);
 
     @Query("SELECT p FROM Product p WHERE (:category IS NULL OR p.category = :category) AND (:minPrice IS NULL OR p.price >= :minPrice) AND (:maxPrice IS NULL OR p.price <= :maxPrice) AND (p.name LIKE %:keyword% OR p.description LIKE %:keyword% OR p.shortDescription LIKE %:keyword%)")
-List<Product> filterProducts(@Param("category") UUID category, 
-                             @Param("minPrice") BigDecimal minPrice, 
-                             @Param("maxPrice") BigDecimal maxPrice, 
-                             @Param("keyword") String keyword);
+    List<Product> filterProducts(@Param("category") UUID category, 
+	                             @Param("minPrice") BigDecimal minPrice, 
+	                             @Param("maxPrice") BigDecimal maxPrice, 
+	                             @Param("keyword") String keyword);
+    
+    @Query("SELECT p FROM Product p WHERE p.seller.id = :sellerId")
+    List<Product> findBySellerId(@Param("sellerId") UUID sellerId);
 
+    @Query("SELECT p FROM Product p WHERE p.active = false")
+    List<Product> findProductsUnactive();
 
 
 }

@@ -27,21 +27,23 @@ public interface ProductService {
     Page<Product> getProductsWithPaginationAndSorting(int page, int size, String sortBy);
 
     Product getProductById(UUID productId);
-
-    // List<Review> getProductReviews(UUID productId);
     
-    // Review addReview(UUID productId, Review review);
-
-    // // Quản lý danh mục sản phẩm
-    // List<Category> getAllCategories();
+    List<Product> getProductBySeller(UUID sellerId);
     
-    // Category createCategory(Category category);
+    List<Product> getAllProductUnactive();
+    
+    Product activateProduct(UUID productId);
+    
+    Product deactiveProduct(UUID productId);
+    
+    List<Product> getAllProducts();
+    
+//    San pham noi bat
+    List<Product> getFeatureProduct();
+    
+    Boolean isProductExist(UUID productId);
 
-    // Quản lý khuyến mãi
-    // Discount applyDiscount(UUID productId, Discount discount);
 
-    // Xử lý hình ảnh sản phẩm
-    Product addProductImage(UUID productId, String imageUrl);
 
     // // Sản phẩm yêu thích
     // List<Product> getWishlist(UUID userId);
@@ -51,5 +53,5 @@ public interface ProductService {
     // void removeFromWishlist(UUID userId, UUID productId);
 
     // Sản phẩm liên quan
-    // List<Product> getRelatedProducts(UUID productId);
+     List<Product> getRelatedProducts(UUID productId);
 }

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.ecommerce.vn.entity.user.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +29,7 @@ public class Cart {
 	@JoinColumn(name = "user_id")
 	private User user;
 	
-	@OneToMany(mappedBy ="cart")
+	@OneToMany(mappedBy ="cart",cascade = CascadeType.ALL)
 	private Set<CartItem> cartItems = new HashSet<CartItem>();
 
 	public UUID getId() {

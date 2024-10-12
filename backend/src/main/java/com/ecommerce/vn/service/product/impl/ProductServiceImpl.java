@@ -4,19 +4,23 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.repository.ProductRepository;
 import com.ecommerce.vn.service.product.ProductService;
 
+
 public class ProductServiceImpl implements ProductService{
-    // private static final Object ProductUpdate = null;
-    ProductRepository productRepository;
+
+	@Autowired
+	private  ProductRepository productRepository;
 
     @Override
     public Product createProduct(Product product) {
@@ -49,11 +53,13 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+	@Transactional(readOnly = true)
     public List<Product> searchProducts(String keyword) {
         return productRepository.findByKeywordProducts(keyword); 
     }
 
     @Override
+	@Transactional(readOnly = true)
     public Page<Product> getProductsWithPaginationAndSorting(int page, int size, String sortBy) {
        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
     
@@ -66,52 +72,80 @@ public class ProductServiceImpl implements ProductService{
         .orElseThrow( () -> new ResourceNotFoundException("Product", "productId", productId));
     }
 
-    @Override
-    public Product addProductImage(UUID productId, String imageUrl) {
-        Product product = productRepository.findById(productId)
-        .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-
-    if (product.getImagePath() == null || product.getImagePath().isEmpty()) {
-        product.setImagePath(imageUrl);
-    } else {
-        product.setImagePath(product.getImagePath() + "," + imageUrl);
-    }
-
-    return productRepository.save(product);
-    }
-
-    // @Override
-    // public List<Product> getWishlist(UUID userId) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'getWishlist'");
-    // }
-
-    // @Override
-    // public void addToWishlist(UUID userId, UUID productId) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'addToWishlist'");
-    // }
-
-    // @Override
-    // public void removeFromWishlist(UUID userId, UUID productId) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'removeFromWishlist'");
-    // }
-
-    // @Override
-    // public List<Product> getRelatedProducts(UUID productId) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'getRelatedProducts'");
-    // }
 
     @Override
+	@Transactional(readOnly = true)
     public Product findProductByUuid(UUID productId) {
         return productRepository.findById(productId)
         .orElseThrow( () -> new ResourceNotFoundException("Product", "productId", productId));
     }
 
     @Override
+	@Transactional(readOnly = true)
     public List<Product> filterProducts(UUID category, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
        return productRepository.filterProducts(category, minPrice, maxPrice, keyword);
     }
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Product> getProductBySeller(UUID sellerId) {
+		if(sellerId == null) {
+			throw new RuntimeException("Seller id must not be null");
+		}
+		
+		return productRepository.findBySellerId(sellerId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Product> getAllProductUnactive() {
+		return productRepository.findProductsUnactive();
+	}
+
+	@Override
+	@Transactional
+	public Product activateProduct(UUID productId) {
+		Product product = findProductByUuid(productId);
+		
+		product.setActive(true);
+		
+		return productRepository.save(product);
+	}
+
+	@Override
+	@Transactional
+	public Product deactiveProduct(UUID productId) {
+		Product product = findProductByUuid(productId);
+		
+		product.setActive(false);
+		
+		return productRepository.save(product);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Product> getAllProducts() {
+		return productRepository.findAll();
+	}
+
+	@Override
+	public List<Product> getFeatureProduct() {
+		
+		return null;
+	}
+
+	@Override
+	public Boolean isProductExist(UUID productId) {
+		try {
+			return productRepository.existsById(productId);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	@Override
+	public List<Product> getRelatedProducts(UUID productId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

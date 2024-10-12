@@ -9,16 +9,20 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.ecommerce.vn.entity.attribute.Attribute;
+import com.ecommerce.vn.entity.seller.Seller;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -43,6 +47,9 @@ public class Product {
 	@Column(name = "short_description")
 	private String shortDescription;
 	
+	@Column(name = "sold_quantity")
+	private Integer soldQuantity;
+	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -56,6 +63,13 @@ public class Product {
 	
 	@Column(name = "updated_by")
 	private UUID updatedBy;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "seller_id")
+	private Seller seller;
+	
+	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+	private Set<Variant> variants = new HashSet<Variant>();
 	
 	
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -85,6 +99,30 @@ public class Product {
 	
 	
 	
+	public Integer getSoldQuantity() {
+		return soldQuantity;
+	}
+
+	public void setSoldQuantity(Integer soldQuantity) {
+		this.soldQuantity = soldQuantity;
+	}
+
+	public Set<Variant> getVariants() {
+		return variants;
+	}
+
+	public void setVariants(Set<Variant> variants) {
+		this.variants = variants;
+	}
+
+	public Seller getSeller() {
+		return seller;
+	}
+
+	public void setSeller(Seller seller) {
+		this.seller = seller;
+	}
+
 	public String getImagePath() {
 		return imagePath;
 	}
