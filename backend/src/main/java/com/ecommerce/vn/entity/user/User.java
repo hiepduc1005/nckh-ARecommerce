@@ -15,6 +15,7 @@ import com.ecommerce.vn.entity.role.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -58,6 +59,8 @@ public class User {
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 	
+	private LocalDateTime deletedAt;
+
 	@LastModifiedDate
 	@Column(name = "updated_at")
 	private LocalDateTime updateAt;
@@ -76,8 +79,27 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<UserAddress> addresses;
 	
-	
-	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserAddress> addressResponses = new HashSet<>();
+
+
+	//Getter and Setter
+	public LocalDateTime getDeletedAt() {
+		return deletedAt;
+	}
+
+	public void setDeletedAt(LocalDateTime deletedAt) {
+		this.deletedAt = deletedAt;
+	}
+
+	public Set<UserAddress> getAddressResponses() {
+		return addressResponses;
+	}
+
+	public void setAddressResponses(Set<UserAddress> addressResponses) {
+		this.addressResponses = addressResponses;
+	}
+
 	public List<UserAddress> getAddresses() {
 		return addresses;
 	}
@@ -181,6 +203,4 @@ public class User {
     public void setUserName(String userName) {
         this.userName = userName;
     }
-	
-	
 }

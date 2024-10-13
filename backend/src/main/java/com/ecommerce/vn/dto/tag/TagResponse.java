@@ -73,6 +73,17 @@ public class TagResponse {
 	public void setUpdatedBy(UUID updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+
+	public TagResponse(UUID id, String tagName, Boolean active, LocalDateTime createdAt, LocalDateTime updateAt,
+			UUID createdBy, UUID updatedBy) {
+		this.id = id;
+		this.tagName = tagName;
+		this.active = active;
+		this.createdAt = createdAt;
+		this.updateAt = updateAt;
+		this.createdBy = createdBy;
+		this.updatedBy = updatedBy;
+	}
 	
 	
 }

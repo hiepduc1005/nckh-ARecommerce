@@ -8,7 +8,6 @@ public class UserCreateRequest {
 	
 	private String lastname;
 	
-	
 	private String password;
 
 	public String getEmail() {
@@ -18,8 +17,6 @@ public class UserCreateRequest {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
-	
 
 	public String getFirstname() {
 		return firstname;

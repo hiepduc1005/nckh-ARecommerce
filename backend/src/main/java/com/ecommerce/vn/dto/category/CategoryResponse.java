@@ -95,6 +95,19 @@ public class CategoryResponse {
 	public void setUpdatedBy(UUID updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+
+	public CategoryResponse(UUID id, String categoryName, String categoryDescription, String imagePath, Boolean active,
+			LocalDateTime createdAt, LocalDateTime updateAt, UUID createdBy, UUID updatedBy) {
+		this.id = id;
+		this.categoryName = categoryName;
+		this.categoryDescription = categoryDescription;
+		this.imagePath = imagePath;
+		this.active = active;
+		this.createdAt = createdAt;
+		this.updateAt = updateAt;
+		this.createdBy = createdBy;
+		this.updatedBy = updatedBy;
+	}
 	
 	
 }

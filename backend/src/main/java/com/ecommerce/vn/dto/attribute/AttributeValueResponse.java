@@ -10,6 +10,10 @@ public class AttributeValueResponse {
 	public void setAttributeValue(String attributeValue) {
 		this.attributeValue = attributeValue;
 	}
-	
-	
+
+	public AttributeValueResponse(String attributeValue) {
+		this.attributeValue = attributeValue;
+	}
+
+		
 }

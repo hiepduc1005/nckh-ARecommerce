@@ -48,7 +48,7 @@ public class Tag {
 	@ManyToMany(mappedBy = "tags",cascade = {CascadeType.MERGE,CascadeType.PERSIST},fetch = FetchType.LAZY)
 	private Set<Product> products = new HashSet<Product>();
 
-	
+	//Getter and Setter
 	public Set<Product> getProducts() {
 		return products;
 	}
@@ -57,8 +57,6 @@ public class Tag {
 		this.products = products;
 	}
 	
-	
-
 	public Boolean getActive() {
 		return active;
 	}
@@ -114,6 +112,4 @@ public class Tag {
 	public void setUpdatedBy(UUID updatedBy) {
 		this.updatedBy = updatedBy;
 	} 
-	
-	
 }

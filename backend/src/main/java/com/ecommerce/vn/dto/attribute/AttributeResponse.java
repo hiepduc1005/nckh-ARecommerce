@@ -87,6 +87,20 @@ public class AttributeResponse {
 	public void setUpdatedBy(UUID updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+
+	public AttributeResponse(UUID id, String attributeName, Boolean active,
+			Set<AttributeValueResponse> attributeValueResponses, LocalDateTime createdAt, LocalDateTime updateAt,
+			UUID createdBy, UUID updatedBy) {
+		this.id = id;
+		this.attributeName = attributeName;
+		this.active = active;
+		this.attributeValueResponses = attributeValueResponses;
+		this.createdAt = createdAt;
+		this.updateAt = updateAt;
+		this.createdBy = createdBy;
+		this.updatedBy = updatedBy;
+	}
+	
 	
 	
 }
