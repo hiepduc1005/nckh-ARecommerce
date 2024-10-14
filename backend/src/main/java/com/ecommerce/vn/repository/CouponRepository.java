@@ -1,6 +1,7 @@
 package com.ecommerce.vn.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface CouponRepository extends JpaRepository<Coupon, UUID>{
     List<Coupon> searchCoupons(@Param("keyword") String keyword);
 
     List<Coupon> findBySellerId(UUID sellerId);
+    
+    Optional<Coupon> findByCode(String couponCode);
 }

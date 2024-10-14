@@ -1,5 +1,6 @@
 package com.ecommerce.vn.service.coupon;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,5 +27,7 @@ public interface CouponService {
     boolean isCouponValid(UUID couponId);
 
     void incrementUsageCount(UUID couponId);
+    
+    Coupon validateAndRetrieveCoupon(String couponCode,BigDecimal cartTotal);
 
 }

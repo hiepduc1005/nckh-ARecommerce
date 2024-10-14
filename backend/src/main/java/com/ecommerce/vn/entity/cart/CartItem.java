@@ -2,7 +2,7 @@ package com.ecommerce.vn.entity.cart;
 
 import java.util.UUID;
 
-import com.ecommerce.vn.entity.product.Product;
+import com.ecommerce.vn.entity.product.Variant;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,8 +26,8 @@ public class CartItem {
 	private Cart cart;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "product_id")
-	private Product product;
+	@JoinColumn(name = "variant_id")
+	private Variant variant;
 	
 	private Integer quantity;
 
@@ -47,12 +47,12 @@ public class CartItem {
 		this.cart = cart;
 	}
 
-	public Product getProduct() {
-		return product;
+	public Variant getVariant() {
+		return variant;
 	}
 
-	public void setProduct(Product product) {
-		this.product = product;
+	public void setVariant(Variant variant) {
+		this.variant = variant;
 	}
 
 	public Integer getQuantity() {
