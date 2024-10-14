@@ -1,11 +1,14 @@
 package com.ecommerce.vn.service.rating.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.entity.customer.Customer;
@@ -34,7 +37,7 @@ public class RatingServiceImpl implements RatingService {
     private CustomerRepository customerRepository;
 
     @Override
-    public Rating createRating(UUID productId, UUID sellerId, UUID customerId, Integer ratingValue, String comment) {
+    public Rating createRating(UUID productId, UUID sellerId, UUID customerId, BigDecimal ratingValue, String comment) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
         
@@ -56,7 +59,7 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
-    public Rating updateRating(UUID ratingId, Integer ratingValue, String comment) {
+    public Rating updateRating(UUID ratingId, BigDecimal ratingValue, String comment) {
         Rating rating = ratingRepository.findById(ratingId)
             .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", ratingId));
 
@@ -95,4 +98,30 @@ public class RatingServiceImpl implements RatingService {
     public List<Rating> getRatingsBySeller(UUID sellerId) {
         return ratingRepository.findBySellerId(sellerId);
     }
+
+	@Override
+	@Transactional(readOnly = true)
+	public BigDecimal getAverageRatingByProduct(UUID productId) {
+		List<Rating> ratings = getRatingsByProduct(productId);
+		
+		return ratings.stream() 
+		        .map(Rating::getRatingValue) 
+		        .reduce(BigDecimal.ZERO, BigDecimal::add) 
+		        .divide(new BigDecimal(ratings.size()),2,RoundingMode.HALF_UP); 
+	}
+
+
+	@Override
+	@Transactional(readOnly = true)
+	public Long getTotalRatingsByProduct(UUID productId) {
+		List<Rating> ratings = getRatingsByProduct(productId);
+
+		return Long.valueOf(ratings.size());
+	}
+
+	@Override
+	@Transactional
+	public boolean hasCustomerRatedProduct(UUID productId, UUID customerId) {
+		return ratingRepository.existsByProductIdAndCustomerId(productId, customerId);
+	}
 }

@@ -1,6 +1,7 @@
 package com.ecommerce.vn.service.order;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,4 +27,16 @@ public interface OrderService {
     BigDecimal calculateTotalAmount(UUID orderId);
 
     Order addNotes(UUID orderId, String notes);
+    
+    List<Order> getOrdersByUserId(UUID userId);
+
+    List<Order> getOrdersByStatus(OrderStatus status);
+
+    List<Order> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+
+    BigDecimal calculateTotalShippingFee(UUID userId, LocalDateTime startDate, LocalDateTime endDate);
+
+    Order cancelOrder(UUID orderId);
+
+    List<Order> getPaidOrders();
 }

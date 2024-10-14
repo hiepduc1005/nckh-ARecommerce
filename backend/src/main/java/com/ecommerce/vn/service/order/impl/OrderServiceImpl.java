@@ -109,4 +109,64 @@ public class OrderServiceImpl implements OrderService {
         order.setNotes(notes);
         return orderRepository.save(order);
     }
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Order> getOrdersByUserId(UUID userId) {
+		
+		return orderRepository.findByUserId(userId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Order> getOrdersByStatus(OrderStatus status) {
+		// TODO Auto-generated method stub
+		return orderRepository.findByOrderStatus(status);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Order> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+		// TODO Auto-generated method stub
+		return orderRepository.findOrdersByDateRange(startDate, endDate);
+	}
+
+	@Override
+	@Transactional
+	public BigDecimal calculateTotalShippingFee(UUID userId, LocalDateTime startDate, LocalDateTime endDate) {
+		List<Order> orders = orderRepository.findOrdersByUserIdAndDateRange(userId, startDate, endDate);
+		
+		BigDecimal totalShippingFee = orders.stream()
+				.map(Order::getShippingFee)
+				.reduce(BigDecimal.ZERO,BigDecimal::add);
+				
+		return totalShippingFee;
+	}
+
+	@Override
+	@Transactional
+	public Order cancelOrder(UUID orderId) {	
+		   Order order = orderRepository.findById(orderId)
+		            .orElseThrow(() -> new ResourceNotFoundException("Order","orderId",orderId)); // Kiểm tra đơn hàng
+
+		    // Kiểm tra trạng thái đơn hàng trước khi hủy
+		    if (order.getOrderStatus() == OrderStatus.SHIPPED || order.getOrderStatus() == OrderStatus.DELIVERED) {
+		        throw new IllegalStateException("Không thể hủy đơn hàng đã được giao hoặc đang vận chuyển");
+		    }
+		    
+		    // Kiểm tra trạng thái đơn hàng trước khi hủy
+		    if (order.getOrderStatus() == OrderStatus.REJECTED || order.getOrderStatus() == OrderStatus.RETURNED) {
+		        throw new IllegalStateException("Không thể hủy đơn hàng đã được tra lai hoac da bi tu choi");
+		    }
+
+		    // Cập nhật trạng thái đơn hàng thành CANCELED
+		    order.setOrderStatus(OrderStatus.CANCELED);
+		    return orderRepository.save(order); // Lưu lại thay đổi
+	}
+
+	@Override
+	@Transactional
+	public List<Order> getPaidOrders() {
+		return getOrdersByStatus(OrderStatus.PAID);
+	}
 }

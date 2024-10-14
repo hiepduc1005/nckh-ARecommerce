@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.ecommerce.vn.entity.attribute.Attribute;
+import com.ecommerce.vn.entity.rating.Rating;
 import com.ecommerce.vn.entity.seller.Seller;
 
 import jakarta.persistence.CascadeType;
@@ -96,9 +97,18 @@ public class Product {
 	)
 	private Set<Attribute> attributes = new HashSet<Attribute>();
 	
+	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+	private Set<Rating> ratings = new HashSet<Rating>();
 	
 	
-	
+	public Set<Rating> getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(Set<Rating> ratings) {
+		this.ratings = ratings;
+	}
+
 	public Integer getSoldQuantity() {
 		return soldQuantity;
 	}
