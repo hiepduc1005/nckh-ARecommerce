@@ -3,6 +3,7 @@ package com.ecommerce.vn.service.coupon.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -82,5 +83,47 @@ public class CouponServiceImpl implements CouponService {
     
         return couponRepository.save(coupon);
     }
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Coupon> searchCoupons(String keyword) {
+		return couponRepository.searchCoupons(keyword);
+	}
+
+	@Override
+	@Transactional
+	public List<Coupon> getCouponsBySellerId(UUID sellerId) {
+		Seller seller = sellerRepository.findById(sellerId)
+		            .orElseThrow(() -> new ResourceNotFoundException("Seller", "sellerId", sellerId));
+		return seller.getCoupons().stream().toList();
+	}
+
+	@Override
+	@Transactional
+	public boolean isCouponValid(UUID couponId) {
+		  Coupon coupon = getCouponById(couponId);
+		  LocalDateTime now = LocalDateTime.now();
+		  
+		  boolean inValidDateRange = now.isAfter(coupon.getCouponStartDate()) && now.isBefore(coupon.getCouponEndDate());
+		  
+		  boolean belowMaxUsage = coupon.getTimeUsed() < coupon.getMaxUsage();
+		  
+		return inValidDateRange && belowMaxUsage;
+	}
+
+	@Override
+	@Transactional
+	public void incrementUsageCount(UUID couponId) {
+		Coupon coupon = getCouponById(couponId);
+		
+		if (coupon.getTimeUsed() >= coupon.getMaxUsage()) {
+		       throw new IllegalStateException("Coupon has reached its maximum usage limit.");
+		   }
+		
+		   coupon.setTimeUsed(coupon.getTimeUsed() + 1);
+		   couponRepository.save(coupon); 
+	}
+	
+	
 }
 
