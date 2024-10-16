@@ -14,7 +14,7 @@ import com.ecommerce.vn.repository.UserRepository;
 import com.ecommerce.vn.service.user.UserService;
 
 @Service
-public class UserServiceImpl  implements UserService{
+public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	private UserRepository userRepository;

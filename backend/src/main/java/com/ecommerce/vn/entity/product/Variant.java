@@ -63,6 +63,8 @@ public class Variant {
     )
     private Set<AttributeValue> attributeValues = new HashSet<AttributeValue>();
 	
+
+	//Getter and Setter
 	public Set<AttributeValue> getAttributeValues() {
 		return attributeValues;
 	}
