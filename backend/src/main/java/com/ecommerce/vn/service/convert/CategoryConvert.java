@@ -5,9 +5,9 @@ import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.entity.product.Category;
 
 public class CategoryConvert {
-    
+
     @SuppressWarnings("null")
-    public Category categoryCreateRequestConvert(CategoryCreateRequest categoryCreateRequest){
+    public Category categoryCreateRequestConvert(CategoryCreateRequest categoryCreateRequest) {
         if (categoryCreateRequest != null) {
             return null;
         }
@@ -20,21 +20,21 @@ public class CategoryConvert {
         return category;
     }
 
-    public CategoryResponse categoryConvertToCategoryResponse(Category category){
+    public CategoryResponse categoryConvertToCategoryResponse(Category category) {
         if (category == null) {
             return null;
         }
 
         return new CategoryResponse(
-            category.getId(),
-            category.getCategoryName(), 
-            category.getCategoryDescription(), 
-            category.getImagePath(), 
-            category.getActive(), 
-            category.getCreatedAt(), 
-            category.getUpdateAt(), 
-            category.getCreatedBy(), 
-            category.getUpdatedBy()
+                category.getId(),
+                category.getCategoryName(),
+                category.getCategoryDescription(),
+                category.getImagePath(),
+                category.getActive(),
+                category.getCreatedAt(),
+                category.getUpdateAt(),
+                category.getCreatedBy(),
+                category.getUpdatedBy()
         );
     }
 }

@@ -29,172 +29,171 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "users")
 public class User {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
-	private UUID id;
-	
-	@Column(name = "first_name")
-	private String firstName;
-	
-	@Column(name = "last_name")
-	private String lastName;
-	
-	@Column(name = "phone_number")
-	private String phoneNumber;
-	
-	@Column(name = "user_name")
-	private String userName;
+    private UUID id;
 
-	@Column(name = "email", nullable = false)
-	private String email;
-	
-	@Column(name = "password_hash")
-	private String password;
-	
-	private Boolean active;
-	
-	@CreatedDate
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-	
-	private LocalDateTime deletedAt;
+    @Column(name = "first_name")
+    private String firstName;
 
-	@LastModifiedDate
-	@Column(name = "updated_at")
-	private LocalDateTime updateAt;
-	
-	@OneToOne(mappedBy = "customer",cascade = CascadeType.ALL)
-	private Cart cart;
-	
-	@ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-	@JoinTable(
-			name = "users_roles",
-			joinColumns = @JoinColumn(name ="user_id"),
-			inverseJoinColumns = @JoinColumn(name = "role_id")
-			)
-	private Set<Role> roles = new HashSet<Role>();
-	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<UserAddress> addresses;
-	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "user_name")
+    private String userName;
+
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @Column(name = "password_hash")
+    private String password;
+
+    private Boolean active;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime deletedAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updateAt;
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    private Cart cart;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<Role>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAddress> addresses;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<UserAddress> addressResponses = new HashSet<>();
 
+    //Getter and Setter
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
 
-	//Getter and Setter
-	public LocalDateTime getDeletedAt() {
-		return deletedAt;
-	}
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
 
-	public void setDeletedAt(LocalDateTime deletedAt) {
-		this.deletedAt = deletedAt;
-	}
+    public Set<UserAddress> getAddressResponses() {
+        return addressResponses;
+    }
 
-	public Set<UserAddress> getAddressResponses() {
-		return addressResponses;
-	}
+    public void setAddressResponses(Set<UserAddress> addressResponses) {
+        this.addressResponses = addressResponses;
+    }
 
-	public void setAddressResponses(Set<UserAddress> addressResponses) {
-		this.addressResponses = addressResponses;
-	}
+    public List<UserAddress> getAddresses() {
+        return addresses;
+    }
 
-	public List<UserAddress> getAddresses() {
-		return addresses;
-	}
+    public void setAddresses(List<UserAddress> addresses) {
+        this.addresses = addresses;
+    }
 
-	public void setAddresses(List<UserAddress> addresses) {
-		this.addresses = addresses;
-	}
+    public Set<Role> getRoles() {
+        return roles;
+    }
 
-	public Set<Role> getRoles() {
-		return roles;
-	}
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
 
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
+    public Cart getCart() {
+        return cart;
+    }
 
-	public Cart getCart() {
-		return cart;
-	}
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
 
-	public void setCart(Cart cart) {
-		this.cart = cart;
-	}
+    public UUID getId() {
+        return id;
+    }
 
-	public UUID getId() {
-		return id;
-	}
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-	public void setId(UUID id) {
-		this.id = id;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public Boolean getActive() {
+        return active;
+    }
 
-	public Boolean getActive() {
-		return active;
-	}
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
+    public LocalDateTime getUpdateAt() {
+        return updateAt;
+    }
 
-	public LocalDateTime getUpdateAt() {
-		return updateAt;
-	}
-
-	public void setUpdateAt(LocalDateTime updateAt) {
-		this.updateAt = updateAt;
-	}
+    public void setUpdateAt(LocalDateTime updateAt) {
+        this.updateAt = updateAt;
+    }
 
     public String getUserName() {
         return userName;
@@ -202,5 +201,12 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public User() {
+    }
+
+    public User(UUID userId) {
+        this.id = userId;
     }
 }
