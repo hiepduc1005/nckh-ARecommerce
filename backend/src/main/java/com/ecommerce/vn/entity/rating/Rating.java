@@ -1,5 +1,6 @@
 package com.ecommerce.vn.entity.rating;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class Rating {
 	private Customer customer;
 	
 	@Column(name = "rating_value",nullable = false)
-	private Integer ratingValue;
+	private BigDecimal ratingValue;
 	
 	@Column(name = "comment", columnDefinition = "TEXT") 
     private String comment;
@@ -89,13 +90,7 @@ public class Rating {
 		this.customer = customer;
 	}
 
-	public Integer getRattingValue() {
-		return ratingValue;
-	}
 
-	public void setRattingValue(Integer rattingValue) {
-		this.ratingValue = rattingValue;
-	}
 
 	public String getComment() {
 		return comment;
@@ -113,17 +108,20 @@ public class Rating {
 		this.createdAt = createdAt;
 	}
 
-    public Integer getRatingValue() {
-        return ratingValue;
-    }
+   
 
-    public void setRatingValue(Integer ratingValue) {
-        this.ratingValue = ratingValue;
-    }
+    public BigDecimal getRatingValue() {
+		return ratingValue;
+	}
 
-    public Boolean getIsVerified() {
+	public void setRatingValue(BigDecimal ratingValue) {
+		this.ratingValue = ratingValue;
+	}
+
+	public Boolean getIsVerified() {
         return isVerified;
     }
+   
 
     public void setIsVerified(Boolean isVerified) {
         this.isVerified = isVerified;

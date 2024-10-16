@@ -18,5 +18,13 @@ public interface CouponService {
     Coupon getCouponById(UUID couponId);
   
     Coupon createCouponForSeller(UUID sellerId, Coupon coupon);
+    
+    List<Coupon> searchCoupons(String keyword);
+
+    List<Coupon> getCouponsBySellerId(UUID sellerId);
+
+    boolean isCouponValid(UUID couponId);
+
+    void incrementUsageCount(UUID couponId);
 
 }

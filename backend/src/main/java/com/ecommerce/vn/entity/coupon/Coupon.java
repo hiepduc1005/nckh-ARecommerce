@@ -57,10 +57,10 @@ public class Coupon {
 	private Integer maxUsage;
 	
 	@Column(name = "coupon_start_date", nullable = false)
-	private Long couponStartDate;
+	private LocalDateTime couponStartDate;
 	
 	@Column(name = "coupon_end_date", nullable = false)
-	private Long couponEndDate;
+	private LocalDateTime couponEndDate;
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
@@ -152,19 +152,19 @@ public class Coupon {
 		this.maxUsage = maxUsage;
 	}
 
-	public Long getCouponStartDate() {
+	public LocalDateTime getCouponStartDate() {
 		return couponStartDate;
 	}
 
-	public void setCouponStartDate(Long couponStartDate) {
+	public void setCouponStartDate(LocalDateTime couponStartDate) {
 		this.couponStartDate = couponStartDate;
 	}
 
-	public Long getCouponEndDate() {
+	public LocalDateTime getCouponEndDate() {
 		return couponEndDate;
 	}
 
-	public void setCouponEndDate(Long couponEndDate) {
+	public void setCouponEndDate(LocalDateTime couponEndDate) {
 		this.couponEndDate = couponEndDate;
 	}
 

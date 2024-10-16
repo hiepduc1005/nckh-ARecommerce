@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.entity.attribute.Attribute;
+import com.ecommerce.vn.entity.rating.Rating;
 import com.ecommerce.vn.entity.seller.Seller;
 
 import jakarta.persistence.CascadeType;
@@ -99,24 +100,18 @@ public class Product {
 	)
 
 	private Set<Attribute> attributes = new HashSet<Attribute>();
-
-
-	//Getter and Setter
-	public String getImagePath() {
-		return imagePath;
+	
+	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+	private Set<Rating> ratings = new HashSet<Rating>();
+	
+	
+	public Set<Rating> getRatings() {
+		return ratings;
 	}
 
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
+	public void setRatings(Set<Rating> ratings) {
+		this.ratings = ratings;
 	}
-
-	public MultipartFile getImage() {
-        return image;
-    }
-
-    public void setImage(MultipartFile image) {
-        this.image = image;
-    }
 
 	public Integer getSoldQuantity() {
 		return soldQuantity;

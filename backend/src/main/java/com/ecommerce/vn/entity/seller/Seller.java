@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.user.User;
 
@@ -47,6 +48,9 @@ public class Seller {
 	@OneToMany(mappedBy = "seller",cascade = CascadeType.ALL)
 	private Set<Product> products = new HashSet<Product>();
 	
+	@OneToMany(mappedBy = "seller",cascade = CascadeType.ALL)
+	private Set<Coupon> coupons = new HashSet<Coupon>();
+	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -56,6 +60,15 @@ public class Seller {
 	private LocalDateTime updateAt;
 	
 	
+	
+	public Set<Coupon> getCoupons() {
+		return coupons;
+	}
+
+	public void setCoupons(Set<Coupon> coupons) {
+		this.coupons = coupons;
+	}
+
 	public Boolean getActive() {
 		return active;
 	}
