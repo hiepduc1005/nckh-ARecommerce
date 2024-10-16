@@ -5,6 +5,8 @@ backend/.metadata/
 
 backend/.mvn/
 
+backend/bin/
+
 
 backend/.settings/
 backend/target/
