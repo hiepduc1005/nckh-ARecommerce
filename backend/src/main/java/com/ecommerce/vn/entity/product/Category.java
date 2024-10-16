@@ -59,9 +59,8 @@ public class Category {
 	
 	@ManyToMany(mappedBy = "categories", cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
 	private Set<Product> products = new HashSet<>();
-
 	
-	
+	//Getter and Setter
 	public Set<Product> getProducts() {
 		return products;
 	}

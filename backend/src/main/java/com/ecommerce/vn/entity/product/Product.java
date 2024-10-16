@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.entity.attribute.Attribute;
 import com.ecommerce.vn.entity.rating.Rating;
@@ -44,8 +45,11 @@ public class Product {
 	
 	@Column(name = "image_path")
 	private String imagePath;
-	
-	@Column(name = "short_description")
+
+	@Column(name = "image")
+	private MultipartFile image;
+
+    @Column(name = "short_description")
 	private String shortDescription;
 	
 	@Column(name = "sold_quantity")
@@ -72,7 +76,6 @@ public class Product {
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
 	private Set<Variant> variants = new HashSet<Variant>();
 	
-	
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(
 	       name = "products_categories",
@@ -95,6 +98,7 @@ public class Product {
 			joinColumns = @JoinColumn(name = "product_id"),
 			inverseJoinColumns = @JoinColumn(name = "attribute_id")
 	)
+
 	private Set<Attribute> attributes = new HashSet<Attribute>();
 	
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
@@ -131,14 +135,6 @@ public class Product {
 
 	public void setSeller(Seller seller) {
 		this.seller = seller;
-	}
-
-	public String getImagePath() {
-		return imagePath;
-	}
-
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
 	}
 
 	public Set<Attribute> getAttributes() {
@@ -236,7 +232,23 @@ public class Product {
 	public void setUpdatedBy(UUID updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
+
+	public MultipartFile getImage() {
+		return image;
+	}
+
+	public void setImage(MultipartFile image) {
+		this.image = image;
+	}
+
 	
 	
- 
 }

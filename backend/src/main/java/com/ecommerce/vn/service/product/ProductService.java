@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.entity.product.Product;
 
@@ -19,6 +20,8 @@ public interface ProductService {
     void deleteProduct(UUID productId);
 
     List<Product> searchProducts(String keyword);
+
+    Product updateProductImage(UUID productId, MultipartFile image);
 
     // Lọc sản phẩm theo danh mục, giá, và các thuộc tính khác
     List<Product> filterProducts(UUID category, BigDecimal minPrice, BigDecimal maxPrice, String keyword);

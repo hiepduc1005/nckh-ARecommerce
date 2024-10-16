@@ -15,7 +15,7 @@ public class ProductCreateRequest {
 	
 	private String shortDescription;
 	
-	private MultipartFile  image;
+	private MultipartFile image;
 	
 	private Set<UUID> categoryIds = new HashSet<UUID>();
 	
@@ -46,8 +46,6 @@ public class ProductCreateRequest {
 	public void setShortDescription(String shortDescription) {
 		this.shortDescription = shortDescription;
 	}
-
-	
 
 	public MultipartFile getImage() {
 		return image;
@@ -80,8 +78,5 @@ public class ProductCreateRequest {
 	public void setAttributeIds(Set<UUID> attributeIds) {
 		this.attributeIds = attributeIds;
 	}
-	
-	
-	
 	
 }

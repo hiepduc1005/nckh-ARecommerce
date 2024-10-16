@@ -1,6 +1,10 @@
 package com.ecommerce.vn.service.product.impl;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
@@ -148,4 +153,30 @@ public class ProductServiceImpl implements ProductService{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Product updateProductImage(UUID productId, MultipartFile image) {
+	 
+	try {
+        Product product = findProductByUuid(productId);
+        
+        if (image != null && !image.isEmpty()) {
+
+            String uploadDir = "/path/to/images/";
+            String imageName = image.getOriginalFilename();
+            Path path = Paths.get(uploadDir + imageName);
+            Files.write(path, image.getBytes()); 
+
+            product.setImagePath(path.toString());
+        } else {
+            throw new IllegalArgumentException("Image file is invalid or empty.");
+        }
+
+        return productRepository.save(product);
+    } catch (IOException e) {
+        throw new RuntimeException("Failed to store image", e);
+    } catch (ResourceNotFoundException e) {
+        throw new ResourceNotFoundException("Product", "productId", productId);
+    }
+}
 }

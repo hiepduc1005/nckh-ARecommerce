@@ -3,6 +3,7 @@ package com.ecommerce.vn.repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
+
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,5 +41,6 @@ public interface VariantRepository extends JpaRepository<Variant, UUID>{
 	
 	@Query("SELECT COUNT(v) > 0 FROM Variant v WHERE v.id = :variantId AND v.product.id = :productId")
 	boolean isVariantOfProduct(@Param("variantId") UUID variantId, @Param("productId") UUID productId);
+
 
 }

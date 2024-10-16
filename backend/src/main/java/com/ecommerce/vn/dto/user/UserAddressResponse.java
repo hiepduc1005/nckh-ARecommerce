@@ -61,6 +61,16 @@ public class UserAddressResponse {
 
 	public void setCity(String city) {
 		this.city = city;
+	}
+
+	public UserAddressResponse(UUID id, String addressLine1, String addressLine2, String postalCode, String country,
+			String city) {
+		this.id = id;
+		this.addressLine1 = addressLine1;
+		this.addressLine2 = addressLine2;
+		this.postalCode = postalCode;
+		this.country = country;
+		this.city = city;
 	} 
 	
 	

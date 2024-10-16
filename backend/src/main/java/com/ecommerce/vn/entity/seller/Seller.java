@@ -27,110 +27,132 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "sellers")
 public class Seller {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	private UUID id;
-	
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
-	
-	@Column(name = "shop_name",nullable = false)
-	private String shopName;
-	
-	@Column(name = "active")
-	private Boolean active;
-	
-	
-	private Boolean isDeleted;
-	
-	@OneToMany(mappedBy = "seller",cascade = CascadeType.ALL)
-	private Set<Product> products = new HashSet<Product>();
-	
-	@OneToMany(mappedBy = "seller",cascade = CascadeType.ALL)
-	private Set<Coupon> coupons = new HashSet<Coupon>();
-	
-	@CreatedDate
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-	
-	@LastModifiedDate
-	@Column(name = "updated_at")
-	private LocalDateTime updateAt;
-	
-	
-	
-	public Set<Coupon> getCoupons() {
-		return coupons;
-	}
 
-	public void setCoupons(Set<Coupon> coupons) {
-		this.coupons = coupons;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-	public Boolean getActive() {
-		return active;
-	}
+    // Liên kết với tài khoản user
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
+    @Column(name = "shop_name", nullable = false)
+    private String shopName;
 
-	public Boolean getIsDeleted() {
-		return isDeleted;
-	}
+    @Column(name = "active")
+    private Boolean active;
 
-	public void setIsDeleted(Boolean isDeleted) {
-		this.isDeleted = isDeleted;
-	}
+    private Boolean isDeleted;
 
-	public Set<Product> getProducts() {
-		return products;
-	}
+    // Địa chỉ lấy hàng
+    @Column(name = "pickup_address", nullable = false)
+    private String pickupAddress;
 
-	public void setProducts(Set<Product> products) {
-		this.products = products;
-	}
+    // Đơn vị vận chuyển
+    @Column(name = "shipping_provider")
+    private String shippingProvider;
 
-	public UUID getId() {
-		return id;
-	}
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
+    private Set<Product> products = new HashSet<>();
 
-	public void setId(UUID id) {
-		this.id = id;
-	}
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
+    private Set<Coupon> coupons = new HashSet<>();
 
-	public User getUser() {
-		return user;
-	}
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-	public String getShopName() {
-		return shopName;
-	}
+    // Getter và Setter
+    public UUID getId() {
+        return id;
+    }
 
-	public void setShopName(String shopName) {
-		this.shopName = shopName;
-	}
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	public LocalDateTime getUpdateAt() {
-		return updateAt;
-	}
+    public String getShopName() {
+        return shopName;
+    }
 
-	public void setUpdateAt(LocalDateTime updateAt) {
-		this.updateAt = updateAt;
-	}
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public String getPickupAddress() {
+        return pickupAddress;
+    }
+
+    public void setPickupAddress(String pickupAddress) {
+        this.pickupAddress = pickupAddress;
+    }
+
+    public String getShippingProvider() {
+        return shippingProvider;
+    }
+
+    public void setShippingProvider(String shippingProvider) {
+        this.shippingProvider = shippingProvider;
+    }
+
+    public Set<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<Product> products) {
+        this.products = products;
+    }
+
+    public Set<Coupon> getCoupons() {
+        return coupons;
+    }
+
+    public void setCoupons(Set<Coupon> coupons) {
+        this.coupons = coupons;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

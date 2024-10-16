@@ -29,5 +29,5 @@ public interface ProductRepository extends JpaRepository<Product, UUID>{
     @Query("SELECT p FROM Product p WHERE p.active = false")
     List<Product> findProductsUnactive();
 
-
+    Product findByProductId(UUID tagId);
 }
