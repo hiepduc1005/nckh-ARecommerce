@@ -13,28 +13,41 @@ import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderItem;
 import com.ecommerce.vn.entity.order.OrderStatus;
+import com.ecommerce.vn.exception.ResourceEmptyException;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.repository.OrderRepository;
+import com.ecommerce.vn.service.coupon.CouponService;
 import com.ecommerce.vn.service.order.OrderService;
 
+
 public class OrderServiceImpl implements OrderService {
+	
     @Autowired
     private OrderRepository orderRepository;
+    
+    @Autowired
+    private CouponService couponService;
+    
 
     @Override
     @Transactional
-    public Order createOrder(Order order) {
-        order.setCreatedAt(LocalDateTime.now());
-        // Tính tổng giá trị đơn hàng nếu có thể
-        BigDecimal totalAmount = calculateTotalAmount(order.getId());
-        order.setTotalAmount(totalAmount);
-        return orderRepository.save(order);
+    public Order createOrder(Order order ,String couponCode) {
+    	if(isOrderEmpty(order)) {
+    		throw new ResourceEmptyException("Order");
+    	}
+    	
+    	Order orderAfterSetTotalPrice = updateTotalPrice(order);
+    	if(!couponCode.trim().isEmpty()) {
+    		Coupon coupon = couponService.validateAndRetrieveCouponByCode(couponCode, orderAfterSetTotalPrice.getTotalPrice());  
+    		orderAfterSetTotalPrice = updateTotalPriceWithCoupon(orderAfterSetTotalPrice, coupon);
+    	}    	
+    	return orderRepository.save(orderAfterSetTotalPrice);    		
     }
 
     @Override
     public Order getOrderById(UUID orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "orderId", orderId));
     }
 
     @Override
@@ -44,21 +57,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order updateOrder(UUID orderId, Order updatedOrder) {
-        Order existingOrder = getOrderById(orderId);
-        existingOrder.setOrderStatus(updatedOrder.getOrderStatus());
-        existingOrder.setShippingMethod(updatedOrder.getShippingMethod());
-        existingOrder.setPaymentMethod(updatedOrder.getPaymentMethod());
-        existingOrder.setShippingFee(updatedOrder.getShippingFee());
-        existingOrder.setNotes(updatedOrder.getNotes());
-        existingOrder.setOrderItems(updatedOrder.getOrderItems());
-        return orderRepository.save(existingOrder);
+    public Order updateOrder(Order updatedOrder) {
+        return orderRepository.save(updatedOrder);
     }
 
     @Override
     @Transactional
     public void deleteOrder(UUID orderId) {
-        Order order = getOrderById(orderId);
+    	Order order = getOrderById(orderId);
         orderRepository.delete(order);
     }
 
@@ -75,33 +81,76 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Order addCouponToOrder(UUID orderId, Coupon coupon) {
         Order order = getOrderById(orderId);
-        if (coupon == null) {
-            throw new ResourceNotFoundException("Coupon", "id", coupon.getId());
-        }
-        order.setCoupon(coupon);
-        BigDecimal discountAmount = coupon.getDiscountValue();
-        BigDecimal totalAmount = calculateTotalAmount(orderId);
-        order.setTotalAmount(totalAmount.subtract(discountAmount));
+//        if (coupon == null) {
+//            throw new ResourceNotFoundException("Coupon", "id", coupon.getId());
+//        }
+//        order.setCoupon(coupon);
+//        BigDecimal discountAmount = coupon.getDiscountValue(); 
+//        BigDecimal totalAmount = calculateTotalAmount(orderId);
+//        order.setTotalAmount(totalAmount.subtract(discountAmount));
         return orderRepository.save(order);
     }
 
     @Override
-    public BigDecimal calculateTotalAmount(UUID orderId) {
+    @Transactional
+    public BigDecimal calculateTotalPriceWithCoupon(UUID orderId, UUID couponId) {
         Order order = getOrderById(orderId);
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         Set<OrderItem> orderItems = order.getOrderItems();
-        for (OrderItem item : orderItems) {
-            totalAmount = totalAmount.add(item.getTotalPrice());
-        }
+        totalAmount = orderItems.stream()
+        		.map(
+        				orderItem -> 
+        					orderItem
+        						.getVariant()
+        						.getPrice()
+        						.multiply(new BigDecimal(orderItem.getQuantity())))
+        		.reduce(BigDecimal.ZERO,BigDecimal::add);
 
         totalAmount = totalAmount.add(order.getShippingFee());
-        if (order.getDiscount() != null) {
-            totalAmount = totalAmount.subtract(order.getDiscount());
-        }
+        
+        totalAmount = couponService.getTotalPriceAfterDiscount(couponId, totalAmount);
+        
         return totalAmount;
     }
+    
+    @Override
+    @Transactional
+    public BigDecimal calculateTotalPrice(Order order) {
+    	 BigDecimal totalAmount = BigDecimal.ZERO;
 
+         Set<OrderItem> orderItems = order.getOrderItems();
+         totalAmount = orderItems.stream()
+         		.map(
+         				orderItem -> 
+         					orderItem
+         						.getVariant()
+         						.getPrice()
+         						.multiply(new BigDecimal(orderItem.getQuantity())))
+         		.reduce(BigDecimal.ZERO,BigDecimal::add);
+
+         totalAmount = totalAmount.add(order.getShippingFee());
+
+         return totalAmount;
+    }
+    
+    @Transactional
+    @Override
+    public Order updateTotalPrice(Order order) {
+    	 BigDecimal totalPrice = calculateTotalPrice(order);
+    	 order.setTotalPrice(totalPrice);
+    	return order;
+    }
+
+    @Override
+    public Order updateTotalPriceWithCoupon(Order order, Coupon coupon) {
+    	BigDecimal totalPrice = calculateTotalPriceWithCoupon(order.getId(),coupon.getId());
+	   	order.setTotalPrice(totalPrice);
+	   	order.setCoupon(coupon);
+	   	return order;
+    }
+    
+    
     @Override
     @Transactional
     public Order addNotes(UUID orderId, String notes) {
@@ -169,4 +218,10 @@ public class OrderServiceImpl implements OrderService {
 	public List<Order> getPaidOrders() {
 		return getOrdersByStatus(OrderStatus.PAID);
 	}
+
+	@Override
+	public Boolean isOrderEmpty(Order order) {
+		return order.getOrderItems().isEmpty();
+	}
+
 }

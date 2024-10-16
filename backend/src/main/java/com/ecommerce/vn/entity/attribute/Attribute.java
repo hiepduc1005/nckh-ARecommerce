@@ -55,6 +55,7 @@ public class Attribute {
 	@OneToMany(mappedBy = "attribute", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AttributeValue> attributeValues = new HashSet<>();
 	
+	
 
 	public Boolean getActive() {
 		return active;

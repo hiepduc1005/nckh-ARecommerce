@@ -1,10 +1,9 @@
 package com.ecommerce.vn.entity.order;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.ecommerce.vn.entity.coupon.Coupon;
-import com.ecommerce.vn.entity.product.Product;
+import com.ecommerce.vn.entity.product.Variant;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,8 +23,8 @@ public class OrderItem {
 	private UUID id;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id", nullable = false)
-	private Product product;	
+    @JoinColumn(name = "variant_id", nullable = false)
+	private Variant variant;	
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "order_id")
@@ -37,7 +36,6 @@ public class OrderItem {
 	
 	private Integer quantity;
 	
-	private BigDecimal price;
 
 	public UUID getId() {
 		return id;
@@ -47,12 +45,13 @@ public class OrderItem {
 		this.id = id;
 	}
 
-	public Product getProduct() {
-		return product;
+
+	public Variant getVariant() {
+		return variant;
 	}
 
-	public void setProduct(Product product) {
-		this.product = product;
+	public void setVariant(Variant variant) {
+		this.variant = variant;
 	}
 
 	public Order getOrder() {
@@ -79,16 +78,6 @@ public class OrderItem {
 		this.quantity = quantity;
 	}
 
-	public BigDecimal getPrice() {
-		return price;
-	}
-
-	public void setPrice(BigDecimal price) {
-		this.price = price;
-	}
 	
-	public BigDecimal getTotalPrice() {
-        return price.multiply(BigDecimal.valueOf(quantity)); // Tính tổng = giá * số lượng
-    }
 	
 }

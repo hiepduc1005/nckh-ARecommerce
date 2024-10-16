@@ -10,13 +10,13 @@ import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
 
 public interface OrderService {
-    Order createOrder(Order order);
+    Order createOrder(Order order,String couponCode);
 
     Order getOrderById(UUID orderId);
 
     List<Order> getAllOrders();
 
-    Order updateOrder(UUID orderId, Order updatedOrder);
+    Order updateOrder( Order updatedOrder);
 
     void deleteOrder(UUID orderId);
 
@@ -24,7 +24,7 @@ public interface OrderService {
 
     Order addCouponToOrder(UUID orderId, Coupon coupon);
 
-    BigDecimal calculateTotalAmount(UUID orderId);
+    BigDecimal calculateTotalPriceWithCoupon(UUID orderId,UUID couponId);
 
     Order addNotes(UUID orderId, String notes);
     
@@ -39,4 +39,13 @@ public interface OrderService {
     Order cancelOrder(UUID orderId);
 
     List<Order> getPaidOrders();
+    
+    BigDecimal calculateTotalPrice(Order order);
+    
+    Order updateTotalPrice(Order order);
+    
+    Order updateTotalPriceWithCoupon(Order order,Coupon coupon);
+    
+    Boolean isOrderEmpty(Order order);
+
 }

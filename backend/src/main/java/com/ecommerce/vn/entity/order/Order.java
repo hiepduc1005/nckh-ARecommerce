@@ -73,11 +73,11 @@ public class Order {
 	@Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 	
-	@Column(name = "discount")
-    private BigDecimal discount;
-
-	@Column(name = "total_amount", nullable = false)
-    private BigDecimal totalAmount;
+	@Column(name = "total_price")
+    private BigDecimal totalPrice;
+	
+	@Column(name = "dícount_price")
+    private BigDecimal discountPrice;
 
 	public User getUser() {
 		return user;
@@ -183,24 +183,22 @@ public class Order {
         this.notes = notes;
     }
 
-	public BigDecimal getDiscount() {
-		return discount;
+	public BigDecimal getTotalPrice() {
+		return totalPrice;
 	}
 
-	public void setDiscount(BigDecimal discount) {
-		this.discount = discount;
+	public void setTotalPrice(BigDecimal totalPrice) {
+		this.totalPrice = totalPrice;
 	}
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
+	public BigDecimal getDiscountPrice() {
+		return discountPrice;
+	}
 
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
+	public void setDiscountPrice(BigDecimal discountPrice) {
+		this.discountPrice = discountPrice;
+	}
 
-	
-	
 	
 
 }

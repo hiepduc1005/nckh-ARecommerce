@@ -107,7 +107,6 @@ public class CartServiceImpl implements CartService {
 	    
 	    cartItem.setQuantity(quantity);
 	    
-	    // Lưu lại mục giỏ hàng đã được cập nhật
 	    cartItemRepository.save(cartItem);
 	}
 
@@ -175,7 +174,7 @@ public class CartServiceImpl implements CartService {
 		Cart cart = cartRepository.findById(cartId)
 		            .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
 
-	    Coupon coupon = couponService.validateAndRetrieveCoupon(couponCode,calculateCartTotal(cartId));
+	    Coupon coupon = couponService.validateAndRetrieveCouponByCode(couponCode,calculateCartTotal(cartId));
 	    
 	    cart.setCoupon(coupon);
 	    cartRepository.save(cart);	

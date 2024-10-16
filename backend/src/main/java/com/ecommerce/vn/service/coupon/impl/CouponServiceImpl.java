@@ -103,16 +103,33 @@ public class CouponServiceImpl implements CouponService {
 
 	@Override
 	@Transactional
-	public boolean isCouponValid(UUID couponId) {
-		  Coupon coupon = getCouponById(couponId);
-		  LocalDateTime now = LocalDateTime.now();
-		  
-		  boolean inValidDateRange = now.isAfter(coupon.getCouponStartDate()) && now.isBefore(coupon.getCouponEndDate());
-		  
-		  boolean belowMaxUsage = coupon.getTimeUsed() < coupon.getMaxUsage();
-		  
-		return inValidDateRange && belowMaxUsage;
+	public boolean isCouponValid(UUID couponId, BigDecimal cartTotal) {
+	    Coupon coupon = getCouponById(couponId);
+	    LocalDateTime now = LocalDateTime.now();
+
+	    // Kiểm tra ngày bắt đầu và kết thúc của coupon
+	    if (now.isBefore(coupon.getCouponStartDate())) {
+	        throw new InvalidCouponException("Coupon is not yet active.");
+	    }
+	    if (now.isAfter(coupon.getCouponEndDate())) {
+	        throw new InvalidCouponException("Coupon has expired.");
+	    }
+
+	    // Kiểm tra điều kiện số lần sử dụng tối đa
+	    if (coupon.getTimeUsed() >= coupon.getMaxUsage()) {
+	        throw new InvalidCouponException("Coupon usage limit reached.");
+	    }
+
+	    // Kiểm tra điều kiện giá trị đơn hàng tối thiểu
+	    if (coupon.getDiscountType().equals(DiscountType.FIXED_AMOUNT)) {
+	        if (coupon.getMinimumOrderAmount() != null && cartTotal.compareTo(new BigDecimal(coupon.getMinimumOrderAmount())) < 0) {
+	            throw new InvalidCouponException("Total amount is less than the minimum order amount for this coupon.");
+	        }
+	    }
+
+	    return true;
 	}
+
 
 	@Override
 	@Transactional
@@ -129,31 +146,46 @@ public class CouponServiceImpl implements CouponService {
 
 	@Override
 	@Transactional
-	public Coupon validateAndRetrieveCoupon(String couponCode,BigDecimal cartTotal) {
-		Coupon coupon = couponRepository.findByCode(couponCode)
+	public Coupon validateAndRetrieveCouponByCode(String couponCode,BigDecimal cartTotal) {
+		 Coupon coupon = couponRepository.findByCode(couponCode)
 		            .orElseThrow(() -> new InvalidCouponException("Invalid coupon code."));
-		
-		LocalDateTime now = LocalDateTime.now();
+		    
+	     isCouponValid(coupon.getId(), cartTotal);
 	    
-	    if (coupon.getCouponStartDate().isAfter(now)) {
-	        throw new InvalidCouponException("Coupon is not yet active.");
+	     return coupon;
+	}
+
+	@Override
+	@Transactional
+	public Coupon validateAndRetrieveCouponById(UUID couponId, BigDecimal cartTotal) {
+		 Coupon coupon = couponRepository.findById(couponId)
+		            .orElseThrow(() -> new InvalidCouponException("Invalid coupon id."));
+		    
+	    isCouponValid(couponId, cartTotal);
+	    
+	    return coupon;
+	}
+
+	@Override
+	@Transactional
+	public BigDecimal getTotalPriceAfterDiscount(UUID couponId, BigDecimal totalPrice) {
+		Coupon coupon = validateAndRetrieveCouponById(couponId, totalPrice);
+		BigDecimal discountAmount = BigDecimal.ZERO;
+
+	    if (coupon.getDiscountType().equals(DiscountType.FIXED_AMOUNT)) {
+	        discountAmount = coupon.getDiscountValue();
+	    } else if (coupon.getDiscountType().equals(DiscountType.PERCENTAGE)) {
+	        BigDecimal discountRate = coupon.getDiscountValue();
+	        discountAmount = totalPrice.multiply(discountRate.divide(new BigDecimal(100)));
 	    }
 
-        if (coupon.getCouponEndDate().isBefore(LocalDateTime.now())) {
-            throw new InvalidCouponException("Coupon has expired.");
-        }
+	    BigDecimal totalPriceAfterDiscount = totalPrice.subtract(discountAmount);
 
-        if(coupon.getDiscountType().equals(DiscountType.FIXED_AMOUNT)) {
-        	if (coupon.getMinimumOrderAmount() != null && cartTotal.compareTo(new BigDecimal(coupon.getMinimumOrderAmount())) < 0) {
-        		throw new InvalidCouponException("Total amount is less than the minimum order amount for this coupon.");
-        	}        	
-        }
+	    if (totalPriceAfterDiscount.compareTo(BigDecimal.ZERO) < 0) {
+	        totalPriceAfterDiscount = BigDecimal.ZERO;
+	    }
 
-        if (coupon.getTimeUsed() >= coupon.getMaxUsage()) {
-            throw new InvalidCouponException("Coupon usage limit reached.");
-        }
-
-        return coupon; 
+	    return totalPriceAfterDiscount;
 	}
 	
 	

@@ -24,10 +24,14 @@ public interface CouponService {
 
     List<Coupon> getCouponsBySellerId(UUID sellerId);
 
-    boolean isCouponValid(UUID couponId);
+    boolean isCouponValid(UUID couponId, BigDecimal cartTotal);
 
     void incrementUsageCount(UUID couponId);
     
-    Coupon validateAndRetrieveCoupon(String couponCode,BigDecimal cartTotal);
+    Coupon validateAndRetrieveCouponByCode(String couponCode,BigDecimal totalPrice);
+    
+    Coupon validateAndRetrieveCouponById(UUID couponId,BigDecimal totalPrice);
+
+    BigDecimal getTotalPriceAfterDiscount(UUID couponId,BigDecimal totalPrice);
 
 }
