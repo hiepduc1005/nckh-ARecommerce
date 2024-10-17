@@ -44,6 +44,15 @@ public class Role {
 	@LastModifiedDate
 	@Column(name = "updated_at")
 	private LocalDateTime updateAt;
+	
+	
+
+	public Role(String roleName) {
+		this.roleName = roleName;
+	}
+
+	public Role() {
+	}
 
 	public UUID getId() {
 		return id;
@@ -83,6 +92,10 @@ public class Role {
 
 	public void setUpdateAt(LocalDateTime updateAt) {
 		this.updateAt = updateAt;
+	}
+	
+	public void addPrivilege(Privilege privilege) {
+		this.privileges.add(privilege);
 	}
 	
 	

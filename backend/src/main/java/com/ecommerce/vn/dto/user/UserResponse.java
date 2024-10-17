@@ -5,11 +5,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-
 public class UserResponse {
 	
 	private UUID id;
-	
+
 	private String firstname;
 	
 	private String lastname;
@@ -19,10 +18,24 @@ public class UserResponse {
 	private String phoneNumber;
 	
 	private Set<UserAddressResponse> addressResponses = new HashSet<UserAddressResponse>();
-
+	
 	private LocalDateTime createdAt;
 	
 	private LocalDateTime deletedAt;
+
+	
+
+	public UserResponse(UUID id, String firstname, String lastname, String email, String phoneNumber,
+			Set<UserAddressResponse> addressResponses, LocalDateTime createdAt, LocalDateTime deletedAt) {
+		this.id = id;
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.email = email;
+		this.phoneNumber = phoneNumber;
+		this.addressResponses = addressResponses;
+		this.createdAt = createdAt;
+		this.deletedAt = deletedAt;
+	}
 
 	public UUID getId() {
 		return id;
@@ -87,16 +100,6 @@ public class UserResponse {
 	public void setDeletedAt(LocalDateTime deletedAt) {
 		this.deletedAt = deletedAt;
 	}
-
-	public UserResponse(UUID id, String firstname, String lastname, String email, String phoneNumber,
-			Set<UserAddressResponse> addressResponses, LocalDateTime createdAt, LocalDateTime deletedAt) {
-		this.id = id;
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.email = email;
-		this.phoneNumber = phoneNumber;
-		this.addressResponses = addressResponses;
-		this.createdAt = createdAt;
-		this.deletedAt = deletedAt;
-	}
+	
+	
 }

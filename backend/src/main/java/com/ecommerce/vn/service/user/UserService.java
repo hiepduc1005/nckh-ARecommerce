@@ -16,9 +16,10 @@ public interface UserService {
 	
 	void deleteUser(UUID userId);
 	
-	User registerUser(String email,String username,String password);
+	User registerUser(String email,String password);
 	
 	User loginUser(String email,String passowrd);
 	
+	boolean existByEmail(String email);
 
 }

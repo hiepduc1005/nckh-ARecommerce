@@ -31,6 +31,9 @@ public class JwtFilterChain extends OncePerRequestFilter{
 	private JwtGenerator jwtGenerator;
 	
 	@Autowired
+	private CustomUserDetailService customUserDetailService;
+	
+	@Autowired
 	public UserService userService;
 
 	@Override
@@ -45,10 +48,7 @@ public class JwtFilterChain extends OncePerRequestFilter{
 					new UsernamePasswordAuthenticationToken(
 							email,
 							null,
-							user.getRoles()
-							.stream()
-							.map(role -> new SimpleGrantedAuthority(role.getRoleName()))
-							.toList()
+							customUserDetailService.mapPrivilegesToAuthorities(user.getRoles())
 						);
 			
 			SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

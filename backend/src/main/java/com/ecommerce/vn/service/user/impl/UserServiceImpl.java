@@ -7,11 +7,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.entity.cart.Cart;
+import com.ecommerce.vn.entity.role.Role;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.exception.ResourceAlreadyExistException;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.repository.UserRepository;
 import com.ecommerce.vn.service.user.UserService;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -66,23 +69,24 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public User registerUser(String email, String username, String password) {
+	@Transactional
+	public User registerUser(String email, String password) {
 		
 	if (findUserByEmail(email) != null) {
         throw new ResourceAlreadyExistException("User", "email", email);
 	}
-   	if (userRepository.findByUsername(username) != null) {
-        throw new ResourceAlreadyExistException("User", "username", username);
-   	}
+   	
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     String encodedPassword = passwordEncoder.encode(password);
+    
 
     User newUser = new User();
     newUser.setEmail(email);
-    newUser.setUserName(username);
     newUser.setPassword(encodedPassword);
     newUser.setCart(new Cart());
+    
+    newUser.setActive(false);
 
     return createUser(newUser);
 	}
@@ -90,6 +94,11 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public User loginUser(String email, String passowrd) {
 		return null;
+	}
+
+	@Override
+	public boolean existByEmail(String email) {
+		return userRepository.existsByEmail(email);
 	}
 
 }

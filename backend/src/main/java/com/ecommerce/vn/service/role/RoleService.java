@@ -16,4 +16,14 @@ public interface RoleService {
     Role getRoleById(UUID id);
     
     List<Role> getAllRoles();
+    
+    Role createCustomerRole();
+    
+    Role createSellerRole();
+    
+    Role createModeratorRole();
+    
+    Role createSupportRole();
+    
+    Role createAdminRole();
 }

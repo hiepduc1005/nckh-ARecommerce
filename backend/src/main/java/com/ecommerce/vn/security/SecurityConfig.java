@@ -12,6 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -62,10 +63,15 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(request -> 
 					request.requestMatchers("/api/v1/public/**","/api/v1/auth/**").permitAll()
+						   .requestMatchers("/api/sellers/**").hasRole("ROLE_SELLER")
+						   .requestMatchers("/api/admin/**").hasRole("ROLE_ADMIN")
+						   .requestMatchers("/api/products/**").permitAll()
 						   .anyRequest().authenticated()
 						   )
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(daoAuthenticationProvider());
+		
+		http.addFilterBefore(jwtFilterChain(), UsernamePasswordAuthenticationFilter.class);
 		
 		
 		return http.build();
