@@ -12,7 +12,8 @@
 }
 
 .container{
-  padding:0 88px;
+  padding:40px 88px;
+  background-color: #EBEBEB;
 }
 
 #root {
