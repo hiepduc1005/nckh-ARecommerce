@@ -1,5 +1,7 @@
 package com.ecommerce.vn.service.user.impl;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.exception.ResourceAlreadyExistException;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.repository.UserRepository;
+import com.ecommerce.vn.service.role.RoleService;
 import com.ecommerce.vn.service.user.UserService;
 
 import jakarta.transaction.Transactional;
@@ -21,7 +24,9 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	private UserRepository userRepository;
-
+	
+	@Autowired
+	private RoleService roleService;
 
 	@Override
 	public User findUserByUuId(UUID userId) {
@@ -36,6 +41,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
+	@Transactional
 	public User createUser(User user) {
 		
 		if (findUserByEmail(user.getEmail()) != null) {
@@ -46,6 +52,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
+	@Transactional
 	public User updateUser(User userUpdate) {
 		try {
 			findUserByUuId(userUpdate.getId());
@@ -57,6 +64,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
+	@Transactional
 	public void deleteUser(UUID userId) {
 		try {
 			findUserByUuId(userId);
@@ -86,6 +94,9 @@ public class UserServiceImpl implements UserService{
     newUser.setPassword(encodedPassword);
     newUser.setCart(new Cart());
     
+    Role customerRole = roleService.createCustomerRole();
+    
+    newUser.setRoles(new HashSet<Role>(Arrays.asList(customerRole)));
     newUser.setActive(false);
 
     return createUser(newUser);
