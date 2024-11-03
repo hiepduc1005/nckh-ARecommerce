@@ -15,4 +15,5 @@ public interface VariantService {
 
     List<Variant> findVariantsByProductId(UUID productId);
 
+    void deleteVariant(UUID variantId);
 }

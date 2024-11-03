@@ -21,7 +21,7 @@ import com.ecommerce.service.convert.ProductConvert;
 import com.ecommerce.service.convert.TagConvert;
 
 @RestController
-@RequestMapping("/tags")
+@RequestMapping("/api/v1/tags")
 public class TagController {
 
     @Autowired

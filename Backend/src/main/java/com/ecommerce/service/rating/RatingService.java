@@ -8,7 +8,7 @@ import com.ecommerce.entity.rating.Rating;
 
 public interface RatingService {
 
-    Rating createRating(UUID productId, UUID sellerId, UUID customerId, BigDecimal ratingValue, String comment);
+    Rating createRating(UUID productId, UUID customerId, BigDecimal ratingValue, String comment);
 
     Rating updateRating(UUID ratingId, BigDecimal ratingValue, String comment);
 

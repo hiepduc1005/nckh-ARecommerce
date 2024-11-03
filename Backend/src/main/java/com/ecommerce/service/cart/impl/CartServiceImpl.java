@@ -21,28 +21,34 @@ import com.ecommerce.service.cart.CartService;
 public class CartServiceImpl implements CartService {
 
     @Autowired
-    private CartRepository cartRepository;  
+    private CartRepository cartRepository;
 
     @Autowired
-    private UserRepository userRepository;  
+    private UserRepository userRepository;
 
     @Autowired
-    private CartItemRepository cartItemRepository;  
+    private CartItemRepository cartItemRepository;
 
     @Override
-    public Cart createCart(User user) {
-        Cart cart = new Cart();
-        cart.setUser(user);
-        return cartRepository.save(cart);
+    public Cart getOrCreateCart(UUID userId) {
+
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setUserId(userId);
+                    return cartRepository.save(newCart);
+                });
+        return cart;
     }
 
     @Override
     public Cart getCartByUserId(UUID userId) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
-            return cartRepository.findByUserId(userId);
+            return cartRepository.findByUserId(userId)
+                    .orElseThrow(() -> new RuntimeException("Cart not found for user: " + userId));
         }
-        throw new RuntimeException("User not found");
+        throw new RuntimeException("User not found for id: " + userId);
     }
 
     @Override
@@ -88,5 +94,5 @@ public class CartServiceImpl implements CartService {
         }
         throw new RuntimeException("Cart not found");
     }
-}
 
+}

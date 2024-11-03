@@ -22,7 +22,7 @@ import com.ecommerce.service.convert.UserConvert;
 import com.ecommerce.service.user.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     @Autowired

@@ -15,4 +15,9 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     List<Notification> findByCustomer(Customer customer);
 
     List<Notification> findByIsGlobal(boolean isGlobal);
+
+    Notification findByNotificationId(UUID notificationId);
+
+    List<Notification> findByCustomerId(UUID customerId);
+
 }

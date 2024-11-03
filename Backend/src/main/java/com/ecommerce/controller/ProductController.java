@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import com.ecommerce.service.convert.ProductConvert;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 public class ProductController {
 
     @Autowired

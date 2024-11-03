@@ -80,4 +80,8 @@ public class Notification {
         this.customer = customer;
     }
 
+    public boolean isRead() {
+        return isRead;
+    }
+
 }

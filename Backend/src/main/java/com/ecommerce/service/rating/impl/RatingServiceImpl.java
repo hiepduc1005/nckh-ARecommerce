@@ -10,12 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ecommerce.entity.customer.Customer;
 import com.ecommerce.exception.ResourceNotFoundException;
-import com.ecommerce.entity.product.Product;
 import com.ecommerce.entity.rating.Rating;
-import com.ecommerce.repository.CustomerRepository;
-import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.repository.RatingRepository;
 import com.ecommerce.service.rating.RatingService;
 
@@ -25,23 +21,11 @@ public class RatingServiceImpl implements RatingService {
     @Autowired
     private RatingRepository ratingRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private CustomerRepository customerRepository;
-
     @Override
-    public Rating createRating(UUID productId, UUID sellerId, UUID customerId, BigDecimal ratingValue, String comment) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
-
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", customerId));
-
+    public Rating createRating(UUID productId, UUID customerId, BigDecimal ratingValue, String comment) {
         Rating rating = new Rating();
-        rating.setProduct(product);
-        rating.setCustomer(customer);
+        rating.setProductId(productId);
+        rating.setCustomerId(customerId);
         rating.setRatingValue(ratingValue);
         rating.setComment(comment);
         rating.setIsVerified(true);

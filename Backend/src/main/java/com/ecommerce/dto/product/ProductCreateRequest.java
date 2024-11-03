@@ -6,77 +6,76 @@ import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
 
-
 public class ProductCreateRequest {
-	
-	private String productName;
-	
-	private String description;
-	
-	private String shortDescription;
-	
-	private MultipartFile image;
-	
-	private Set<UUID> categoryIds = new HashSet<UUID>();
-	
-	private Set<UUID> tagIds = new HashSet<UUID>();
-	
-	private Set<UUID> attributeIds = new HashSet<UUID>();
 
-	public String getProductName() {
-		return productName;
-	}
+    private String productName;
 
-	public void setProductName(String productName) {
-		this.productName = productName;
-	}
+    private String description;
 
-	public String getDescription() {
-		return description;
-	}
+    private String shortDescription;
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    private MultipartFile image;
 
-	public String getShortDescription() {
-		return shortDescription;
-	}
+    private Set<UUID> categoryIds = new HashSet<UUID>();
 
-	public void setShortDescription(String shortDescription) {
-		this.shortDescription = shortDescription;
-	}
+    private Set<UUID> tagIds = new HashSet<UUID>();
 
-	public MultipartFile getImage() {
-		return image;
-	}
+    private Set<UUID> attributeIds = new HashSet<UUID>();
 
-	public void setImage(MultipartFile image) {
-		this.image = image;
-	}
+    public String getProductName() {
+        return productName;
+    }
 
-	public Set<UUID> getCategoryIds() {
-		return categoryIds;
-	}
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
-	public void setCategoryIds(Set<UUID> categoryIds) {
-		this.categoryIds = categoryIds;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public Set<UUID> getTagIds() {
-		return tagIds;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setTagIds(Set<UUID> tagIds) {
-		this.tagIds = tagIds;
-	}
+    public String getShortDescription() {
+        return shortDescription;
+    }
 
-	public Set<UUID> getAttributeIds() {
-		return attributeIds;
-	}
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
 
-	public void setAttributeIds(Set<UUID> attributeIds) {
-		this.attributeIds = attributeIds;
-	}
-	
+    public MultipartFile getImage() {
+        return image;
+    }
+
+    public void setImage(MultipartFile image) {
+        this.image = image;
+    }
+
+    public Set<UUID> getCategoryIds() {
+        return categoryIds;
+    }
+
+    public void setCategoryIds(Set<UUID> categoryIds) {
+        this.categoryIds = categoryIds;
+    }
+
+    public Set<UUID> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(Set<UUID> tagIds) {
+        this.tagIds = tagIds;
+    }
+
+    public Set<UUID> getAttributeIds() {
+        return attributeIds;
+    }
+
+    public void setAttributeIds(Set<UUID> attributeIds) {
+        this.attributeIds = attributeIds;
+    }
+
 }

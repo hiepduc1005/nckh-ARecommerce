@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.springframework.data.annotation.CreatedDate;
 
 import com.ecommerce.entity.coupon.Coupon;
-import com.ecommerce.entity.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,7 +33,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UUID userId;
 
     @ManyToOne
     @JoinColumn(name = "order_coupon_id")
@@ -51,6 +50,9 @@ public class Order {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
     @Column(name = "order_approved_at")
     private LocalDateTime orderApprovedAt;
 
@@ -79,13 +81,8 @@ public class Order {
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+    @Column(name = "shipping_address", nullable = false)
+    private String shippingAddress;
 
     public LocalDateTime getOrderDeliveredUserDate() {
         return orderDeliveredUserDate;
@@ -197,6 +194,30 @@ public class Order {
 
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
+
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
 }
