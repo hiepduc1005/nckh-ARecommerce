@@ -8,14 +8,14 @@ import com.ecommerce.entity.order.Order;
 
 public interface CustomerService {
 
-    Customer getCustomerById(UUID customerId, UUID userId, String email); 
+    Customer getCustomerById(UUID customerId, UUID userId, String email);
 
     List<Customer> getAllCustomers();
 
-    List<Order> getCustomerOrders(UUID customerId, String email); 
+    List<Order> getCustomerOrders(UUID customerId, String email);
 
     void addLoyaltyPoints(UUID customerId, int points, String email);
 
-    void redeemLoyaltyPoints(UUID customerId, int points, String email); 
+    void redeemLoyaltyPoints(UUID customerId, int points, String email);
 
 }
