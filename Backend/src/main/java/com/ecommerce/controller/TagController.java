@@ -43,7 +43,6 @@ public class TagController {
     }
 
     // Cập nhật thẻ
-    // Cập nhật thẻ
     @PutMapping("/update/{tagId}")
     public ResponseEntity<TagResponse> updateTag(@PathVariable UUID tagId, @RequestBody TagUpdateRequest tagUpdateRequest) {
         // Tìm thẻ hiện có dựa trên tagId
@@ -52,11 +51,11 @@ public class TagController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Trả về 404 nếu không tìm thấy thẻ
         }
 
-        // Cập nhật thông tin thẻ bằng phương thức convert
-        Tag updatedTagEntity = tagConvert.tagUpdateConvert(tagUpdateRequest, existingTag);
+        // Lấy tên thẻ mới từ request
+        String newTagName = tagUpdateRequest.getTagName();
 
-        // Gọi service để cập nhật thẻ đã được chỉnh sửa
-        Tag updatedTag = tagService.updateTag(tagId, updatedTagEntity);
+        // Gọi service để cập nhật tên thẻ mới
+        Tag updatedTag = tagService.updateTag(tagId, newTagName);
 
         // Chuyển đổi đối tượng Tag thành TagResponse để trả về
         TagResponse response = tagConvert.tagConvertToTagResponse(updatedTag);
