@@ -1,22 +1,14 @@
 package com.ecommerce.vn.security;
 
 import java.io.IOException;
-import java.net.http.HttpRequest;
-import java.util.Arrays;
-
-import org.apache.tomcat.util.http.parser.HttpHeaderParser.HeaderParsePosition;
-import org.apache.tomcat.util.http.parser.HttpHeaderParser.HeaderParseStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.auth0.jwt.interfaces.Header;
-import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.service.user.UserService;
 
 import jakarta.servlet.FilterChain;
@@ -42,13 +34,13 @@ public class JwtFilterChain extends OncePerRequestFilter{
 		String token = getTokenByRequest(request);
 		if(token != null) {
 			String email = jwtGenerator.verifyToken(token).getSubject();
-			User user = userService.findUserByEmail(email);
+			UserDetails user = customUserDetailService.loadUserByUsername(email);
 			
 			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = 
 					new UsernamePasswordAuthenticationToken(
 							email,
 							null,
-							customUserDetailService.mapPrivilegesToAuthorities(user.getRoles())
+							user.getAuthorities()
 						);
 			
 			SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

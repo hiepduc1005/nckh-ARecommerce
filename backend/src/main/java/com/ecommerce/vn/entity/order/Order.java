@@ -54,12 +54,6 @@ public class Order {
 	@Column(name = "order_approved_at")
 	private LocalDateTime orderApprovedAt;
 	
-	@Column(name = "order_delivered_carrier_date")
-	private LocalDateTime orderDeliveredCarrierDate;
-	
-	@Column(name = "order_delivered_user_date")
-	private LocalDateTime orderDeliveredUserDate;
-	
 	//ADD more
 	@Column(name = "payment_method", nullable = false)
     private String paymentMethod;
@@ -85,14 +79,6 @@ public class Order {
 
 	public void setUser(User user) {
 		this.user = user;
-	}
-
-	public LocalDateTime getOrderDeliveredUserDate() {
-		return orderDeliveredUserDate;
-	}
-
-	public void setOrderDeliveredUserDate(LocalDateTime orderDeliveredUserDate) {
-		this.orderDeliveredUserDate = orderDeliveredUserDate;
 	}
 
 	public UUID getId() {
@@ -143,13 +129,6 @@ public class Order {
 		this.orderApprovedAt = orderApprovedAt;
 	}
 
-	public LocalDateTime getOrderDeliveredCarrierDate() {
-		return orderDeliveredCarrierDate;
-	}
-
-	public void setOrderDeliveredCarrierDate(LocalDateTime orderDeliveredCarrierDate) {
-		this.orderDeliveredCarrierDate = orderDeliveredCarrierDate;
-	}
 
     public String getPaymentMethod() {
         return paymentMethod;

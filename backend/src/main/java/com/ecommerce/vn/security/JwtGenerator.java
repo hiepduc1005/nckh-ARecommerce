@@ -50,4 +50,10 @@ public class JwtGenerator {
 			throw new RuntimeException("Invalid token", e);
 		}
 	}
+	
+	public String getUsernameByToken(String token) {
+		DecodedJWT decodedJWT = verifyToken(token);
+	    String email = decodedJWT.getSubject();
+	    return email;
+	}
 }

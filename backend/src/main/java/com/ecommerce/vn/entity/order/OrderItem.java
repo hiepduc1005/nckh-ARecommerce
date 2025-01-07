@@ -2,7 +2,6 @@ package com.ecommerce.vn.entity.order;
 
 import java.util.UUID;
 
-import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.product.Variant;
 
 import jakarta.persistence.Entity;
@@ -29,10 +28,6 @@ public class OrderItem {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "order_id")
 	private Order order;
-	
-	@ManyToOne
-	@JoinColumn(name = "product_coupon_id")
-	private Coupon coupon;
 	
 	private Integer quantity;
 	
@@ -62,13 +57,6 @@ public class OrderItem {
 		this.order = order;
 	}
 
-	public Coupon getCoupon() {
-		return coupon;
-	}
-
-	public void setCoupon(Coupon coupon) {
-		this.coupon = coupon;
-	}
 
 	public Integer getQuantity() {
 		return quantity;

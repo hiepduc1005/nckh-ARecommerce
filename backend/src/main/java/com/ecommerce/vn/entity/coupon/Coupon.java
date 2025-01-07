@@ -8,18 +8,14 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.ecommerce.vn.entity.product.DiscountType;
-import com.ecommerce.vn.entity.seller.Seller;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -48,7 +44,7 @@ public class Coupon {
 	private CouponType couponType;
 	
 	@Column(name = "minimum_order_amount")
-	private Integer minimumOrderAmount;
+	private Double minimumOrderAmount;
 	
 	@Column(name = "time_used")
 	private Integer timeUsed = 0;
@@ -76,9 +72,6 @@ public class Coupon {
 	@Column(name = "updated_by")
 	private UUID updatedBy;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false) // Thêm trường seller
-    private Seller seller;
 
 	public UUID getId() {
 		return id;
@@ -128,11 +121,11 @@ public class Coupon {
 		this.couponType = couponType;
 	}
 
-	public Integer getMinimumOrderAmount() {
+	public Double getMinimumOrderAmount() {
 		return minimumOrderAmount;
 	}
 
-	public void setMinimumOrderAmount(Integer minimumOrderAmount) {
+	public void setMinimumOrderAmount(Double minimumOrderAmount) {
 		this.minimumOrderAmount = minimumOrderAmount;
 	}
 
@@ -208,11 +201,4 @@ public class Coupon {
         this.couponDescription = couponDescription;
     }
 
-    public Seller getSeller() {
-        return seller;
-    }
-
-    public void setSeller(Seller seller) {
-        this.seller = seller;
-    }
 }

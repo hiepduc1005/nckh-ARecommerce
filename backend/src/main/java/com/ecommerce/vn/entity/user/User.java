@@ -1,15 +1,17 @@
 package com.ecommerce.vn.entity.user;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.ecommerce.vn.entity.cart.Cart;
+import com.ecommerce.vn.entity.notification.Notification;
+import com.ecommerce.vn.entity.order.Order;
+import com.ecommerce.vn.entity.rating.Rating;
 import com.ecommerce.vn.entity.role.Role;
 
 import jakarta.persistence.CascadeType;
@@ -52,6 +54,9 @@ public class User {
 
     @Column(name = "password_hash")
     private String password;
+    
+    @Column(name = "loyalty_points")
+    private Integer loyaltyPoint;
 
     private Boolean active;
 
@@ -65,7 +70,7 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updateAt;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -74,15 +79,55 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles = new HashSet<Role>();
+    private List<Role> roles = new ArrayList<Role>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserAddress> addresses;
+    private List<UserAddress> addresses = new ArrayList<UserAddress>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<UserAddress> addressResponses = new HashSet<>();
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<Order>();
 
-    //Getter and Setter
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Rating> ratings = new ArrayList<Rating>();
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Notification> notifications  = new ArrayList<Notification>();
+	
+	
+
+    public List<Notification> getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(List<Notification> notifications) {
+		this.notifications = notifications;
+	}
+
+	public List<Rating> getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(List<Rating> ratings) {
+		this.ratings = ratings;
+	}
+
+	public Integer getLoyaltyPoint() {
+		return loyaltyPoint;
+	}
+
+	public void setLoyaltyPoint(Integer loyaltyPoint) {
+		this.loyaltyPoint = loyaltyPoint;
+	}
+
+	public List<Order> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(List<Order> orders) {
+		this.orders = orders;
+	}
+
+	//Getter and Setter
     public LocalDateTime getDeletedAt() {
         return deletedAt;
     }
@@ -91,13 +136,6 @@ public class User {
         this.deletedAt = deletedAt;
     }
 
-    public Set<UserAddress> getAddressResponses() {
-        return addressResponses;
-    }
-
-    public void setAddressResponses(Set<UserAddress> addressResponses) {
-        this.addressResponses = addressResponses;
-    }
 
     public List<UserAddress> getAddresses() {
         return addresses;
@@ -107,11 +145,11 @@ public class User {
         this.addresses = addresses;
     }
 
-    public Set<Role> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
 

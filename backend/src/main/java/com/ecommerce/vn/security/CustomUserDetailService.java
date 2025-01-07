@@ -1,8 +1,8 @@
 package com.ecommerce.vn.security;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,8 +34,8 @@ public class CustomUserDetailService implements UserDetailsService{
 				);
 	}
 	
-	public Collection<? extends GrantedAuthority> mapPrivilegesToAuthorities(Set<Role> roles) {
-        Set<GrantedAuthority> authorities = new HashSet<>();
+	public Collection<? extends GrantedAuthority> mapPrivilegesToAuthorities(List<Role> roles) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
         for (Role role : roles) {
             for (Privilege privilege : role.getPrivileges()) {
                 authorities.add(new SimpleGrantedAuthority(privilege.toString()));

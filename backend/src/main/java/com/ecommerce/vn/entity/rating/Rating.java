@@ -7,9 +7,8 @@ import java.util.UUID;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import com.ecommerce.vn.entity.customer.Customer;
 import com.ecommerce.vn.entity.product.Product;
-import com.ecommerce.vn.entity.seller.Seller;
+import com.ecommerce.vn.entity.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,14 +31,10 @@ public class Rating {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id")
 	private Product product;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "seller_id")
-	private Seller seller;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id")
-	private Customer customer;
+	private User user;
 	
 	@Column(name = "rating_value",nullable = false)
 	private BigDecimal ratingValue;
@@ -74,23 +69,18 @@ public class Rating {
 		this.product = product;
 	}
 
-	public Seller getSeller() {
-		return seller;
+
+	
+
+
+
+	public User getUser() {
+		return user;
 	}
 
-	public void setSeller(Seller seller) {
-		this.seller = seller;
+	public void setUser(User user) {
+		this.user = user;
 	}
-
-	public Customer getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
-
-
 
 	public String getComment() {
 		return comment;

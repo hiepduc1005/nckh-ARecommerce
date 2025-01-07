@@ -5,8 +5,7 @@ import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 
-import com.ecommerce.vn.entity.customer.Customer;
-import com.ecommerce.vn.entity.seller.Seller;
+import com.ecommerce.vn.entity.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,13 +37,8 @@ public class Notification {
 
     // Thông báo đến Customer
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
-
-    // Thông báo đến Seller
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id")
-    private Seller seller;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public UUID getId() {
         return id;
@@ -78,20 +72,24 @@ public class Notification {
         this.createdAt = createdAt;
     }
 
-    public Customer getCustomer() {
-        return customer;
-    }
+	public boolean isRead() {
+		return isRead;
+	}
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
+	public void setRead(boolean isRead) {
+		this.isRead = isRead;
+	}
 
-    public Seller getSeller() {
-        return seller;
-    }
+	public User getUser() {
+		return user;
+	}
 
-    public void setSeller(Seller seller) {
-        this.seller = seller;
-    }
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	
+    
+
 }
 

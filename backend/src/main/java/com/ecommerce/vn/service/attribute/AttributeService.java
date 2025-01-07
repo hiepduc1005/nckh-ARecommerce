@@ -11,7 +11,7 @@ public interface AttributeService {
 
     Attribute createAttribute(Attribute attribute);
 
-    Attribute updateAttribute(UUID id, Attribute attributeDetails);
+    Attribute updateAttribute( Attribute attributeDetails);
 
     void deleteAttribute(UUID id);
 

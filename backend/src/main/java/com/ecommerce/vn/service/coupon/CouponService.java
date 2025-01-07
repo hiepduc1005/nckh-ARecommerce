@@ -1,6 +1,5 @@
 package com.ecommerce.vn.service.coupon;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,21 +16,14 @@ public interface CouponService {
     List<Coupon> getAllCoupons();
 
     Coupon getCouponById(UUID couponId);
-  
-    Coupon createCouponForSeller(UUID sellerId, Coupon coupon);
-    
+     
     List<Coupon> searchCoupons(String keyword);
 
-    List<Coupon> getCouponsBySellerId(UUID sellerId);
-
-    boolean isCouponValid(UUID couponId, BigDecimal cartTotal);
+    boolean isCouponValid(UUID couponId);
 
     void incrementUsageCount(UUID couponId);
     
-    Coupon validateAndRetrieveCouponByCode(String couponCode,BigDecimal totalPrice);
-    
-    Coupon validateAndRetrieveCouponById(UUID couponId,BigDecimal totalPrice);
+    Coupon getCouponByCode(String code);
 
-    BigDecimal getTotalPriceAfterDiscount(UUID couponId,BigDecimal totalPrice);
 
 }

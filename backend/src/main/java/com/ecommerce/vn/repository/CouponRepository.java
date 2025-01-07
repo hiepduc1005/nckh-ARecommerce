@@ -14,10 +14,13 @@ import com.ecommerce.vn.entity.coupon.Coupon;
 @Repository
 public interface CouponRepository extends JpaRepository<Coupon, UUID>{
 
-    @Query("SELECT c FROM Coupon c WHERE c.code LIKE %:keyword% OR c.couponDescription LIKE %:keyword%")
+    @Query("SELECT c FROM Coupon c WHERE c.code LIKE %:keyword%")
     List<Coupon> searchCoupons(@Param("keyword") String keyword);
 
     List<Coupon> findBySellerId(UUID sellerId);
     
+    @Query("SELECT c FROM Coupon c WHERE c.code = %:couponCode%")
     Optional<Coupon> findByCode(String couponCode);
+    
+    boolean existsByCode(String code);
 }

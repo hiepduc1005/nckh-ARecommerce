@@ -2,20 +2,15 @@ package com.ecommerce.vn.service.notification;
 
 import java.util.List;
 
-import com.ecommerce.vn.entity.customer.Customer;
 import com.ecommerce.vn.entity.notification.Notification;
-import com.ecommerce.vn.entity.seller.Seller;
+import com.ecommerce.vn.entity.user.User;
 
 public interface NotificationService {
     
-    void notifyCustomer(Customer customer, String message);
-
-    void notifySeller(Seller seller, String message);
+    void notifyUser(User customer, String message);
 
     void notifyAllUsers(String message);
 
-    List<Notification> getCustomerNotifications(Customer customer);
-
-    List<Notification> getSellerNotifications(Seller seller);
+    List<Notification> getCustomerNotifications(User customer);
 
 }

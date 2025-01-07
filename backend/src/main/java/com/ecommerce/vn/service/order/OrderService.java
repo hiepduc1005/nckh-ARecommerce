@@ -10,7 +10,7 @@ import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
 
 public interface OrderService {
-    Order createOrder(Order order,String couponCode);
+    Order createOrder(Order order);
 
     Order getOrderById(UUID orderId);
 
@@ -24,7 +24,7 @@ public interface OrderService {
 
     Order addCouponToOrder(UUID orderId, Coupon coupon);
 
-    BigDecimal calculateTotalPriceWithCoupon(UUID orderId,UUID couponId);
+    BigDecimal calculateTotalPriceWithCoupon(Order order,Coupon coupon);
 
     Order addNotes(UUID orderId, String notes);
     
@@ -47,5 +47,7 @@ public interface OrderService {
     Order updateTotalPriceWithCoupon(Order order,Coupon coupon);
     
     Boolean isOrderEmpty(Order order);
+    
+    Order applyCouponToOrder(String couponCode,Order order);
 
 }

@@ -1,5 +1,5 @@
 package com.ecommerce.vn.entity.product;
 
 public enum DiscountType {
-	PERCENTAGE,FIXED_AMOUNT,FREE_SHIPPING
+	PERCENTAGE,FIXED_AMOUNT,FREE_SHIPPING,ORDER_VALUE_BASED,
 }

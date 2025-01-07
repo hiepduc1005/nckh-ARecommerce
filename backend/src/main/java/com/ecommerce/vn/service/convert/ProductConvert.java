@@ -50,7 +50,6 @@ public class ProductConvert {
         product.setProductName(productCreateRequest.getProductName());
         product.setDescription(productCreateRequest.getDescription());
         product.setShortDescription(productCreateRequest.getShortDescription());
-        product.setImage(productCreateRequest.getImage());
         product.setCategories(categories);
         product.setTags(tags);
         product.setAttributes(attributes);
