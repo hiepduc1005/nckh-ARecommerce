@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.ecommerce.vn.entity.role.Privilege;
 import com.ecommerce.vn.entity.role.Role;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.service.user.UserService;
@@ -37,9 +36,7 @@ public class CustomUserDetailService implements UserDetailsService{
 	public Collection<? extends GrantedAuthority> mapPrivilegesToAuthorities(List<Role> roles) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         for (Role role : roles) {
-            for (Privilege privilege : role.getPrivileges()) {
-                authorities.add(new SimpleGrantedAuthority(privilege.toString()));
-            }
+            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
         }
         return authorities;
 	}
