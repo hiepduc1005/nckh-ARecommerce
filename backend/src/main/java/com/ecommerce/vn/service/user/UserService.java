@@ -1,5 +1,6 @@
 package com.ecommerce.vn.service.user;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.ecommerce.vn.entity.user.User;
@@ -16,10 +17,18 @@ public interface UserService {
 	
 	void deleteUser(UUID userId);
 	
-	User registerUser(String email,String password);
+	User registerUser(String email,String password,String firstName, String lastName);
 	
 	User loginUser(String email,String passowrd);
 	
 	boolean existByEmail(String email);
+	
+	User activeUser(User user);
+	
+	User deactiveUser(User user);
+	
+	List<User> getUnactiveUser();
+	
+	List<User> getActiveUser();
 
 }

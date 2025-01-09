@@ -57,8 +57,9 @@ public class User {
     
     @Column(name = "loyalty_points")
     private Integer loyaltyPoint;
-
-    private Boolean active;
+    
+    @Column(name = "active", nullable = false)
+    private Boolean active = false;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

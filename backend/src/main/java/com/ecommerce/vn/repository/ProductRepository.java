@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ecommerce.vn.dto.product.ProductWithScore;
 import com.ecommerce.vn.entity.product.Product;
+import com.ecommerce.vn.entity.product.Tag;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID>{
@@ -55,5 +56,14 @@ public interface ProductRepository extends JpaRepository<Product, UUID>{
             nativeQuery = true)
     List<ProductWithScore> findRelatedProducts(@Param("productId") UUID productId);
 
+    @Query("SELECT p FROM Product p JOIN p.tags t WHERE t = :tag")
+    List<Product> findByTag(@Param("tag") Tag tag);
+    
+    @Query("SELECT p FROM Product p JOIN p.tags t WHERE t.tagName = :tagName")
+    List<Product> findByTagName(@Param("tagName") String tagName);
+
+
+    @Query("SELECT p FROM Product p JOIN p.categories t WHERE t.categoryName = :categoryName")
+    List<Product> findByCategoryName(@Param("categoryName") String categoryName);
 
 }
