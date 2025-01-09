@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.ecommerce.vn.dto.product.ProductWithScore;
 import com.ecommerce.vn.entity.product.Product;
 
 @Repository
@@ -28,6 +29,31 @@ public interface ProductRepository extends JpaRepository<Product, UUID>{
 
     @Query("SELECT p FROM Product p WHERE p.active = false")
     List<Product> findProductsUnactive();
+    
+    @Query("SELECT p FROM Product p WHERE p.active = true")
+    List<Product> findProductsActive();
+    
+    @Query(value = "SELECT p.id AS id, " +
+            "       p.active AS active, " +
+            "       p.product_name AS productName, " +
+            "       p.description AS description, " +
+            "       p.image_path AS imagePath, " +
+            "       p.short_description AS shortDescription, " +
+            "       p.sold_quantity AS soldQuantity, " +
+            "       (COUNT(DISTINCT c.id) + COUNT(DISTINCT t.id)) * 0.7 + p.sold_quantity * 0.3 AS score, " +
+            "       p.created_at AS createdAt, " +
+            "       p.update_at AS updateAt, " +
+            "       p.created_by AS createdBy, " +
+            "       p.updated_by AS updatedBy " +
+            "FROM product p " +
+            "LEFT JOIN products_categories c ON c.product_id = p.id " +
+            "LEFT JOIN products_tags t ON t.product_id = p.id " +
+            "WHERE p.id != :productId " +
+            "GROUP BY p.id " +
+            "ORDER BY score DESC " +
+            "LIMIT 10;",
+            nativeQuery = true)
+    List<ProductWithScore> findRelatedProducts(@Param("productId") UUID productId);
 
-    Product findByProductId(UUID tagId);
+
 }

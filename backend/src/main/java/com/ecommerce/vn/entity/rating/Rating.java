@@ -1,17 +1,18 @@
 package com.ecommerce.vn.entity.rating;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +23,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "ratings")
+@EntityListeners(AuditingEntityListener.class)
 public class Rating {
 	
 	@Id
@@ -37,7 +39,7 @@ public class Rating {
 	private User user;
 	
 	@Column(name = "rating_value",nullable = false)
-	private BigDecimal ratingValue;
+	private Double ratingValue;
 	
 	@Column(name = "comment", columnDefinition = "TEXT") 
     private String comment;
@@ -100,11 +102,11 @@ public class Rating {
 
    
 
-    public BigDecimal getRatingValue() {
+    public Double getRatingValue() {
 		return ratingValue;
 	}
 
-	public void setRatingValue(BigDecimal ratingValue) {
+	public void setRatingValue(Double ratingValue) {
 		this.ratingValue = ratingValue;
 	}
 

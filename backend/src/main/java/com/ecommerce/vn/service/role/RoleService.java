@@ -9,7 +9,7 @@ public interface RoleService {
 
     Role createRole(Role role);
 
-    Role updateRole(UUID id, Role roleDetails);
+    Role updateRole(Role roleDetails);
 
     void deleteRole(UUID id);
 
@@ -18,12 +18,12 @@ public interface RoleService {
     List<Role> getAllRoles();
     
     Role createCustomerRole();
-    
-    Role createSellerRole();
-    
+        
     Role createModeratorRole();
     
     Role createSupportRole();
     
     Role createAdminRole();
+    
+    Role getRoleByName();
 }

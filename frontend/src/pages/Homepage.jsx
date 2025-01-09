@@ -21,7 +21,7 @@ const Homepage = () => {
         <ListCategories></ListCategories>
       </div>
 
-      <div className='list-brands'>
+      <div className='list-brands-container'>
         <ListBrand></ListBrand>
       </div>
 

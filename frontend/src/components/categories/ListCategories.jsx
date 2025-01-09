@@ -10,68 +10,131 @@ const ListCategories = () => {
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
         <div className="category-item">
           <div className="category-image">
             <img src={categoriesImage}></img>
           </div>
-          <div className="category-name">Thời trang nam</div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
         </div>
+        <div className="category-item">
+          <div className="category-image">
+            <img src={categoriesImage}></img>
+          </div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
+        </div>
+        <div className="category-item">
+          <div className="category-image">
+            <img src={categoriesImage}></img>
+          </div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
+        </div>
+        <div className="category-item">
+          <div className="category-image">
+            <img src={categoriesImage}></img>
+          </div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
+        </div>
+        <div className="category-item">
+          <div className="category-image">
+            <img src={categoriesImage}></img>
+          </div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
+        </div>
+        <div className="category-item">
+          <div className="category-image">
+            <img src={categoriesImage}></img>
+          </div>
+          <div className="category-name">
+            <span>Thời trang nam</span>
+          </div>
+        </div>
+      
       </div>
     </div>
   )

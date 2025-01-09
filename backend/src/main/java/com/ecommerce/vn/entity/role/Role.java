@@ -1,8 +1,6 @@
 package com.ecommerce.vn.entity.role;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -10,11 +8,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,13 +24,8 @@ public class Role {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 	
-	@Column(name = "role_name",nullable = false)
+	@Column(name = "role_name",nullable = false, unique = true)
 	private String roleName;
-	
-	@ElementCollection
-	@Enumerated(EnumType.STRING)
-	@Column(name = "privilege")
-	private Set<Privilege> privileges = new HashSet<Privilege>();
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
@@ -70,13 +60,6 @@ public class Role {
 		this.roleName = roleName;
 	}
 
-	public Set<Privilege> getPrivileges() {
-		return privileges;
-	}
-
-	public void setPrivileges(Set<Privilege> privileges) {
-		this.privileges = privileges;
-	}
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
@@ -94,9 +77,6 @@ public class Role {
 		this.updateAt = updateAt;
 	}
 	
-	public void addPrivilege(Privilege privilege) {
-		this.privileges.add(privilege);
-	}
-	
+
 	
 }

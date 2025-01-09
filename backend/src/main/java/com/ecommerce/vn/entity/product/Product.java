@@ -88,7 +88,6 @@ public class Product {
 			joinColumns = @JoinColumn(name = "product_id"),
 			inverseJoinColumns = @JoinColumn(name = "attribute_id")
 	)
-
 	private Set<Attribute> attributes = new HashSet<Attribute>();
 	
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)

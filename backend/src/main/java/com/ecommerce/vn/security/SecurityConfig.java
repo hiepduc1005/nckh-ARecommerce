@@ -3,6 +3,7 @@ package com.ecommerce.vn.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -20,6 +21,7 @@ import io.micrometer.common.lang.NonNull;
 
 @Configuration
 @EnableWebSecurity
+@EnableJpaAuditing
 public class SecurityConfig {
 	
 	@Autowired

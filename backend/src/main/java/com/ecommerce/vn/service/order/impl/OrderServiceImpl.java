@@ -34,6 +34,11 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Order createOrder(Order order) {
+		
+		if(isOrderEmpty(order)) {
+			throw new RuntimeException("Order is empty!");
+		}
+		
 		BigDecimal totalPrice = calculateTotalPrice(order);
 		order.setTotalPrice(totalPrice);
 		return orderRepository.save(order);
@@ -208,8 +213,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Boolean isOrderEmpty(Order order) {
-		// TODO Auto-generated method stub
-		return null;
+		return order.getOrderItems().isEmpty();
 	}
 
 

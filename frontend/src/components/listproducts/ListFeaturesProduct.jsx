@@ -70,6 +70,36 @@ const ListFeaturesProduct = () => {
               <div className="product-selled">Đã bán 12</div>
             </div>
          </div>
+         <div className="product-feature-item">
+            <div className="product-image">
+              <img src={productTest}></img>
+            </div>
+            <div className="productname">Giày Thể Thao Nam Dệt Thoi Thời Trang Giày Chạy Bộ Thường Ngày Chịu Mài Mòn</div>
+            <div className="others">
+              <div className="product-price">75,421</div>
+              <div className="product-selled">Đã bán 12</div>
+            </div>
+         </div>
+         <div className="product-feature-item">
+            <div className="product-image">
+              <img src={productTest}></img>
+            </div>
+            <div className="productname">Giày Thể Thao Nam Dệt Thoi Thời Trang Giày Chạy Bộ Thường Ngày Chịu Mài Mòn</div>
+            <div className="others">
+              <div className="product-price">75,421</div>
+              <div className="product-selled">Đã bán 12</div>
+            </div>
+         </div>
+         <div className="product-feature-item">
+            <div className="product-image">
+              <img src={productTest}></img>
+            </div>
+            <div className="productname">Giày Thể Thao Nam Dệt Thoi Thời Trang Giày Chạy Bộ Thường Ngày Chịu Mài Mòn</div>
+            <div className="others">
+              <div className="product-price">75,421</div>
+              <div className="product-selled">Đã bán 12</div>
+            </div>
+         </div>
       </div>
       <div className='arrow-left'>
         <img src={arrowLeftIcon}></img>

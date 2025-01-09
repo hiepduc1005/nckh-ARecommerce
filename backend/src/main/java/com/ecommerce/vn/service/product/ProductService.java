@@ -7,13 +7,14 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ecommerce.vn.dto.product.ProductWithScore;
 import com.ecommerce.vn.entity.product.Product;
 
 public interface ProductService {
 
     Product createProduct(Product product);
 
-    Product updateProduct(UUID productId, Product productUpdate);
+    Product updateProduct(Product productUpdate);
 
     Product findProductByUuid(UUID productId);
 
@@ -56,5 +57,5 @@ public interface ProductService {
     // void removeFromWishlist(UUID userId, UUID productId);
 
     // Sản phẩm liên quan
-     List<Product> getRelatedProducts(UUID productId);
+     List<ProductWithScore> getRelatedProducts(UUID productId);
 }
