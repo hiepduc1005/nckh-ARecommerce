@@ -29,7 +29,8 @@ public class Tag {
 	@Column(name = "tag_name")
 	private String tagName;
 	
-	private Boolean active;
+	@Column(name = "active", nullable = false)
+	private Boolean active = true;
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)

@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.dto.product.ProductWithScore;
 import com.ecommerce.vn.entity.product.Product;
+import com.ecommerce.vn.entity.product.Tag;
 
 public interface ProductService {
 
@@ -41,6 +42,8 @@ public interface ProductService {
     Product deactiveProduct(UUID productId);
     
     List<Product> getAllProducts();
+    
+    List<Product> getProductByTag(Tag tag);
     
 //    San pham noi bat
     List<Product> getFeatureProduct();
