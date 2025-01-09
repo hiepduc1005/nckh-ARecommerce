@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +20,13 @@ import com.ecommerce.vn.service.user.UserService;
 @Transactional
 public class RatingServiceImpl implements RatingService {
 	
+	@Autowired
 	private RatingRepository ratingRepository;
 	
+	@Autowired
 	private ProductService productService;
 	
+	@Autowired
 	private UserService userService;
 
 	@Override

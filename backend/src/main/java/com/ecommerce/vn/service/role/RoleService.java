@@ -25,5 +25,5 @@ public interface RoleService {
     
     Role createAdminRole();
     
-    Role getRoleByName();
+    Role getRoleByName(String roleName);
 }

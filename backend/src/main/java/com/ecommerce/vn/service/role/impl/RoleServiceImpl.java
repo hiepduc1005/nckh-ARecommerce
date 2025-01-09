@@ -1,14 +1,12 @@
 package com.ecommerce.vn.service.role.impl;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ecommerce.vn.entity.role.Privilege;
 import com.ecommerce.vn.entity.role.Role;
 import com.ecommerce.vn.repository.RoleRepository;
 import com.ecommerce.vn.service.role.RoleService;
@@ -17,7 +15,14 @@ import com.ecommerce.vn.service.role.RoleService;
 @Transactional
 public class RoleServiceImpl implements RoleService {
 	
+	@Autowired
 	private RoleRepository roleRepository;
+	
+	private static final String ADMIN_ROLE= "ADMIN";
+	private static final String MODERATOR_ROLE= "MODERATOR";
+	private static final String SUPPORT_ROLE= "SUPPORT";
+	private static final String USER_ROLE= "USER";
+
 
 	@Override
 	public Role createRole(Role role) {
@@ -36,50 +41,58 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public void deleteRole(UUID id) {
-		// TODO Auto-generated method stub
-		
+		Role role = getRoleById(id);
+		roleRepository.delete(role);
 	}
 
 	@Override
 	public Role getRoleById(UUID id) {
-		// TODO Auto-generated method stub
-		return null;
+		if(id == null) {
+			throw new RuntimeException("Role id missing");
+		}
+		return roleRepository.findById(id).orElseThrow(() -> 
+				new RuntimeException("Cant not found role with id:" + id));
 	}
 
 	@Override
 	public List<Role> getAllRoles() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return roleRepository.findAll();
 	}
 
 	@Override
 	public Role createCustomerRole() {
-		// TODO Auto-generated method stub
-		return null;
+		Role role = new Role();
+		role.setRoleName(USER_ROLE);
+		return createRole(role);
 	}
 
 	@Override
 	public Role createModeratorRole() {
-		// TODO Auto-generated method stub
-		return null;
+		Role role = new Role();
+		role.setRoleName(MODERATOR_ROLE);
+		return createRole(role);
 	}
 
 	@Override
 	public Role createSupportRole() {
-		// TODO Auto-generated method stub
-		return null;
+		Role role = new Role();
+		role.setRoleName(SUPPORT_ROLE);
+		return createRole(role);
 	}
 
 	@Override
 	public Role createAdminRole() {
-		// TODO Auto-generated method stub
-		return null;
+		Role role = new Role();
+		role.setRoleName(ADMIN_ROLE);
+		return createRole(role);
 	}
 
 	@Override
-	public Role getRoleByName() {
+	public Role getRoleByName(String roleName) {
 		// TODO Auto-generated method stub
-		return null;
+		return roleRepository.findByName(roleName).orElseThrow(() -> 
+				new RuntimeException("Cant n0t found role with name: " + roleName));
 	}
 }
 
