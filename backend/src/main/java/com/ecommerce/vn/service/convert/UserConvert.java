@@ -9,16 +9,21 @@ import org.springframework.stereotype.Service;
 import com.ecommerce.vn.dto.user.UserAddressResponse;
 import com.ecommerce.vn.dto.user.UserCreateRequest;
 import com.ecommerce.vn.dto.user.UserResponse;
+import com.ecommerce.vn.dto.user.UserUpdateRequest;
 import com.ecommerce.vn.entity.user.User;
+import com.ecommerce.vn.service.user.UserService;
 
 @Service 
 public class UserConvert {
     @Autowired
     private UserAdressConvert userAdressConvert;
+    
+    @Autowired
+    private UserService userService;
 
     @SuppressWarnings("null")
     public User userCreateRequestConvert(UserCreateRequest userCreateRequest){
-        if(userCreateRequest != null){
+        if(userCreateRequest == null){
             return null;
         }
 
@@ -28,6 +33,19 @@ public class UserConvert {
         user.setEmail(userCreateRequest.getEmail());
         user.setPassword(userCreateRequest.getPassword());  
 
+        return user;
+    }
+    
+    public User userUpdateRequestConvert(UserUpdateRequest userUpdateRequest){
+        if(userUpdateRequest == null){
+            return null;
+        }
+
+        User user = userService.findUserByUuId((userUpdateRequest.getId()));
+        user.setFirstName(userUpdateRequest.getFirstname());
+        user.setFirstName(userUpdateRequest.getLastname());
+        user.setEmail(userUpdateRequest.getEmail());
+        user.setUserName(userUpdateRequest.getUsername());
         return user;
     }
 
@@ -46,8 +64,11 @@ public class UserConvert {
         user.getId(),
         user.getFirstName(),
         user.getLastName(),
+        user.getUserName(),
         user.getEmail(),
         user.getPhoneNumber(),
+        user.getActive(),
+        user.getLoyaltyPoint(),
         addressResponses,
         user.getCreatedAt(),
         user.getDeletedAt()

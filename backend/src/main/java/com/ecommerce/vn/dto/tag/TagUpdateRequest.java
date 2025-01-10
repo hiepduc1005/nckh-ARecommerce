@@ -1,10 +1,24 @@
 package com.ecommerce.vn.dto.tag;
 
+import java.util.UUID;
+
 public class TagUpdateRequest {
+	
+	private UUID id;
 	
 	private String tagName;
 	
 	private Boolean active;
+	
+	
+
+	public UUID getId() {
+		return id;
+	}
+
+	public void setId(UUID id) {
+		this.id = id;
+	}
 
 	public String getTagName() {
 		return tagName;

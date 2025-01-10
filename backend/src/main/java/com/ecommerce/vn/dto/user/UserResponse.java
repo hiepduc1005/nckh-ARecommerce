@@ -13,9 +13,15 @@ public class UserResponse {
 	
 	private String lastname;
 	
+	private String userName;
+	
 	private String email;
 	
 	private String phoneNumber;
+	
+	private boolean active;
+	
+	private Integer loyaltyPoint;
 	
 	private Set<UserAddressResponse> addressResponses = new HashSet<UserAddressResponse>();
 	
@@ -36,6 +42,67 @@ public class UserResponse {
 		this.createdAt = createdAt;
 		this.deletedAt = deletedAt;
 	}
+	
+	
+
+	public UserResponse() {
+	}
+
+
+
+	public UserResponse(UUID id, String firstname, String lastname, String userName, String email, String phoneNumber,
+			boolean active, Integer loyaltyPoint, Set<UserAddressResponse> addressResponses, LocalDateTime createdAt,
+			LocalDateTime deletedAt) {
+		this.id = id;
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.userName = userName;
+		this.email = email;
+		this.phoneNumber = phoneNumber;
+		this.active = active;
+		this.loyaltyPoint = loyaltyPoint;
+		this.addressResponses = addressResponses;
+		this.createdAt = createdAt;
+		this.deletedAt = deletedAt;
+	}
+
+
+
+	public String getUserName() {
+		return userName;
+	}
+
+
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+
+
+	public boolean isActive() {
+		return active;
+	}
+
+
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+
+
+	public Integer getLoyaltyPoint() {
+		return loyaltyPoint;
+	}
+
+
+
+	public void setLoyaltyPoint(Integer loyaltyPoint) {
+		this.loyaltyPoint = loyaltyPoint;
+	}
+
+
 
 	public UUID getId() {
 		return id;

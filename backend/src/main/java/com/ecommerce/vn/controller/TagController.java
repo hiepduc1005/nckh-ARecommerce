@@ -1,10 +1,8 @@
 package com.ecommerce.vn.controller;
 
-import com.ecommerce.vn.dto.product.ProductResponse;
 import com.ecommerce.vn.dto.tag.TagCreateRequest;
 import com.ecommerce.vn.dto.tag.TagResponse;
 import com.ecommerce.vn.dto.tag.TagUpdateRequest;
-import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Tag;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.service.convert.TagConvert;
@@ -19,14 +17,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.ecommerce.vn.service.convert.ProductConvert;
 
 @RestController
-@RequestMapping("/tags")
+@RequestMapping("api/v1/tags")
 public class TagController {
 
-    @Autowired
-    private ProductConvert productConvert;
 
     @Autowired
     private TagService tagService;
@@ -90,17 +85,6 @@ public class TagController {
         return ResponseEntity.noContent().build();
     }
 
-    //Tìm sản phẩm theo thẻ
-    @GetMapping("/products/{tagId}")
-    public ResponseEntity<List<ProductResponse>> getProductsByTag(@PathVariable UUID tagId) {
-        List<Product> products = tagService.getProductsByTag(tagId); // Phương thức trả về List<Product>
-
-        List<ProductResponse> productResponses = products.stream()
-                .map(productConvert::productConvertToProductResponse)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(productResponses);
-    }
 
     // Kiểm tra thẻ đã tồn tại hay chưa
     @GetMapping("/exists")

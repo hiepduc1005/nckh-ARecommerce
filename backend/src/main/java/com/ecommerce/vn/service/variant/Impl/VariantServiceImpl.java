@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Variant;
-import com.ecommerce.vn.repository.ProductRepository;
 import com.ecommerce.vn.repository.VariantRepository;
 import com.ecommerce.vn.service.product.ProductService;
 import com.ecommerce.vn.service.variant.VariantService;

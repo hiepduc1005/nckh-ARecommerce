@@ -1,5 +1,6 @@
 package com.ecommerce.vn.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.vn.dto.user.UserCreateRequest;
 import com.ecommerce.vn.dto.user.UserResponse;
+import com.ecommerce.vn.dto.user.UserUpdateRequest;
 import com.ecommerce.vn.entity.user.User;
-import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.service.convert.UserConvert;
 import com.ecommerce.vn.service.user.UserService;
 
@@ -50,6 +51,28 @@ public class UserController {
 		UserResponse response = userConvert.userConvertToUserResponse(user); 
 		return ResponseEntity.ok(response); 
 	}
+	
+	@GetMapping("/active")
+	public ResponseEntity<List<UserResponse>> getActiveUser() {
+		List<User> users = userService.getActiveUser();
+		if (users.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); 
+		}
+		
+		List<UserResponse> userResponses = users.stream().map((user) -> userConvert.userConvertToUserResponse(user)).toList();
+		return ResponseEntity.ok(userResponses); 
+	}
+	
+	@GetMapping("/unactive")
+	public ResponseEntity<List<UserResponse>> getUnactiveUser() {
+		List<User> users = userService.getUnactiveUser();
+		if (users.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); 
+		}
+		
+		List<UserResponse> userResponses = users.stream().map((user) -> userConvert.userConvertToUserResponse(user)).toList();
+		return ResponseEntity.ok(userResponses); 
+	}
 
 	@GetMapping("{userEmail}")
 	public ResponseEntity<UserResponse> findUserByEmail(@PathVariable("userEmail") String email){
@@ -63,8 +86,8 @@ public class UserController {
 	}
 
 	@PutMapping
-	public ResponseEntity<UserResponse> updateUser(@PathVariable UUID userId, @RequestBody UserCreateRequest request){
-		User userToUpdate = userConvert.userCreateRequestConvert(request); 
+	public ResponseEntity<UserResponse> updateUser(UserUpdateRequest request){
+		User userToUpdate = userConvert.userUpdateRequestConvert(request); 
 		User updatedUser = userService.updateUser(userToUpdate);
 		UserResponse response = userConvert.userConvertToUserResponse(updatedUser); 
 		
@@ -72,16 +95,18 @@ public class UserController {
 	}
 	
 
-	@DeleteMapping
-	public ResponseEntity<String> deleteUser(@PathVariable UUID userId){
+	@DeleteMapping("/{userId}")
+	public ResponseEntity<String> deleteUser(@PathVariable("userId") UUID userId){
 		try {
             userService.deleteUser(userId);
             return ResponseEntity.ok("User deleted successfully.");
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the user.");
         }
 	}
+	
+	
 
 }
