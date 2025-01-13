@@ -1,11 +1,13 @@
 package com.ecommerce.vn.dto.category;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class CategoryCreateRequest {
 	private String categoryName;
 	
 	private String categoryDescription;
 	
-	private String imagePath;
+	private MultipartFile file;
 
 	public String getCategoryName() {
 		return categoryName;
@@ -23,13 +25,14 @@ public class CategoryCreateRequest {
 		this.categoryDescription = categoryDescription;
 	}
 
-	public String getImagePath() {
-		return imagePath;
+	public MultipartFile getFile() {
+		return file;
 	}
 
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
+	public void setFile(MultipartFile file) {
+		this.file = file;
 	}
+
 	
 	
 }

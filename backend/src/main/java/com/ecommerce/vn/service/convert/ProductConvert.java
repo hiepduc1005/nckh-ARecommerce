@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.dto.product.ProductCreateRequest;
 import com.ecommerce.vn.dto.product.ProductResponse;
+import com.ecommerce.vn.dto.product.ProductUpdateRequest;
 import com.ecommerce.vn.dto.tag.TagResponse;
 import com.ecommerce.vn.entity.product.Category;
 import com.ecommerce.vn.entity.product.Product;
@@ -50,6 +51,31 @@ public class ProductConvert {
         product.setProductName(productCreateRequest.getProductName());
         product.setDescription(productCreateRequest.getDescription());
         product.setShortDescription(productCreateRequest.getShortDescription());
+        product.setCategories(categories);
+        product.setTags(tags);
+        product.setAttributes(attributes);
+            
+        return product;
+    }
+    
+    public Product productUpdateRequestConver(ProductUpdateRequest productUpdateRequest){
+
+        if (productUpdateRequest == null) {
+            return null;
+        }
+
+        Set<Category> categories = categoryRepository.findAllById(productUpdateRequest.getCategoryIds())
+        .stream().collect(Collectors.toSet());
+        Set<Tag> tags = tagRepository.findAllById(productUpdateRequest.getTagIds())
+        .stream().collect(Collectors.toSet());
+        Set<Attribute> attributes = attributeRepository.findAllById(productUpdateRequest.getAttributeIds())
+        .stream().collect(Collectors.toSet());
+
+        Product product = new Product();
+        product.setId(productUpdateRequest.getId());     
+        product.setProductName(productUpdateRequest.getProductName());
+        product.setDescription(productUpdateRequest.getDescription());
+        product.setShortDescription(productUpdateRequest.getShortDescription());
         product.setCategories(categories);
         product.setTags(tags);
         product.setAttributes(attributes);

@@ -1,14 +1,30 @@
 package com.ecommerce.vn.dto.category;
 
+import java.util.UUID;
+
+import org.springframework.web.multipart.MultipartFile;
+
 public class CategoryUpdateRequest {
+	
+	private UUID id;
 	
 	private String categoryName;
 	
 	private String categoryDescription;
 	
-	private String imagePath;
+	private MultipartFile image;
 	
 	private Boolean active;
+	
+	
+
+	public UUID getId() {
+		return id;
+	}
+
+	public void setId(UUID id) {
+		this.id = id;
+	}
 
 	public String getCategoryName() {
 		return categoryName;
@@ -26,12 +42,13 @@ public class CategoryUpdateRequest {
 		this.categoryDescription = categoryDescription;
 	}
 
-	public String getImagePath() {
-		return imagePath;
+
+	public MultipartFile getImage() {
+		return image;
 	}
 
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
+	public void setImage(MultipartFile image) {
+		this.image = image;
 	}
 
 	public Boolean getActive() {

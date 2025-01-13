@@ -17,6 +17,9 @@ public interface CategoryService {
 	
 	List<Category> searchCategory(String keyword);
 	
+	List<Category> getAllCategories();
+
+	
 	Category getCategoryByname(String categoryName);
 	
 	Category activeCategory(UUID categoryId);

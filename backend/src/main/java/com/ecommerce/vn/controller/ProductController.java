@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.vn.dto.product.ProductCreateRequest;
 import com.ecommerce.vn.dto.product.ProductResponse;
+import com.ecommerce.vn.dto.product.ProductUpdateRequest;
+import com.ecommerce.vn.dto.product.ProductWithScore;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.service.convert.ProductConvert;
@@ -29,7 +31,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 public class ProductController {
     
     @Autowired
@@ -39,7 +41,7 @@ public class ProductController {
     private ProductService productService;
 
     //Tạo sản phẩm
-    @PostMapping("/Products")
+    @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductCreateRequest request) {
         Product product = productConvert.productCreateRequestConver(request);
 
@@ -62,20 +64,12 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
     }
 
-    //Find productByName
-    // @PostMapping("")
-    // public String postMethodName(@RequestBody String entity) {
-    //     //TODO: process POST request
-        
-    //     return entity;
-    // }
-
     //Update sản phẩm
     @PutMapping
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable UUID productId, @RequestBody ProductCreateRequest request) {
-        Product productToUpdate = productConvert.productCreateRequestConver(request);
+    public ResponseEntity<ProductResponse> updateProduct( @RequestBody ProductUpdateRequest productUpdateRequest) {
+        Product productToUpdate = productConvert.productUpdateRequestConver(productUpdateRequest);
 
-        Product updateProduct = productService.updateProduct(productId, productToUpdate);
+        Product updateProduct = productService.updateProduct(productToUpdate);
         ProductResponse response = productConvert.productConvertToProductResponse(updateProduct);
 
         return ResponseEntity.ok(response);
@@ -85,7 +79,7 @@ public class ProductController {
     @DeleteMapping
 	public ResponseEntity<String> deleteProduct(@PathVariable UUID productId){
 		try {
-            productService.deleteProduct(productId);;
+            productService.deleteProduct(productId);
             return ResponseEntity.ok("Product deleted successfully.");
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
@@ -97,20 +91,32 @@ public class ProductController {
 
     // Tìm kiếm sản phẩm theo từ khóa
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> searchProducts(@RequestParam("keyword") String keyword) {
+    public ResponseEntity<List<ProductResponse>> searchProducts(@RequestParam("keyword") String keyword) {
         List<Product> products = productService.searchProducts(keyword);
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        
+        List<ProductResponse> productResponses = products.stream()
+        		.map((product) -> 
+        			productConvert.productConvertToProductResponse(product)
+        			).toList();
+        
+        return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
     // Lọc sản phẩm theo danh mục, giá, và từ khóa
     @GetMapping("/filter")
-    public ResponseEntity<List<Product>> filterProducts(
+    public ResponseEntity<List<ProductResponse>> filterProducts(
             @RequestParam(value = "category", required = false) UUID category,
             @RequestParam(value = "minPrice", required = false) BigDecimal minPrice,
             @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice,
             @RequestParam(value = "keyword", required = false) String keyword) {
         List<Product> products = productService.filterProducts(category, minPrice, maxPrice, keyword);
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        
+        List<ProductResponse> productResponses = products.stream()
+        		.map((product) -> 
+        			productConvert.productConvertToProductResponse(product)
+        			).toList();
+        
+        return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
     // Phân trang và sắp xếp sản phẩm
@@ -125,30 +131,58 @@ public class ProductController {
 
     // Lấy danh sách sản phẩm theo người bán 
     @GetMapping("/seller/{sellerId}")
-    public ResponseEntity<List<Product>> getProductBySeller(@PathVariable("sellerId") UUID sellerId) {
+    public ResponseEntity<List<ProductResponse>> getProductBySeller(@PathVariable("sellerId") UUID sellerId) {
         List<Product> products = productService.getProductBySeller(sellerId);
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        
+        List<ProductResponse> productResponses = products.stream()
+        		.map((product) -> 
+        			productConvert.productConvertToProductResponse(product)
+        			).toList();
+        
+        
+        return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
     // Lấy tất cả sản phẩm chưa được kích hoạt
     @GetMapping("/unactive")
-    public ResponseEntity<List<Product>> getAllProductUnactive() {
+    public ResponseEntity<List<ProductResponse>> getAllProductUnactive() {
         List<Product> products = productService.getAllProductUnactive();
+
+        List<ProductResponse> productResponses = products.stream()
+        		.map((product) -> 
+        			productConvert.productConvertToProductResponse(product)
+        			).toList();
+
+        return new ResponseEntity<>(productResponses, HttpStatus.OK);
+    }
+    
+    @GetMapping("/{productId}/related")
+    public ResponseEntity<List<ProductWithScore>> getProductsRelated(@PathVariable("productId") UUID productId) {
+        List<ProductWithScore> products = productService.getRelatedProducts(productId);
+
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
+
     // Kích hoạt sản phẩm theo productId
     @PutMapping("/{id}/activate")
-    public ResponseEntity<Product> activateProduct(@PathVariable("id") UUID productId) {
+    public ResponseEntity<ProductResponse> activateProduct(@PathVariable("id") UUID productId) {
         Product activatedProduct = productService.activateProduct(productId);
-        return new ResponseEntity<>(activatedProduct, HttpStatus.OK);
+       
+        ProductResponse productResponse = productConvert.productConvertToProductResponse(activatedProduct);
+        
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
     // Vô hiệu hóa sản phẩm theo productId
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<Product> deactivateProduct(@PathVariable("id") UUID productId) {
+    public ResponseEntity<ProductResponse> deactivateProduct(@PathVariable("id") UUID productId) {
         Product deactivatedProduct = productService.deactiveProduct(productId);
-        return new ResponseEntity<>(deactivatedProduct, HttpStatus.OK);
+    
+        ProductResponse productResponse = productConvert.productConvertToProductResponse(deactivatedProduct);
+
+        
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
 
