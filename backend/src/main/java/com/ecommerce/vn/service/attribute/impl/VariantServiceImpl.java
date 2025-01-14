@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ecommerce.vn.entity.attribute.Attribute;
 import com.ecommerce.vn.entity.attribute.AttributeValue;
 import com.ecommerce.vn.entity.product.Variant;
 import com.ecommerce.vn.exception.ResourceNotFoundException;

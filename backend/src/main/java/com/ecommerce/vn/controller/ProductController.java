@@ -18,6 +18,7 @@ import com.ecommerce.vn.dto.product.ProductUpdateRequest;
 import com.ecommerce.vn.dto.product.ProductWithScore;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
+import com.ecommerce.vn.service.FileUploadService;
 import com.ecommerce.vn.service.convert.ProductConvert;
 import com.ecommerce.vn.service.product.ProductService;
 
@@ -39,12 +40,20 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+    
+    @Autowired
+    private FileUploadService fileUploadService;
 
     //Tạo sản phẩm
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductCreateRequest request) {
+    public ResponseEntity<?> createProduct(@RequestBody ProductCreateRequest request) {
+    	if(request.getImage() == null) {
+    		return ResponseEntity.badRequest().body("Product image is empty!");
+    	}
         Product product = productConvert.productCreateRequestConver(request);
-
+        String imagePath = fileUploadService.uploadFileToServer(request.getImage());
+        product.setImagePath(imagePath);
+        
         Product saveProduct = productService.createProduct(product);
 
         ProductResponse response = productConvert.productConvertToProductResponse(saveProduct);
@@ -66,9 +75,14 @@ public class ProductController {
 
     //Update sản phẩm
     @PutMapping
-    public ResponseEntity<ProductResponse> updateProduct( @RequestBody ProductUpdateRequest productUpdateRequest) {
-        Product productToUpdate = productConvert.productUpdateRequestConver(productUpdateRequest);
-
+    public ResponseEntity<?> updateProduct( @RequestBody ProductUpdateRequest productUpdateRequest) {
+    	if(productUpdateRequest.getImage() == null) {
+    		return ResponseEntity.badRequest().body("Product image is empty!");
+    	}
+    	Product productToUpdate = productConvert.productUpdateRequestConver(productUpdateRequest);
+    	String imagePath = fileUploadService.uploadFileToServer(productUpdateRequest.getImage());
+    	productToUpdate.setImagePath(imagePath);
+    	
         Product updateProduct = productService.updateProduct(productToUpdate);
         ProductResponse response = productConvert.productConvertToProductResponse(updateProduct);
 
