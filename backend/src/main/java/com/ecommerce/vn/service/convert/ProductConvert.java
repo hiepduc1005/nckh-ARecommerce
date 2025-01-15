@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.dto.product.ProductCreateRequest;
@@ -18,6 +19,7 @@ import com.ecommerce.vn.repository.CategoryRepository;
 import com.ecommerce.vn.repository.TagRepository;
 import com.ecommerce.vn.entity.attribute.Attribute;
 
+@Service
 public class ProductConvert {
     @Autowired
     private TagConvert tagConvert;

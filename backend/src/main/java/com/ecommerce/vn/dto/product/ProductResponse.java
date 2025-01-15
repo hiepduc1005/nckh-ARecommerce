@@ -1,10 +1,13 @@
 package com.ecommerce.vn.dto.product;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.ecommerce.vn.dto.attribute.AttributeResponse;
 import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.dto.tag.TagResponse;
 
@@ -24,6 +27,8 @@ public class ProductResponse {
 	private Set<CategoryResponse> categories = new HashSet<CategoryResponse>();
 	
 	private Set<TagResponse> tags = new HashSet<TagResponse>();
+	
+	private List<AttributeResponse> attributeResponses = new ArrayList<AttributeResponse>();
 
 	private LocalDateTime createdAt;
 	
@@ -36,6 +41,17 @@ public class ProductResponse {
 	public UUID getId() {
 		return id;
 	}
+	
+
+	public List<AttributeResponse> getAttributeResponses() {
+		return attributeResponses;
+	}
+
+
+	public void setAttributeResponses(List<AttributeResponse> attributeResponses) {
+		this.attributeResponses = attributeResponses;
+	}
+
 
 	public void setId(UUID id) {
 		this.id = id;

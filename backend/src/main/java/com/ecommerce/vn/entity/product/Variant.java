@@ -2,8 +2,8 @@ package com.ecommerce.vn.entity.product;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -61,15 +61,15 @@ public class Variant {
         joinColumns = @JoinColumn(name = "variant_id"),
         inverseJoinColumns = @JoinColumn(name = "attribute_value_id")
     )
-    private Set<AttributeValue> attributeValues = new HashSet<AttributeValue>();
+    private List<AttributeValue> attributeValues = new ArrayList<AttributeValue>();
 	
 
 	//Getter and Setter
-	public Set<AttributeValue> getAttributeValues() {
+	public List<AttributeValue> getAttributeValues() {
 		return attributeValues;
 	}
 
-	public void setAttributeValues(Set<AttributeValue> attributeValues) {
+	public void setAttributeValues(List<AttributeValue> attributeValues) {
 		this.attributeValues = attributeValues;
 	}
 

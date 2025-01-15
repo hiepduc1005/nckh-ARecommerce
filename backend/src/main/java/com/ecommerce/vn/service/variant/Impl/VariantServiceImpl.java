@@ -1,18 +1,21 @@
 package com.ecommerce.vn.service.variant.Impl;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.ecommerce.vn.entity.product.Product;
+import com.ecommerce.vn.entity.attribute.AttributeValue;
 import com.ecommerce.vn.entity.product.Variant;
+import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.repository.VariantRepository;
-import com.ecommerce.vn.service.product.ProductService;
 import com.ecommerce.vn.service.variant.VariantService;
 
-import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -21,42 +24,89 @@ public class VariantServiceImpl implements VariantService{
 	@Autowired
 	private VariantRepository variantRepository;
 	
-	@Autowired
-	private ProductService productService;
-	
 	@Override
 	public Variant createVariant(Variant variant) {
-
+		// TODO Auto-generated method stub
 		return variantRepository.save(variant);
 	}
 
 	@Override
-	public Variant updateVariant(Variant variantUpdate) {
-		if(variantUpdate.getId() == null) {
-			throw new RuntimeException("Variant id is missing");
+	public Variant getVariantById(UUID id) {
+		Optional<Variant> variant = variantRepository.findById(id);
+		if(variant.isEmpty()) {
+			throw new ResourceNotFoundException("Variant","id", id);
 		}
-		return variantRepository.save(variantUpdate);
+		return variant.get();
 	}
 
 	@Override
-	public Variant findVariantById(UUID variantId) {
-		if(variantId == null) {
-			throw new RuntimeException("Variant id is missing");
-		}
-		return variantRepository.findById(variantId).orElseThrow(() -> 
-				new RuntimeException("Variant not found with id: " +variantId ));
+	public Variant updateVariant(Variant variant) {
+		// TODO Auto-generated method stub
+		return variantRepository.save(variant);
 	}
 
 	@Override
 	public void deleteVariant(UUID variantId) {
-		Variant variant = findVariantById(variantId);
-		variantRepository.delete(variant);
+		if(variantId != null) {
+			variantRepository.deleteById(variantId);
+			return;
+		}
+		
+		throw new RuntimeException("ID must not null !");
 	}
 
 	@Override
-	public List<Variant> findVariantsByProductId(UUID productId) {
-		Product product = productService.getProductById(productId);
-		
+	public List<Variant> findAllPriceBetween(BigDecimal minPrice, BigDecimal maxPrice) {
+		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Variant> findAll() {
+		// TODO Auto-generated method stub
+		return variantRepository.findAll();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Variant> findAllVariantsByProduct(UUID productId) {
+		return variantRepository.findByProductId(productId);
+	}
+
+	@Override
+	public List<Variant> findVariantsByAttributeValues(Set<AttributeValue> attributeValues) {
+		// TODO Auto-generated method stub
+		return findVariantsByAttributeValues(attributeValues);
+	}
+
+	@Override
+	public Integer findVariantQuantity(UUID variantId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isVariantInStock(UUID variantId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Variant decreaseStock(UUID variantId, Integer quantity) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BigDecimal caculateDiscountPrice(UUID variantId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isVariantOfProduct(UUID variantId, UUID productId) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

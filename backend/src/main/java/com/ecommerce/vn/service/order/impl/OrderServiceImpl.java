@@ -38,9 +38,14 @@ public class OrderServiceImpl implements OrderService {
 		if(isOrderEmpty(order)) {
 			throw new RuntimeException("Order is empty!");
 		}
-		
+		Coupon coupon = order.getCoupon();
+		if(coupon != null) {
+			BigDecimal discountPrice = calculateTotalPriceWithCoupon(order,coupon);
+			order.setDiscountPrice(discountPrice);
+		}
 		BigDecimal totalPrice = calculateTotalPrice(order);
-		order.setTotalPrice(totalPrice);
+		order.setTotalPrice(totalPrice);			
+		
 		return orderRepository.save(order);
 	}
 
@@ -74,9 +79,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void deleteOrder(UUID orderId) {
-		getOrderById(orderId);
+		Order order = getOrderById(orderId);
 		
-		orderRepository.deleteById(orderId);
+		orderRepository.delete(order);
 	}
 
 	@Override

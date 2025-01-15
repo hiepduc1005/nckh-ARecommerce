@@ -2,8 +2,8 @@ package com.ecommerce.vn.entity.order;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -45,7 +45,7 @@ public class Order {
 	private OrderStatus orderStatus;
 	
 	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY)
-	private Set<OrderItem> orderItems = new HashSet<OrderItem>();
+	private List<OrderItem> orderItems = new ArrayList<OrderItem>();
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
@@ -55,9 +55,10 @@ public class Order {
 	private LocalDateTime orderApprovedAt;
 	
 	//ADD more
+	@Enumerated(EnumType.STRING)
 	@Column(name = "payment_method", nullable = false)
-    private String paymentMethod;
-
+	private PaymentMethod paymentMethod;
+	
 	@Column(name = "shipping_method", nullable = false)
     private String shippingMethod;  // Ví dụ: "Standard", "Express"
 
@@ -105,11 +106,11 @@ public class Order {
 		this.orderStatus = orderStatus;
 	}
 
-	public Set<OrderItem> getOrderItems() {
+	public List<OrderItem> getOrderItems() {
 		return orderItems;
 	}
 
-	public void setOrderItems(Set<OrderItem> orderItems) {
+	public void setOrderItems(List<OrderItem> orderItems) {
 		this.orderItems = orderItems;
 	}
 
@@ -130,15 +131,17 @@ public class Order {
 	}
 
 
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
+    
 
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
+    public PaymentMethod getPaymentMethod() {
+		return paymentMethod;
+	}
 
-    public String getShippingMethod() {
+	public void setPaymentMethod(PaymentMethod paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
+
+	public String getShippingMethod() {
         return shippingMethod;
     }
 

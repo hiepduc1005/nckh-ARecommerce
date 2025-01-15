@@ -1,10 +1,13 @@
 package com.ecommerce.vn.service.convert;
 
+import org.springframework.stereotype.Service;
+
 import com.ecommerce.vn.dto.attribute.AttributeValueCreateRequest;
 import com.ecommerce.vn.dto.attribute.AttributeValueResponse;
 import com.ecommerce.vn.entity.attribute.Attribute;
 import com.ecommerce.vn.entity.attribute.AttributeValue;
 
+@Service
 public class AttributeValueConvert {
 
     public Attribute attributeValueCreateRequestConvert(AttributeValueCreateRequest attributeValueCreateRequest) {
