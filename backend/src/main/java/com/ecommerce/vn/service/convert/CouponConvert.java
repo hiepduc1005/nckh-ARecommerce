@@ -2,6 +2,7 @@ package com.ecommerce.vn.service.convert;
 
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.vn.dto.coupon.CouponCreateRequest;
 import com.ecommerce.vn.dto.coupon.CouponResponse;
 import com.ecommerce.vn.entity.coupon.Coupon;
 
@@ -27,5 +28,19 @@ public class CouponConvert {
 		couponResponse.setCreatedBy(coupon.getCreatedBy());
 		
 		return couponResponse;
+	}
+	
+	public Coupon couponCreateRequestConvertToCoupon(CouponCreateRequest couponCreateRequest) {
+		Coupon coupon = new Coupon();
+		coupon.setCouponDescription(couponCreateRequest.getCouponDescription());
+		coupon.setCouponEndDate(couponCreateRequest.getCouponEndDate());
+		coupon.setCouponStartDate(couponCreateRequest.getCouponStartDate());
+		coupon.setCouponType(couponCreateRequest.getCouponType());
+		coupon.setMaxUsage(couponCreateRequest.getMaxUsage());
+		coupon.setMinimumOrderAmount(couponCreateRequest.getMinimumOrderAmount());
+		coupon.setDiscountType(couponCreateRequest.getDiscountType());
+		coupon.setDiscountValue(couponCreateRequest.getDiscountValue());
+		
+		return coupon;
 	}
 }

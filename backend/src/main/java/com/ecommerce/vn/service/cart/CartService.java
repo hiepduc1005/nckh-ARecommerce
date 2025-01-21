@@ -14,12 +14,14 @@ public interface CartService {
     Cart createCart(User user);
 
     Cart getCartByUserId(UUID userId);
+    
+    Cart getCartById(UUID cartId);
 
-    void addItemToCart(UUID cartId, CartItem cartItem);
+    Cart addItemToCart(UUID cartId, CartItem cartItem);
 
-    void removeItemFromCart(UUID cartId, UUID cartItemId);
+    Cart removeItemFromCart(UUID cartId, UUID cartItemId);
 
-    void clearCart(UUID cartId);
+    Cart clearCart(UUID cartId);
     
 
     Set<CartItem> getCartItems(UUID cartId);

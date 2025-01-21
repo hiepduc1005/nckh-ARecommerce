@@ -39,36 +39,33 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addItemToCart(UUID cartId, CartItem cartItem) {
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
+    public Cart addItemToCart(UUID cartId, CartItem cartItem) {
+        Cart cart = getCartById(cartId);
         cart.getCartItems().add(cartItem);
-        cartRepository.save(cart);
+        return cartRepository.save(cart);
     }
 
     @Override
-    public void removeItemFromCart(UUID cartId, UUID cartItemId) {
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
+    public Cart removeItemFromCart(UUID cartId, UUID cartItemId) {
+        Cart cart = getCartById(cartId);
         cartItemService.deleteCartItem(cartItemId);
         cart.getCartItems().removeIf(item -> item.getId().equals(cartItemId));
-        cartRepository.save(cart);
+        return cartRepository.save(cart);
     }
 
     @Override
-    public void clearCart(UUID cartId) {
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
+    public Cart clearCart(UUID cartId) {
+        Cart cart = getCartById(cartId);
         cart.getCartItems().forEach(cartItem -> cartItemService.deleteCartItem(cartItem.getId()));
         cart.getCartItems().clear();
-        cartRepository.save(cart);
+        return cartRepository.save(cart);
     }
 
     @Override
     public Set<CartItem> getCartItems(UUID cartId) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
-        return cart.getCartItems();
+        return (Set<CartItem>) cart.getCartItems();
     }
 
     @Override
@@ -104,4 +101,13 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
         return cart.getCartItems().stream().mapToInt(CartItem::getQuantity).sum();
     }
+
+	@Override
+	public Cart getCartById(UUID cartId) {
+		if (cartId == null) {
+            throw new RuntimeException("Cart Id is missing!");
+        }
+		return cartRepository.findById(cartId).orElseThrow(() -> 
+			new RuntimeException("cart not found with id: " + cartId));
+	}
 }

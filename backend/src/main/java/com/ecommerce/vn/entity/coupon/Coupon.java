@@ -89,14 +89,6 @@ public class Coupon {
 		this.code = code;
 	}
 
-	public String getCoupondDescription() {
-		return couponDescription;
-	}
-
-	public void setCoupondDescription(String coupondDescription) {
-		this.couponDescription = coupondDescription;
-	}
-
 	public BigDecimal getDiscountValue() {
 		return discountValue;
 	}

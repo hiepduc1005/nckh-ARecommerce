@@ -1,7 +1,7 @@
 package com.ecommerce.vn.entity.cart;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.ecommerce.vn.entity.coupon.Coupon;
@@ -32,7 +32,7 @@ public class Cart {
 	private User user;
 	
 	@OneToMany(mappedBy ="cart",cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<CartItem> cartItems = new HashSet<CartItem>();
+	private List<CartItem> cartItems = new ArrayList<CartItem>();
 	
 	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coupon_id")
@@ -64,11 +64,11 @@ public class Cart {
 		this.user = user;
 	}
 
-	public Set<CartItem> getCartItems() {
+	public List<CartItem> getCartItems() {
 		return cartItems;
 	}
 
-	public void setCartItems(Set<CartItem> cartItems) {
+	public void setCartItems(List<CartItem> cartItems) {
 		this.cartItems = cartItems;
 	}
 	

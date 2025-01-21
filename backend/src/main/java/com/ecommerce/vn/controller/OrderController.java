@@ -1,5 +1,6 @@
 package com.ecommerce.vn.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,14 @@ public class OrderController {
 		OrderResponse orderResponse = orderConvert.orderConvertToOrderResponse(order);
 	
 		return ResponseEntity.ok(orderResponse);
+	}
+	
+	@GetMapping
+	public ResponseEntity<List<OrderResponse>> getAllOrders(){
+		List<Order> orders = orderService.getAllOrders();
+		List<OrderResponse> orderResponses = orders.stream().map((order) -> orderConvert.orderConvertToOrderResponse(order)).toList();
+	
+		return ResponseEntity.ok(orderResponses);
 	}
 	
 	@PutMapping("/status/{orderId}")
