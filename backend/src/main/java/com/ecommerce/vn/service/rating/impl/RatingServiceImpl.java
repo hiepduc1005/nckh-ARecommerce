@@ -30,10 +30,10 @@ public class RatingServiceImpl implements RatingService {
 	private UserService userService;
 
 	@Override
-	public Rating createRating(UUID productId, UUID userId, Double ratingValue, String comment) {
-		Product product = productService.getProductById(productId);
+	public Rating createRating(Rating rating) {
+		Product product = rating.getProduct();
 		
-	    User user = userService.findUserByUuId(userId);
+	    User user = rating.getUser();
 	    
 	    if(product != null && user != null) {
 	    	
@@ -41,12 +41,8 @@ public class RatingServiceImpl implements RatingService {
     		Optional<Rating> ratingOp = ratingRepository.findByUserInProduct(product,user);
     		
     		if(ratingOp.isPresent()) {
-    			return updateRating(ratingOp.get().getId(), ratingValue, comment);	
+    			return updateRating(ratingOp.get().getId(), rating.getRatingValue(), rating.getComment());	
     		}	    	
-    		
-	    	Rating rating = new Rating();
-	    	rating.setComment(comment);
-	    	rating.setRatingValue(ratingValue);
 	    	
 	    	return ratingRepository.save(rating);
 	    }

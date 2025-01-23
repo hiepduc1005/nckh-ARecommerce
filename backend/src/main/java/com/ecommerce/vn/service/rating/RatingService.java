@@ -9,7 +9,7 @@ import com.ecommerce.vn.entity.user.User;
 
 public interface RatingService {
 
-    Rating createRating(UUID productId, UUID userId, Double ratingValue, String comment);
+    Rating createRating(Rating rating);
 
     Rating updateRating(UUID ratingId, Double ratingValue, String comment);
 
