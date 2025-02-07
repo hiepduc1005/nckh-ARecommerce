@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom'
 const Header = () => {
   
   return (
-    <div className='header-container'>
+    <header className='header-container'>
         <div className="header-left">
           <div className='webicon-container'>
             <img src={webicon}></img>
@@ -35,7 +35,7 @@ const Header = () => {
               <img alt='Giỏ hàng' title='Giỏ hàng' src={cartIcon}></img>
             </Link>
         </div>
-    </div>
+    </header>
   )
 }
 

@@ -1,0 +1,59 @@
+.register-to-recive {
+    position: relative;
+    background-image: url('../../images/Mailbackground.png'); // Hình nền như trong ảnh
+    background-size: cover; // Đảm bảo ảnh bao phủ toàn bộ phần tử
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%; 
+    min-height: 330px; // Tùy chỉnh chiều cao theo nhu cầu
+    display: flex;
+    justify-content: center; /* Căn giữa theo chiều dọc */
+    align-items: center; /* Căn giữa theo chiều ngang */
+    padding: 20px;
+  
+    .container {
+      text-align: center; /* Căn giữa text trong container */
+      padding: 30px;
+      border-radius: 10px; /* Làm tròn góc */
+      width: 100%;
+      max-width: 600px; /* Giới hạn chiều rộng */
+    }
+  
+    .title {
+      color: white;
+      font-weight: 800;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+  
+    .input-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+  
+      input {
+        padding: 10px;
+        border-radius: 4px;
+        border: none;
+        width: 70%; /* Chiều rộng input */
+        font-size: 16px;
+      }
+  
+      button {
+        padding: 10px 20px;
+        background-color: #207355; /* Màu nút */
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 16px;
+  
+        &:hover {
+          background-color: #185e4c; /* Màu khi hover */
+        }
+      }
+    }
+  }
+  

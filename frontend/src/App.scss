@@ -1,0 +1,10 @@
+input{
+    outline: none; /* Loại bỏ đường viền khi input được focus */
+    border: none;  /* Nếu muốn loại bỏ luôn border */
+    font-weight: 500;
+
+    &::placeholder{
+        font-size: 12px;
+        opacity: 0.5;
+    }
+}
