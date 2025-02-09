@@ -3,15 +3,52 @@ $primaryColor: #207355;
 .ensure-safety{
     text-align: center;
     padding: 20px 80px;
+    color: $primaryColor;
 
     .protect-icon{
-        margin: 0 auto;
-        max-width: 50px;
+        margin: 12px auto;
+        max-width: 60px;
     }
 
     .title{
         font-weight: 800;
-        font-size: 18px;
-        color: $primaryColor;
+        font-size: 20px;
+    }
+
+    .content{
+        margin-top: 8px;
+    }
+
+    .list-protect{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin: 26px 0;
+
+        .item{
+            flex: 1;
+            border-left: 1px solid $primaryColor;
+            border-bottom: 2px solid $primaryColor;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+            padding-bottom: 10px;
+
+            &:first-child { 
+                border-left: none; // Loại bỏ border-left cho item đầu tiên
+            }
+
+            .item-title{
+                font-weight: bold;
+                font-size: 16px;
+            }
+        }
+
+        img{
+            max-width: 100px;
+            margin: 0 auto;
+        }
+    
     }
 }

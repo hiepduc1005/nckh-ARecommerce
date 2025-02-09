@@ -1,0 +1,59 @@
+$primaryColor: #207355;
+
+
+.saleproduct-carousel{
+    text-align: center;
+    color: $primaryColor;
+
+    .title{
+        font-size: 20px;
+        font-weight: 800;
+        margin-top: 50px;
+    }
+
+    .product-prices {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 5px;
+      
+        .original-price {
+          text-decoration: line-through;
+          color: #999;
+          font-size: 14px;
+        }
+      
+        .discounted-price {
+          color: red;
+          font-size: 16px;
+          font-weight: bold;
+        }
+      }
+      
+      .product-rating {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 5px;
+
+        .rating-score {
+            font-size: 12px;
+            font-weight: bold;
+            color: #f8b400; // Màu vàng giống sao
+        }
+      
+        .reviews {
+          color: #666;
+          white-space: nowrap;
+          font-size: 12px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 50%;
+          display: block;
+        }
+      }
+
+      
+      
+}

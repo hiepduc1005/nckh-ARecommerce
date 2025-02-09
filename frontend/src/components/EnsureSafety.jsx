@@ -9,24 +9,25 @@ import guaranteeIcon from "../assets/icons/guarantee-icon.png"
 const EnsureSafety = () => {
   return (
     <div className='ensure-safety'>
+        <div className="break-line"></div>
         <img src={protectIcon} alt="" className="protect-icon" />
         <div className="title">ĐẢM BẢO AN TOÀN</div>
         <div className="content">Chúng tôi cam kết, đảm bảo trải nghiệm mua sắm tốt nhất đến với khách hàng.</div>
         <div className="list-protect">
             <div className="item">
-                <div className="title">NHANH, MIỄN PHÍ</div>
+                <div className="item-title">NHANH, MIỄN PHÍ</div>
                 <img src={deleveryIcon} alt="" />
             </div>
             <div className="item">
-                <div className="title">TRẢ HÀNG, ĐỔI HÀNG TRONG VÒNG 14 NGÀY</div>
+                <div className="item-title">TRẢ HÀNG, ĐỔI HÀNG TRONG VÒNG 14 NGÀY</div>
                 <img src={returnIcon} alt="" />
             </div>
             <div className="item">
-                <div className="title">ĐẢM BẢO HOÀN TIỀN 100% KHI TRẢ HÀNG</div>
+                <div className="item-title">ĐẢM BẢO HOÀN TIỀN 100% KHI TRẢ HÀNG</div>
                 <img src={moneyBackIcon} alt="" />
             </div>
             <div className="item">
-                <div className="title">BẢO HÀNH 6 THÁNG</div>
+                <div className="item-title">BẢO HÀNH 6 THÁNG</div>
                 <img src={guaranteeIcon} alt="" />
             </div>
         </div>

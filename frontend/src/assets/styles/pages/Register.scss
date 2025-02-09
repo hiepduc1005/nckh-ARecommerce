@@ -1,0 +1,217 @@
+$primaryColor: #207355;
+$hoverColor: #165c42;
+$textWhite: #fff;
+$borderRadius: 8px;
+$inputBorder: #ccc;
+
+.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f8f8f8;
+  padding: 40px 20px;
+
+  .register-box {
+    background: $textWhite;
+    padding: 30px;
+    border-radius: $borderRadius;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+
+    h2 {
+      font-size: 22px;
+      color: $primaryColor;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      .input-group-row {
+        display: flex;
+        gap: 10px;
+
+        .input-group {
+          flex: 1;
+        }
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        text-align: left;
+
+        label {
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 5px;
+          color: $primaryColor;
+          gap: 5px;
+          white-space: nowrap; /* Ngăn chữ bị xuống dòng */
+        }
+
+        input, select {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid $inputBorder;
+          border-radius: $borderRadius;
+          font-size: 14px;
+          outline: none;
+
+          &:focus {
+            border-color: $primaryColor;
+          }
+        }
+
+        .date-group {
+          display: flex;
+          gap: 10px;
+
+          select {
+            flex: 1;
+            appearance: none;
+            background: white;
+          }
+        }
+
+        .gender-group {
+          display: flex;
+          gap: 20px;
+
+          button {
+            flex: 1;
+            padding: 10px;
+            background: #eaeaea;
+            border: none;
+            border-radius: $borderRadius;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+
+            &:hover {
+              background: $primaryColor;
+              color: $textWhite;
+            }
+          }
+        }
+      }
+
+      .password-group {
+        .password-wrapper {
+          position: relative;
+
+          input {
+            padding-right: 40px;
+          }
+
+          .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #555;
+            font-size: 18px;
+
+            &:hover {
+              color: $primaryColor;
+            }
+          }
+        }
+      }
+
+      .register-btn {
+        width: 100%;
+        padding: 12px;
+        background: $primaryColor;
+        color: $textWhite;
+        border: none;
+        border-radius: $borderRadius;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &:hover {
+          background: $hoverColor;
+        }
+      }
+
+      p {
+        font-size: 14px;
+
+        a {
+          color: $primaryColor;
+          text-decoration: none;
+          font-weight: bold;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  .gender-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  
+    label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+    }
+  
+    input[type="radio"] {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+
+
+  .react-datepicker__input-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    .react-datepicker__calendar-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #555;
+    }
+  }
+  
+  .react-datepicker__input-container input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+  
+    &:focus {
+      border-color: #207355;
+    }
+  }
+}
+
+    
+  
+  

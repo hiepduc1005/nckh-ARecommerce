@@ -1,0 +1,50 @@
+$primaryColor: #207355;
+
+.userrate{
+    padding: 20px 80px;
+    text-align: center;
+
+    .title{
+        margin-top: 50px;
+        color: $primaryColor;
+        font-weight: 800;
+        font-size: 20px;
+    }
+
+    .userates{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 24px;
+        gap: 30px;
+        padding: 18px;
+
+        .item{
+            flex: 1 1 calc(33.333% - 30px);
+            background-color: #D6E5E3;
+            padding: 10px;
+
+            .info{
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+
+                img{
+                    max-width: 30px;
+                    margin-right: 8px;
+                }
+
+                .username{
+                    text-align: center;
+                    font-weight: bold;
+                }
+            }
+
+            .content{
+                text-align: left;
+                margin-top: 12px;
+            }
+        }
+    }
+}

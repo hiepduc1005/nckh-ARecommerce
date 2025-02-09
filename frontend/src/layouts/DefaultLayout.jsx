@@ -5,12 +5,14 @@ import Footer from './footer/Footer'
 import RegisterToRecive from '../components/RegisterToRecive'
 import AdressFooter from '../components/AdressFooter'
 import EnsureSafety from '../components/EnsureSafety'
+import UserRate from '../components/UserRate'
 
 const DefaultLayout = () => {
   return (
     <div>
         <Header></Header>
         <Outlet></Outlet>
+        <UserRate/>
         <EnsureSafety/>
         <RegisterToRecive/>
         <Footer></Footer>

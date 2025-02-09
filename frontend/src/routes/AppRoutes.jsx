@@ -9,6 +9,7 @@ import ProductLayout from '../layouts/ProductLayout'
 import ProductList from '../pages/ProductList'
 import ProductDetails from '../pages/ProductDetails'
 import DefaultLayout from '../layouts/DefaultLayout'
+import NotFound from '../pages/NotFound'
 
 const AppRoutes = () => {
   return (
@@ -27,6 +28,8 @@ const AppRoutes = () => {
             <Route path='login' element={<Login/>}/>
             <Route path='register' element={<Register/>}/>
         </Route>
+
+        <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

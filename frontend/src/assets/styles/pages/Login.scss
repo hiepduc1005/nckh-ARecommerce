@@ -1,0 +1,115 @@
+$primaryColor: #207355;
+$hoverColor: #165c42;
+$textWhite: #fff;
+$borderRadius: 8px;
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #f8f8f8;
+
+  .login-box {
+    background: $textWhite;
+    padding: 30px;
+    border-radius: $borderRadius;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+
+    h2 {
+      font-size: 22px;
+      color: $primaryColor;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+      position: relative;
+
+      label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px 40px 12px 12px;
+        border: 1px solid #ccc;
+        border-radius: $borderRadius;
+        font-size: 14px;
+        outline: none;
+
+        &:focus {
+          border-color: $primaryColor;
+        }
+      }
+    }
+
+    .input-wraper {
+        position: relative;
+      
+        .toggle-password {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: pointer;
+          color: #555;
+          font-size: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%; // Giúp icon luôn căn giữa theo chiều cao của input
+      
+          &:hover {
+            color: $primaryColor;
+          }
+        }
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: $primaryColor;
+      color: $textWhite;
+      border: none;
+      border-radius: $borderRadius;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+
+      &:hover {
+        background: $hoverColor;
+      }
+    }
+
+    .login-options {
+      margin-top: 15px;
+      font-size: 14px;
+
+      a {
+        color: $primaryColor;
+        text-decoration: none;
+        font-weight: bold;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      span {
+        display: block;
+        margin-top: 10px;
+      }
+    }
+  }
+}

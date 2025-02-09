@@ -1,0 +1,48 @@
+$primaryColor: #207355;
+
+.notfound {
+    text-align: center;
+    padding: 50px;
+    width: 100vw;
+    height: 100vh;
+    background-color: $primaryColor;
+    color: white;
+
+    .notfound-code {
+      font-size: 120px;
+      font-weight: bold;
+    }
+
+    .title {
+      font-size: 30px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .content {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+    
+    .back-home {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: 2px solid #fff;
+      background-color: $primaryColor;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    
+    .back-home:hover {
+      background-color: #fff;
+      color: $primaryColor;
+    }
+}
+  
+  
+  
+  
