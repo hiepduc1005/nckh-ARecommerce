@@ -10,6 +10,8 @@ import ProductList from '../pages/ProductList'
 import ProductDetails from '../pages/ProductDetails'
 import DefaultLayout from '../layouts/DefaultLayout'
 import NotFound from '../pages/NotFound'
+import ForgotPassword from '../pages/ForgotPassword'
+import ResetPassword from '../pages/ResetPassword'
 
 const AppRoutes = () => {
   return (
@@ -27,6 +29,8 @@ const AppRoutes = () => {
         <Route element={<AuthLayout/>} >
             <Route path='login' element={<Login/>}/>
             <Route path='register' element={<Register/>}/>
+            <Route path='forgot-password' element={<ForgotPassword/>}/>
+            <Route path='reset-password' element={<ResetPassword/>}/>
         </Route>
 
         <Route path="*" element={<NotFound />} />

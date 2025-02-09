@@ -32,7 +32,7 @@ const Login = () => {
           <button type="submit" className="login-btn">ĐĂNG NHẬP</button>
         </form>
         <div className="login-options">
-          <a href="#">Bạn đã quên mật khẩu?</a>
+          <a href="/forgot-password">Bạn đã quên mật khẩu?</a>
           <span>Bạn chưa có tài khoản? <a href="/register">Tạo tài khoản ngay</a></span>
         </div>
       </div>
