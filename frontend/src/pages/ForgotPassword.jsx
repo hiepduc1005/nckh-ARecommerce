@@ -22,7 +22,7 @@ const ForgotPassword = () => {
     } else if (resendTimer === 0) {
       setCanResend(true);
     }
-    return () => clearInterval(timer);
+    return () =>  clearInterval(timer);
   }, [otpSent, resendTimer]);
 
   const handleSubmit = async (e) => {

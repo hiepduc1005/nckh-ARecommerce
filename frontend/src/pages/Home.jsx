@@ -1,13 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ProductCarousel from '../components/ProductCarousel'
 import glassImage from "../assets/images/glass-image.png"
 import SaleProductCarousel from '../components/SaleProductCarousel';
+import useLoading from '../hooks/UseLoading';
 const Home = () => {
+
   const categoryData = {
     title: "Kính Mắt",
     description: "Tổng hợp các mẫu kính nổi bật trong tháng vừa qua",
     image: glassImage
   };
+
+
 
   return (
     <div className='homepage-container' style={{padding: "0 80px"}}>

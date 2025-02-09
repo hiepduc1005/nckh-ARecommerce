@@ -50,3 +50,11 @@ h1, h2, h3, h4, h5, h6 {
 #root, #__next {
   isolation: isolate;
 }
+
+#nprogress .bar {
+  background: #007bff !important; /* Màu xanh giống Facebook */
+  height: 3px !important; /* Độ dày của thanh loading */
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px #007bff, 0 0 5px #007bff !important;
+}
