@@ -3,12 +3,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.dto.attribute.AttributeCreateRequest;
 import com.ecommerce.vn.dto.attribute.AttributeResponse;
 import com.ecommerce.vn.dto.attribute.AttributeValueResponse;
 import com.ecommerce.vn.entity.attribute.Attribute;
 
+@Service
 public class AttributeConvert {
     
     @Autowired

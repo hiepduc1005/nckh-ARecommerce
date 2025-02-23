@@ -1,0 +1,42 @@
+.search-filters {
+    h2 {
+      color: #2d6a4f;
+      font-size: 18px;
+    }
+  
+    .filter-group {
+      margin-top: 10px;
+      label {
+        font-weight: bold;
+        display: block;
+      }
+  
+      button {
+        margin: 5px;
+        padding: 5px 10px;
+        border: none;
+        cursor: pointer;
+        background: #40916c;
+        color: white;
+        border-radius: 5px;
+  
+        &:hover {
+          background: #1b4332;
+        }
+      }
+    }
+  
+    .color-options {
+      display: flex;
+      gap: 5px;
+  
+      .color-btn {
+        width: 20px;
+        height: 20px;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+    }
+  }
+  

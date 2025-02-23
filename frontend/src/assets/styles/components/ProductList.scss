@@ -1,0 +1,37 @@
+.product-list {
+    h3 {
+      font-size: 18px;
+      color: #2d6a4f;
+    }
+  
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+  
+    .product-card {
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+      .image-placeholder {
+        height: 150px;
+        background: #ddd;
+        border-radius: 5px;
+      }
+  
+      h4 {
+        margin-top: 10px;
+        font-size: 16px;
+      }
+  
+      p {
+        color: #1b4332;
+        font-weight: bold;
+      }
+    }
+  }
+  

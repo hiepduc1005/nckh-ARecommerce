@@ -3,11 +3,14 @@ package com.ecommerce.vn.service.convert;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.dto.cart.CartItemResponse;
 import com.ecommerce.vn.dto.cart.CartResponse;
 import com.ecommerce.vn.entity.cart.Cart;
 
+
+@Service
 public class CartConvert {
 	
 	@Autowired

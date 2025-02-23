@@ -1,9 +1,12 @@
 package com.ecommerce.vn.service.convert;
 
+import org.springframework.stereotype.Service;
+
 import com.ecommerce.vn.dto.user.UserAddressCreateRequest;
 import com.ecommerce.vn.dto.user.UserAddressResponse;
 import com.ecommerce.vn.entity.user.UserAddress;
 
+@Service
 public class UserAdressConvert {
     
     public UserAddress userAddressCreateRequestConvert(UserAddressCreateRequest userAddressCreateRequest){

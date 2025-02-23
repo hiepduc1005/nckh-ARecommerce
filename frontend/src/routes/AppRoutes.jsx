@@ -6,12 +6,12 @@ import Register from '../pages/Register'
 import Profile from '../pages/Profile'
 import AuthLayout from '../layouts/AuthLayout'
 import ProductLayout from '../layouts/ProductLayout'
-import ProductList from '../pages/ProductList'
 import ProductDetails from '../pages/ProductDetails'
 import DefaultLayout from '../layouts/DefaultLayout'
 import NotFound from '../pages/NotFound'
 import ForgotPassword from '../pages/ForgotPassword'
 import ResetPassword from '../pages/ResetPassword'
+import SearchPage from '../pages/SearchPage'
 
 const AppRoutes = () => {
   return (
@@ -22,7 +22,7 @@ const AppRoutes = () => {
         </Route>
 
         <Route path='/products' element={<ProductLayout/>} >
-            <Route index element={<ProductList/>}/>
+            <Route index element={<SearchPage/>}/>
             <Route path=':productId' element={<ProductDetails/>}/>
         </Route>
 

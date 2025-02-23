@@ -1,10 +1,13 @@
 package com.ecommerce.vn.service.convert;
 
+import org.springframework.stereotype.Service;
+
 import com.ecommerce.vn.dto.tag.TagCreateRequest;
 import com.ecommerce.vn.dto.tag.TagResponse;
 import com.ecommerce.vn.dto.tag.TagUpdateRequest;
 import com.ecommerce.vn.entity.product.Tag;
 
+@Service
 public class TagConvert {
 
     public Tag tagCreateConvert(TagCreateRequest tagCreateRequest) {

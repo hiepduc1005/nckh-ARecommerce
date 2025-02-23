@@ -51,6 +51,8 @@ public class User {
 
     @Column(name = "email", nullable = false)
     private String email;
+    
+    private String gender;
 
     @Column(name = "password_hash")
     private String password;
@@ -94,9 +96,16 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Notification> notifications  = new ArrayList<Notification>();
 	
-	
 
-    public List<Notification> getNotifications() {
+    public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public List<Notification> getNotifications() {
 		return notifications;
 	}
 

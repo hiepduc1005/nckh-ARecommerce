@@ -91,7 +91,7 @@ public class TagServiceImpl implements TagService{
 	@Override
 	public boolean isTagExist(String tagName) {
 		// TODO Auto-generated method stub
-		return tagRepository.existsByName(tagName);
+		return tagRepository.existsByTagName(tagName);
 	}
 
 	@Override

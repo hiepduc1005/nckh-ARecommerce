@@ -17,13 +17,6 @@ import com.ecommerce.vn.entity.user.User;
 public interface RatingRepository extends JpaRepository<Rating, UUID>{
     List<Rating> findByProductId(UUID productId);
 
-    List<Rating> findByCustomerId(UUID customerId);
-
-    List<Rating> findBySellerId(UUID sellerId);
-    
-    @Query("SELECT COUNT(r) > 0"
-    		+ "FROM Rating r WHERE r.product.id = :productId AND r.customer.id = :customerId")
-    boolean existsByProductIdAndCustomerId(@Param("productId") UUID productId, @Param("customerId") UUID customerId);
 
     @Query("SELECT r FROM Rating r WHERE r.user = :user")
     List<Rating> findByUser(@Param("user") User user);

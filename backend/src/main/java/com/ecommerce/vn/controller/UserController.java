@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +49,14 @@ public class UserController {
 		if (user == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); 
 		}
+		UserResponse response = userConvert.userConvertToUserResponse(user); 
+		return ResponseEntity.ok(response); 
+	}
+	
+	@GetMapping("/authenticated")
+	public ResponseEntity<UserResponse> getUserAuthenticated() {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		User user = userService.findUserByEmail(email);
 		UserResponse response = userConvert.userConvertToUserResponse(user); 
 		return ResponseEntity.ok(response); 
 	}

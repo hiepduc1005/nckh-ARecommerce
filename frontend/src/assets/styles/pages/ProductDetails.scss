@@ -1,0 +1,300 @@
+$primaryColor: #207355;
+
+.product-details {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  background: #fff;
+  color: $primaryColor;
+
+  .left {
+    flex: 6;
+    padding-right: 20px;
+
+    .carousel {
+      width: 100%;
+      max-width: 900px;
+      overflow: hidden;
+
+      .slick-slider {
+        max-width: 100%;
+      }
+      .item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .slide-image {
+        max-height: 500px;
+        width: 100%;
+        object-fit: cover;
+      }
+    }
+    .custom-dots {
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      bottom: -40px;
+      padding: 0;
+      li {
+        width: 80px;
+        height: 80px;
+        list-style: none;
+        cursor: pointer;
+        &.slick-active img {
+          border: 2px solid #3498db;
+          opacity: 1;
+        }
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 5px;
+          opacity: 0.7;
+          transition: opacity 0.3s ease, border 0.3s ease;
+        }
+      }
+    }
+
+    .button-group {
+      display: flex;
+      gap: 30px;
+      margin-top: 15px;
+      justify-content: flex-start;
+
+      div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: $primaryColor;
+
+
+        img {
+          width: 20px;
+          height: 20px;
+          color: $primaryColor;
+
+        }
+      }
+      
+     
+    }
+
+    .products-recommend {
+      margin-top: 30px;
+      width: fit-content;
+      text-align: center;
+
+
+      .title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: left;
+      }
+
+      .more {
+        display: inline-block;
+        margin-top: 10px;
+        background-color: $primaryColor;
+        color: #fff;
+        font-weight: 500;
+        padding: 8px;
+        font-size: 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        text-align: center;
+
+        &:hover{
+          background-color: #185740;
+        }
+      }
+    }
+  }
+
+  .right {
+    flex: 4;
+    padding-left: 20px;
+
+    .product-name {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+
+      .score {
+        font-size: 16px;
+        font-weight: 600;
+        color: #f8b400;
+      }
+
+      .reviews {
+        font-size: 14px;
+        color: #666;
+      }
+    }
+
+    .prices {
+      display: flex;
+      gap: 15px;
+      margin: 10px 0;
+
+      .original {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 16px;
+      }
+
+      .discounted {
+        font-size: 20px;
+        font-weight: bold;
+        color: #d9534f;
+      }
+    }
+
+    .benefits {
+      margin-top: 20px;
+
+      h3 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 5px;
+
+        img {
+          width: 16px;
+          height: 16px;
+        }
+
+        span {
+          font-size: 14px;
+          color: #444;
+        }
+      }
+
+      
+    }
+
+    .product-options {
+      h3 {
+        margin-bottom: 5px;
+      }
+
+      .colors {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+
+        .color {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          cursor: pointer;
+
+          &.selected {
+            border: 3px solid black;
+          }
+      
+          &.color-black.selected {
+            border: 3px solid rgb(55, 53, 53); // Viền trắng khi chọn màu đen
+          }
+        }
+      }
+
+      .sizes {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+
+
+        .size {
+          padding: 5px 15px;
+          border: 1px solid #ccc;
+          cursor: pointer;
+          transition: 0.3s;
+
+         
+        }
+      }
+
+      .quantity {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+
+        .value {
+          width: 50px;
+          text-align: center;
+          padding: 6px;
+          border-radius: 0;
+        }
+
+        div{
+          width: 30px;
+          text-align: center;
+          border: 1px solid #ccc;
+          padding: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease-in-out;
+          user-select: none;
+          outline: none; 
+
+
+          &:not(.value):hover{
+            background-color: $primaryColor;
+            color: #fff;
+          }
+        }
+
+        
+      }
+
+      .purchase-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+
+        button {
+          
+          padding: 8px;
+          cursor: pointer;
+          border: none;
+          transition: 0.3s;
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        .choose-lens {
+          background: #ddd;
+        }
+
+        .add-to-cart {
+          background: orange;
+          color: white;
+        }
+
+        .buy-now {
+          background: red;
+          color: white;
+        }
+      }
+    }
+  }
+}

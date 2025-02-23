@@ -12,5 +12,4 @@ import com.ecommerce.vn.entity.notification.Notification;
 public interface NotificationRepository extends JpaRepository<Notification,UUID>{
 
 
-    List<Notification> findByIsGlobal(boolean isGlobal);
 }

@@ -1,6 +1,7 @@
 package com.ecommerce.vn.service.convert;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.dto.cart.CartItemCreateRequest;
 import com.ecommerce.vn.dto.cart.CartItemResponse;
@@ -8,6 +9,7 @@ import com.ecommerce.vn.entity.cart.CartItem;
 import com.ecommerce.vn.entity.product.Variant;
 import com.ecommerce.vn.service.variant.VariantService;
 
+@Service
 public class CartItemConvert {
 	@Autowired
 	private VariantService variantService;

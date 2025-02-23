@@ -12,7 +12,7 @@ import com.ecommerce.vn.entity.product.Tag;
 
 @Repository
 public interface TagRepository extends JpaRepository<Tag, UUID> {
-	 boolean existsByName(String name);
+	 boolean existsByTagName(String tagName);
 	 
 	 @Query("SELECT t FROM Tag t WHERE LOWER(t.tagName) LIKE LOWER(CONCAT('%', :name, '%'))")
 	 List<Tag> findByName(@Param("name") String name);

@@ -56,7 +56,7 @@ public class AuthController {
 			if(userService.existByEmail(userCreateRequest.getEmail())) {
 				return ResponseEntity.badRequest().body("Email is already in use!");
 			}
-			userService.registerUser(userCreateRequest.getEmail(),userCreateRequest.getPassword());
+			userService.registerUser(userCreateRequest.getEmail(),userCreateRequest.getPassword(), userCreateRequest.getFirstname(), userCreateRequest.getLastname());
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body("User register success");
 		}catch (Exception ex) {
