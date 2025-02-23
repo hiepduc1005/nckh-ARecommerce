@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import "../assets/styles/pages/Register.scss"
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import useAuth from '../hooks/UseAuth';
+import useLoading from '../hooks/UseLoading';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,19 +14,61 @@ const Register = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [gender, setGender] = useState("male");
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const navigate = useNavigate();
+  const {isAuthenticated,register} = useAuth();
+  const {setLoading} = useLoading();
+
+  useEffect(() => {
+    if(isAuthenticated){
+      setLoading(true);
+      navigate("/")
+      const timeout = setTimeout(() => setLoading(false), 500);
+
+      return () => clearTimeout(timeout);
+    }
+  },[isAuthenticated, navigate, setLoading])
+
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Ngăn chặn reload trang
+    if (password !== confirmPassword) {
+      toast.error("Mật khẩu xác nhận không khớp!");
+      return;
+    }
+
+    register(email, firstName, lastName, password);
+  };
+
   return (
     <div className="register-container">
       <div className="register-box">
         <h2>ĐĂNG KÝ TÀI KHOẢN</h2>
-        <form>
+        <form onSubmit={(e) => handleSubmit(e)}>
           <div className="input-group-row">
             <div className="input-group">
               <label>Họ</label>
-              <input required type="text" placeholder="Nhập họ" />
+              <input 
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)} 
+                required 
+                type="text" 
+                placeholder="Nhập họ" 
+              />
             </div>
             <div className="input-group">
               <label>Tên</label>
-              <input required type="text" placeholder="Nhập tên" />
+              <input 
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required 
+                type="text" 
+                placeholder="Nhập tên" 
+              />
             </div>
           </div>
 
@@ -77,7 +123,13 @@ const Register = () => {
 
           <div className="input-group">
             <label>Nhập số điện thoại hoặc email:</label>
-            <input type="text" required placeholder="Nhập số điện thoại hoặc email" />
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)} 
+              type="text" 
+              required 
+              placeholder="Nhập số điện thoại hoặc email" 
+            />
           </div>
 
           <div className="input-group">
@@ -88,7 +140,13 @@ const Register = () => {
           <div className="input-group password-group">
             <label>Nhập mật khẩu:</label>
             <div className="password-wrapper">
-              <input required type={showPassword ? "text" : "password"} placeholder="Nhập mật khẩu" />
+              <input 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+                type={showPassword ? "text" : "password"} 
+                placeholder="Nhập mật khẩu" 
+              />
               <span className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <FaEye /> : <FaEyeSlash />}
               </span>
@@ -98,7 +156,13 @@ const Register = () => {
           <div className="input-group password-group">
             <label>Xác nhận lại mật khẩu:</label>
             <div className="password-wrapper">
-              <input required type={showConfirmPassword ? "text" : "password"} placeholder="Xác nhận mật khẩu" />
+              <input 
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required 
+                type={showConfirmPassword ? "text" : "password"} 
+                placeholder="Xác nhận mật khẩu" 
+              />
               <span className="toggle-password" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                 {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
               </span>

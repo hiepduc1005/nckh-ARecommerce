@@ -60,7 +60,7 @@ public class AuthController {
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body("User register success");
 		}catch (Exception ex) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to register user!");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to register user! " + ex.toString() );
 	    }
 	}
 	

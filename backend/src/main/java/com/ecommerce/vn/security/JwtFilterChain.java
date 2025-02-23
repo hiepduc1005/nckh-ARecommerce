@@ -52,7 +52,7 @@ public class JwtFilterChain extends OncePerRequestFilter{
 	private String getTokenByRequest(HttpServletRequest request) {
 		String authHeader = request.getHeader("Authorization");
 		
-		if(!authHeader.trim().isEmpty()) {
+		if(authHeader != null && !authHeader.trim().isEmpty()) {
 			return authHeader.substring(7);
 		}
 		

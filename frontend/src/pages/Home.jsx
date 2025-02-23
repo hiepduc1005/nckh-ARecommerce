@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 import ProductCarousel from '../components/ProductCarousel'
 import glassImage from "../assets/images/glass-image.png"
 import SaleProductCarousel from '../components/SaleProductCarousel';
-import useLoading from '../hooks/UseLoading';
 const Home = () => {
 
   const categoryData = {

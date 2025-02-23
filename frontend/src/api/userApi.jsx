@@ -37,3 +37,24 @@ export const loginUser = async (email,password) => {
         throw error;
     }
 }
+
+export const registerUser = async (email, firstname, lastname, password) => {
+    try {
+        const res = await axiosInstance.post("api/v1/auth/register", {
+            email: email,
+            firstname: firstname,
+            lastname: lastname,
+            password: password,
+        })
+        
+        return res.data
+    } catch (error) {
+        if(error.response){
+            throw new Error(error.response.data || "Có lỗi xảy ra khi đăng ký!");
+        }
+
+        throw new Error("Không thể kết nối đến máy chủ!");
+    }
+
+   
+} 

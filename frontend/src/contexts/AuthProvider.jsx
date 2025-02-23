@@ -1,5 +1,5 @@
-import { createContext, useState } from "react";
-import { getAuthUser, loginUser } from "../api/userApi";
+import { createContext, useEffect, useState } from "react";
+import { getAuthUser, loginUser, registerUser } from "../api/userApi";
 import {toast, ToastContainer} from "react-toastify"
 import { useNavigate } from "react-router-dom";
 import useLoading from "../hooks/UseLoading";
@@ -23,14 +23,21 @@ export const AuthProvider = ({children}) => {
                 return;
             }
 
-            const userAuth = await getAuthUser(token);
-            if (userAuth) {
-                setUser(userAuth);
-                setIsAuthenticated(true);
-            } else {
+            try {
+                const userAuth = await getAuthUser(token);
+                if(userAuth){
+                    setUser(userAuth);
+                    setIsAuthenticated(true);
+                }
+                
+            } catch (error) {
                 setIsAuthenticated(false);
+                localStorage.removeItem("token");
+                setUser(null);
+                toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
+                
             }
-
+          
             setLoading(false);
         };
 
@@ -65,10 +72,22 @@ export const AuthProvider = ({children}) => {
         setLoading(false);
     }
 
-    const register = () 
+    const register = async (email, firstname, lastname, password) => {
+        try {
+            setLoading(true);
+            const data = await registerUser(email,firstname,lastname,password);
+
+            toast.success(data)
+            navigate("/login");
+        } catch (error) {
+            toast.error(error.response?.data || "Đăng ký thất bại!");
+        }finally{
+            setLoading(false)
+        }
+    } 
 
     return (
-        <AuthContext.Provider value={{user,isAuthenticated,login,logout}}>
+        <AuthContext.Provider value={{user,isAuthenticated,login,logout,register}}>
             {children}
         </AuthContext.Provider>
     )
