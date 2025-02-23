@@ -25,11 +25,14 @@ public class SecurityConfig {
 	@Autowired
 	public CustomUserDetailService customUserDetailService;
 	
+	@Autowired
+	public PasswordConfig passwordConfig;
 	
 
-	public CustomUserDetailService getCustomUserDetailService() {
-		return customUserDetailService;
-	}
+//	@Bean
+//	public CustomUserDetailService getCustomUserDetailService() {
+//		return customUserDetailService;
+//	}
 
 	public void setCustomUserDetailService(CustomUserDetailService customUserDetailService) {
 		this.customUserDetailService = customUserDetailService;
@@ -46,6 +49,7 @@ public class SecurityConfig {
 	public DaoAuthenticationProvider daoAuthenticationProvider() {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 		provider.setUserDetailsService(customUserDetailService);
+		provider.setPasswordEncoder(passwordConfig.passwordEncoder());
 		return provider;
 	}
 	

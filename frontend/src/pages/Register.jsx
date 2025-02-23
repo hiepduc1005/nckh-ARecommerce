@@ -28,7 +28,7 @@ const Register = () => {
     if(isAuthenticated){
       setLoading(true);
       navigate("/")
-      const timeout = setTimeout(() => setLoading(false), 500);
+      const timeout = setTimeout(() => setLoading(false), 300);
 
       return () => clearTimeout(timeout);
     }

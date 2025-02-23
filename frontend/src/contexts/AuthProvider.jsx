@@ -55,7 +55,8 @@ export const AuthProvider = ({children}) => {
             toast.success('Đăng nhập thành công!');
             navigate("/");
         } catch (error) {
-            toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại!');
+            console.log(error)
+            toast.error(error.response?.data || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');
         }finally{
             setLoading(false)
         }
@@ -73,17 +74,21 @@ export const AuthProvider = ({children}) => {
     }
 
     const register = async (email, firstname, lastname, password) => {
-        try {
-            setLoading(true);
-            const data = await registerUser(email,firstname,lastname,password);
+        setLoading(true);
+        const res = await registerUser(email,firstname,lastname,password);
 
-            toast.success(data)
-            navigate("/login");
-        } catch (error) {
-            toast.error(error.response?.data || "Đăng ký thất bại!");
-        }finally{
-            setLoading(false)
+        if(!res.success){
+            console.log(res)
+            toast.error(res.error || "Đăng ký thất bại!");
+            setLoading(false);
+            return;
         }
+
+        toast.success(res.data)
+        navigate("/login");
+        
+        setLoading(false);
+    
     } 
 
     return (

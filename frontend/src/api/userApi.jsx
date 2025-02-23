@@ -47,13 +47,19 @@ export const registerUser = async (email, firstname, lastname, password) => {
             password: password,
         })
         
-        return res.data
+        return { success: true, data: res.data };
     } catch (error) {
         if(error.response){
-            throw new Error(error.response.data || "Có lỗi xảy ra khi đăng ký!");
+            return {
+                success: false,
+                error: error.response?.data || "Có lỗi xảy ra khi đăng ký!" 
+            };
         }
 
-        throw new Error("Không thể kết nối đến máy chủ!");
+        return {
+            success: false,
+            error: error.response?.data || "Không thể kết nối đến máy chủ!" 
+        };
     }
 
    

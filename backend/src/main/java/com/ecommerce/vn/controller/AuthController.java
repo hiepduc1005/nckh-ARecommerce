@@ -36,6 +36,8 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@RequestBody UserLoginRequest userLoginRequest){
 		try {
+			System.out.println(userLoginRequest.getEmail());
+
 			Authentication authentication = authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(userLoginRequest.getEmail(), userLoginRequest.getPassword()));
 			
@@ -46,7 +48,8 @@ public class AuthController {
 			
 			return ResponseEntity.ok(userAuthenticateSuccess);
 		} catch (AuthenticationException ex) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password"); // 401 Unauthorized
+
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai tên đăng nhập hoặc mật khẩu!"); // 401 Unauthorized
 		}
 	}
 	
@@ -54,13 +57,13 @@ public class AuthController {
 	public ResponseEntity<?> registerUser(@RequestBody UserCreateRequest userCreateRequest){
 		try {
 			if(userService.existByEmail(userCreateRequest.getEmail())) {
-				return ResponseEntity.badRequest().body("Email is already in use!");
+				return ResponseEntity.badRequest().body("Email này đã được đăng ký!");
 			}
 			userService.registerUser(userCreateRequest.getEmail(),userCreateRequest.getPassword(), userCreateRequest.getFirstname(), userCreateRequest.getLastname());
 			
-			return ResponseEntity.status(HttpStatus.CREATED).body("User register success");
+			return ResponseEntity.status(HttpStatus.CREATED).body("Đăng ký thành công!");
 		}catch (Exception ex) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to register user! " + ex.toString() );
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi! Không thể đăng ký");
 	    }
 	}
 	
