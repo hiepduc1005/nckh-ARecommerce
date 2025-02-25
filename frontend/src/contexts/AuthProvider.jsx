@@ -10,39 +10,49 @@ export const AuthProvider = ({children}) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const navigate = useNavigate();
-    const {setLoading} = useLoading();
+    const {loading,setLoading} = useLoading();
 
     useEffect(() => {
         const fetchAuthUser = async () => {
-            setLoading(true);
-            const token = localStorage.getItem("token");
-            
-            if (!token) {
-                setIsAuthenticated(false);
-                setLoading(false);
-                return;
-            }
-
             try {
+                
+                setLoading(true); 
+                const token = localStorage.getItem("token");
+                
+                if (!token) {
+                    setIsAuthenticated(false);
+                    const timeout = setTimeout(() => setLoading(false), 300); 
+
+                    return () => clearTimeout(timeout);
+                }
+    
+               
                 const userAuth = await getAuthUser(token);
                 if(userAuth){
                     setUser(userAuth);
                     setIsAuthenticated(true);
+                }else{
+                    setIsAuthenticated(false)
+                    setUser(null)
                 }
-                
+                    
             } catch (error) {
-                setIsAuthenticated(false);
-                localStorage.removeItem("token");
-                setUser(null);
-                toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
-                
+                console.error(error)
+            }finally{
+                const timeout = setTimeout(() => setLoading(false), 300); 
+                return () => clearTimeout(timeout);
             }
+            
+           
           
-            setLoading(false);
         };
 
         fetchAuthUser();
     }, [setLoading]);
+
+    useEffect(() => {
+        console.log("Loading state changed: ", loading);
+    }, [loading]);
 
     const login = async (email , password) => {
         try {
@@ -55,7 +65,6 @@ export const AuthProvider = ({children}) => {
             toast.success('Đăng nhập thành công!');
             navigate("/");
         } catch (error) {
-            console.log(error)
             toast.error(error.response?.data || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');
         }finally{
             setLoading(false)

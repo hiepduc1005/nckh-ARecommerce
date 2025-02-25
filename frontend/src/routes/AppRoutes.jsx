@@ -12,6 +12,9 @@ import NotFound from '../pages/NotFound'
 import ForgotPassword from '../pages/ForgotPassword'
 import ResetPassword from '../pages/ResetPassword'
 import SearchPage from '../pages/SearchPage'
+import AdminLayout from '../layouts/AdminLayout'
+import Dashboard from '../pages/Dashboard'
+import AdminProduct from '../pages/AdminProduct'
 
 const AppRoutes = () => {
   return (
@@ -31,6 +34,11 @@ const AppRoutes = () => {
             <Route path='register' element={<Register/>}/>
             <Route path='forgot-password' element={<ForgotPassword/>}/>
             <Route path='reset-password' element={<ResetPassword/>}/>
+        </Route>
+
+        <Route path='/admin' element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path='products' element={<AdminProduct/>} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

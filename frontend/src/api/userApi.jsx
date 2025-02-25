@@ -12,7 +12,6 @@ export const getAuthUser = async (token) => {
 
         return res.data;
     } catch (error) {
-        console.log(error);
         console.error()
         return null;
     }

@@ -1,12 +1,16 @@
 package com.ecommerce.vn.service.convert;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.dto.attribute.AttributeValueResponse;
+import com.ecommerce.vn.dto.variant.VariantCreateRequest;
 import com.ecommerce.vn.dto.variant.VariantResponse;
+import com.ecommerce.vn.entity.attribute.AttributeValue;
+import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Variant;
 
 @Service
@@ -38,5 +42,26 @@ public class VariantConvert {
 		variantResponse.setAttributeValueResponses(attributeValueResponses);
 		
 		return variantResponse;
+	}
+	
+	public Variant variantCreateRequestConvertToVariant(VariantCreateRequest variantCreateRequest) {
+		Product product = new Product();
+		product.setId(variantCreateRequest.getProductId());
+		
+		Variant variant = new Variant();
+		variant.setPrice(BigDecimal.valueOf(variantCreateRequest.getPrice()));
+		variant.setQuantity(variantCreateRequest.getQuantity());
+		variant.setDiscountPrice(BigDecimal.valueOf(variantCreateRequest.getDiscountPrice()));
+		variant.setProduct(product);
+		
+		List<AttributeValue> attributeValues = variantCreateRequest.getAttributeValueCreateRequests()
+				.stream()
+				.map(attributeValueConvert::attributeValueCreateRequestConvert)
+				.toList();
+		
+		variant.setAttributeValues(attributeValues);
+		
+		return variant;
+		
 	}
 }

@@ -10,15 +10,19 @@ import com.ecommerce.vn.entity.attribute.AttributeValue;
 @Service
 public class AttributeValueConvert {
 
-    public Attribute attributeValueCreateRequestConvert(AttributeValueCreateRequest attributeValueCreateRequest) {
+    public AttributeValue attributeValueCreateRequestConvert(AttributeValueCreateRequest attributeValueCreateRequest) {
         if (attributeValueCreateRequest != null) {
             return null;
         }
-
+        
         Attribute attribute = new Attribute();
-        attribute.setAttributeValues(attribute.getAttributeValues());
+        attribute.setId(attributeValueCreateRequest.getAttributeId());
 
-        return attribute;
+        AttributeValue attributeValue = new AttributeValue();
+        attributeValue.setAttribute(attribute);
+        attributeValue.setAttributeValue(attributeValueCreateRequest.getAttributeValue());
+
+        return attributeValue;
     }
 
     public AttributeValueResponse attributeConvertToAttributeValuesResponse(AttributeValue attributeValue) {

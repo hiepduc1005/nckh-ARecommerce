@@ -11,6 +11,7 @@ const  useLoading = () => {
             nprogress.start();
         }else{
             nprogress.done();
+
         }
 
         console.log(loading)
