@@ -58,5 +58,16 @@ public class AttributeServiceImpl implements AttributeService {
 		return attributeRepository.findAll();
 	}
 
+	@Transactional
+	@Override
+	public Attribute createAttributeIfExist(String name) {	
+		return attributeRepository.findByAttributeName(name).orElseGet(() -> {
+			Attribute newAttribute = new Attribute();
+	        newAttribute.setAttributeName(name);
+	        newAttribute.setActive(true);
+	        return attributeRepository.save(newAttribute);
+		});
+	}
+
 }
 

@@ -17,17 +17,13 @@ public class AttributeConvert {
     private AttributeValueConvert attributeValueConvert;
 
     public Attribute attributeCreateRequestConvert(AttributeCreateRequest attributeCreateRequest){
-        if (attributeCreateRequest != null) {
+        if (attributeCreateRequest == null) {
             return null;
         }
 
         Attribute attribute = new Attribute();
-        attribute.setAttributeName(attribute.getAttributeName());
-        attribute.setAttributeValues(attribute.getAttributeValues());
-        attribute.setCreatedAt(attribute.getCreatedAt());
-        attribute.setUpdatedAt(attribute.getUpdatedAt());
-        attribute.setCreatedBy(attribute.getCreatedBy());
-        attribute.setUpdatedBy(attribute.getUpdatedBy());
+        attribute.setAttributeName(attributeCreateRequest.getName());
+       
 
         return attribute;
     }

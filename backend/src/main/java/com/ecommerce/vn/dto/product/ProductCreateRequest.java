@@ -1,10 +1,13 @@
 package com.ecommerce.vn.dto.product;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
+
+import com.ecommerce.vn.dto.attribute.AttributeCreateRequest;
 
 
 public class ProductCreateRequest {
@@ -15,13 +18,20 @@ public class ProductCreateRequest {
 	
 	private String shortDescription;
 	
-	private MultipartFile image;
 	
-	private Set<UUID> categoryIds = new HashSet<UUID>();
+//	private Set<UUID> categoryIds = new HashSet<UUID>();
+//	
+//	private Set<UUID> tagIds = new HashSet<UUID>();
 	
-	private Set<UUID> tagIds = new HashSet<UUID>();
+	private List<AttributeCreateRequest> attributeCreateRequests;
+
 	
-	private Set<UUID> attributeIds = new HashSet<UUID>();
+	@Override
+	public String toString() {
+		return "ProductCreateRequest [productName=" + productName + ", description=" + description
+				+ ", shortDescription=" + shortDescription + ", attributeCreateRequests=" + attributeCreateRequests
+				+ "]";
+	}
 
 	public String getProductName() {
 		return productName;
@@ -47,36 +57,32 @@ public class ProductCreateRequest {
 		this.shortDescription = shortDescription;
 	}
 
-	public MultipartFile getImage() {
-		return image;
+	
+	public List<AttributeCreateRequest> getAttributeCreateRequests() {
+		return attributeCreateRequests;
 	}
 
-	public void setImage(MultipartFile image) {
-		this.image = image;
+	public void setAttributeCreateRequests(List<AttributeCreateRequest> attributeCreateRequests) {
+		this.attributeCreateRequests = attributeCreateRequests;
 	}
+	
+	
 
-	public Set<UUID> getCategoryIds() {
-		return categoryIds;
-	}
+//	public Set<UUID> getCategoryIds() {
+//		return categoryIds;
+//	}
+//
+//	public void setCategoryIds(Set<UUID> categoryIds) {
+//		this.categoryIds = categoryIds;
+//	}
+//
+//	public Set<UUID> getTagIds() {
+//		return tagIds;
+//	}
+//
+//	public void setTagIds(Set<UUID> tagIds) {
+//		this.tagIds = tagIds;
+//	}
 
-	public void setCategoryIds(Set<UUID> categoryIds) {
-		this.categoryIds = categoryIds;
-	}
-
-	public Set<UUID> getTagIds() {
-		return tagIds;
-	}
-
-	public void setTagIds(Set<UUID> tagIds) {
-		this.tagIds = tagIds;
-	}
-
-	public Set<UUID> getAttributeIds() {
-		return attributeIds;
-	}
-
-	public void setAttributeIds(Set<UUID> attributeIds) {
-		this.attributeIds = attributeIds;
-	}
 	
 }

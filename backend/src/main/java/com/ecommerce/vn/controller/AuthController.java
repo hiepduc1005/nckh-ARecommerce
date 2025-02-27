@@ -63,6 +63,7 @@ public class AuthController {
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body("Đăng ký thành công!");
 		}catch (Exception ex) {
+			ex.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi! Không thể đăng ký");
 	    }
 	}

@@ -1,12 +1,15 @@
 package com.ecommerce.vn.entity.product;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.ecommerce.vn.entity.attribute.Attribute;
 import com.ecommerce.vn.entity.rating.Rating;
@@ -14,6 +17,7 @@ import com.ecommerce.vn.entity.rating.Rating;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,6 +29,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "product")
+@EntityListeners(AuditingEntityListener.class)
 public class Product {
 	
 	@Id
@@ -64,7 +69,7 @@ public class Product {
 	private UUID updatedBy;
 	
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
-	private Set<Variant> variants = new HashSet<Variant>();
+	private List<Variant> variants = new ArrayList<Variant>();
 	
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(
@@ -72,7 +77,7 @@ public class Product {
 	       joinColumns = @JoinColumn(name = "product_id"),
 	       inverseJoinColumns = @JoinColumn(name = "category_id")
 	)
-	private Set<Category> categories = new HashSet<>();
+	private List<Category> categories = new ArrayList<>();
 
 	@ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
 	@JoinTable(
@@ -80,28 +85,21 @@ public class Product {
 			joinColumns = @JoinColumn(name = "product_id"),
 			inverseJoinColumns = @JoinColumn(name = "tag_id")
 	)
-	private Set<Tag> tags = new HashSet<Tag>();
+	private List<Tag> tags = new ArrayList<Tag>();
 	
-	@ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+	@ManyToMany
 	@JoinTable(
 			name = "products_attributes",
 			joinColumns = @JoinColumn(name = "product_id"),
 			inverseJoinColumns = @JoinColumn(name = "attribute_id")
 	)
-	private Set<Attribute> attributes = new HashSet<Attribute>();
+	private List<Attribute> attributes = new ArrayList<Attribute>();
 	
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
-	private Set<Rating> ratings = new HashSet<Rating>();
+	private List<Rating> ratings = new ArrayList<Rating>();
 	
 	
-	public Set<Rating> getRatings() {
-		return ratings;
-	}
-
-	public void setRatings(Set<Rating> ratings) {
-		this.ratings = ratings;
-	}
-
+	
 	public Integer getSoldQuantity() {
 		return soldQuantity;
 	}
@@ -110,37 +108,46 @@ public class Product {
 		this.soldQuantity = soldQuantity;
 	}
 
-	public Set<Variant> getVariants() {
+	
+
+	public List<Variant> getVariants() {
 		return variants;
 	}
 
-	public void setVariants(Set<Variant> variants) {
+	public void setVariants(List<Variant> variants) {
 		this.variants = variants;
 	}
 
-
-	public Set<Attribute> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Set<Attribute> attributes) {
-		this.attributes = attributes;
-	}
-
-	public Set<Category> getCategories() {
+	public List<Category> getCategories() {
 		return categories;
 	}
 
-	public void setCategories(Set<Category> categories) {
+	public void setCategories(List<Category> categories) {
 		this.categories = categories;
 	}
 
-	public Set<Tag> getTags() {
+	public List<Tag> getTags() {
 		return tags;
 	}
 
-	public void setTags(Set<Tag> tags) {
+	public void setTags(List<Tag> tags) {
 		this.tags = tags;
+	}
+
+	public List<Attribute> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(List<Attribute> attributes) {
+		this.attributes = attributes;
+	}
+
+	public List<Rating> getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(List<Rating> ratings) {
+		this.ratings = ratings;
 	}
 
 	public UUID getId() {

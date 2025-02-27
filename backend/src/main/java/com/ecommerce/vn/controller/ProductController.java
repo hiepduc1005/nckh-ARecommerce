@@ -2,15 +2,19 @@ package com.ecommerce.vn.controller;
 
 import java.util.UUID;
 import java.util.List;
+import java.io.Console;
 import java.math.BigDecimal;
 
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.dto.product.ProductCreateRequest;
 import com.ecommerce.vn.dto.product.ProductResponse;
@@ -45,13 +49,17 @@ public class ProductController {
     private FileUploadService fileUploadService;
 
     //Tạo sản phẩm
-    @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody ProductCreateRequest request) {
-    	if(request.getImage() == null) {
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> createProduct(
+            @RequestPart("image") MultipartFile image, 
+            @RequestPart("product")  ProductCreateRequest request) {
+    	if(image == null) {
     		return ResponseEntity.badRequest().body("Product image is empty!");
     	}
+    	
+    	System.out.println(request.toString());
         Product product = productConvert.productCreateRequestConver(request);
-        String imagePath = fileUploadService.uploadFileToServer(request.getImage());
+        String imagePath = fileUploadService.uploadFileToServer(image);
         product.setImagePath(imagePath);
         
         Product saveProduct = productService.createProduct(product);

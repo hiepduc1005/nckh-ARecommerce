@@ -1,5 +1,6 @@
 package com.ecommerce.vn.service.convert;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,9 @@ public class ProductConvert {
 
     @Autowired
     private AttributeRepository attributeRepository;
+    
+    @Autowired
+    private AttributeConvert attributeConvert;
 
     public Product productCreateRequestConver(ProductCreateRequest productCreateRequest){
 
@@ -42,19 +46,23 @@ public class ProductConvert {
             return null;
         }
 
-        Set<Category> categories = categoryRepository.findAllById(productCreateRequest.getCategoryIds())
-        .stream().collect(Collectors.toSet());
-        Set<Tag> tags = tagRepository.findAllById(productCreateRequest.getTagIds())
-        .stream().collect(Collectors.toSet());
-        Set<Attribute> attributes = attributeRepository.findAllById(productCreateRequest.getAttributeIds())
-        .stream().collect(Collectors.toSet());
-
+//        Set<Category> categories = categoryRepository.findAllById(productCreateRequest.getCategoryIds())
+//        .stream().collect(Collectors.toSet());
+//        Set<Tag> tags = tagRepository.findAllById(productCreateRequest.getTagIds())
+//        .stream().collect(Collectors.toSet());
+//      
+        
+        List<Attribute> attributes = productCreateRequest.getAttributeCreateRequests()
+        		.stream()
+        		.map(attributeCreateRequest -> { 
+        			return attributeConvert.attributeCreateRequestConvert(attributeCreateRequest);
+        			})
+        		.toList();
+        
         Product product = new Product();
         product.setProductName(productCreateRequest.getProductName());
         product.setDescription(productCreateRequest.getDescription());
         product.setShortDescription(productCreateRequest.getShortDescription());
-        product.setCategories(categories);
-        product.setTags(tags);
         product.setAttributes(attributes);
             
         return product;
@@ -66,12 +74,12 @@ public class ProductConvert {
             return null;
         }
 
-        Set<Category> categories = categoryRepository.findAllById(productUpdateRequest.getCategoryIds())
-        .stream().collect(Collectors.toSet());
-        Set<Tag> tags = tagRepository.findAllById(productUpdateRequest.getTagIds())
-        .stream().collect(Collectors.toSet());
-        Set<Attribute> attributes = attributeRepository.findAllById(productUpdateRequest.getAttributeIds())
-        .stream().collect(Collectors.toSet());
+        List<Category> categories = categoryRepository.findAllById(productUpdateRequest.getCategoryIds())
+        .stream().collect(Collectors.toList());
+        List<Tag> tags = tagRepository.findAllById(productUpdateRequest.getTagIds())
+        .stream().collect(Collectors.toList());
+        List<Attribute> attributes = attributeRepository.findAllById(productUpdateRequest.getAttributeIds())
+        .stream().collect(Collectors.toList());
 
         Product product = new Product();
         product.setId(productUpdateRequest.getId());     

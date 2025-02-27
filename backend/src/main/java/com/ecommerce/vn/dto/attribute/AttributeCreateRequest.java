@@ -1,28 +1,26 @@
 package com.ecommerce.vn.dto.attribute;
 
-import java.util.HashSet;
-import java.util.Set;
+
 
 public class AttributeCreateRequest {
-	private String attributeName;
+	private String name;
 
-	private Set<AttributeValueCreateRequest> attributeValueCreateRequest = new HashSet<AttributeValueCreateRequest>();
-	
-	public Set<AttributeValueCreateRequest> getAttributeValueCreateRequest() {
-		return attributeValueCreateRequest;
+
+	@Override
+	public String toString() {
+		return "AttributeCreateRequest [name=" + name + " ]";
 	}
 
-	public void setAttributeValueCreateRequest(Set<AttributeValueCreateRequest> attributeValueCreateRequest) {
-		this.attributeValueCreateRequest = attributeValueCreateRequest;
+
+	public String getName() {
+		return name;
 	}
 
-	public String getAttributeName() {
-		return attributeName;
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void setAttributeName(String attributeName) {
-		this.attributeName = attributeName;
-	}
 	
 	
 }

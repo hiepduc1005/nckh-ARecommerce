@@ -12,9 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.dto.product.ProductWithScore;
+import com.ecommerce.vn.entity.attribute.Attribute;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Tag;
 import com.ecommerce.vn.repository.ProductRepository;
+import com.ecommerce.vn.service.attribute.AttributeService;
+import com.ecommerce.vn.service.attribute.impl.AttributeServiceImpl;
 import com.ecommerce.vn.service.product.ProductService;
 
 @Service
@@ -23,9 +26,24 @@ public class ProductServiceImpl implements ProductService{
 	
 	@Autowired
 	private ProductRepository productRepository;
+	
+	@Autowired
+	private AttributeService attributeService;
 
+	
 	@Override
 	public Product createProduct(Product product) {
+		product.setActive(false);
+		
+		List<Attribute> attributes = product.getAttributes()
+			.stream()
+			.map(
+					(attribute) -> attributeService.createAttributeIfExist(attribute.getAttributeName())
+				)
+			.toList();
+		
+		product.setAttributes(attributes);
+		
 		return productRepository.save(product);
 	}
 

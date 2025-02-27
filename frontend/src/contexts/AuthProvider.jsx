@@ -8,7 +8,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({children}) => {
     const [user,setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+    const [token , setToken] = useState();
     const navigate = useNavigate();
     const {loading,setLoading} = useLoading();
 
@@ -28,6 +28,7 @@ export const AuthProvider = ({children}) => {
     
                
                 const userAuth = await getAuthUser(token);
+                setToken(token);
                 if(userAuth){
                     setUser(userAuth);
                     setIsAuthenticated(true);
@@ -101,7 +102,7 @@ export const AuthProvider = ({children}) => {
     } 
 
     return (
-        <AuthContext.Provider value={{user,isAuthenticated,login,logout,register}}>
+        <AuthContext.Provider value={{user,isAuthenticated,token,login,logout,register}}>
             {children}
         </AuthContext.Provider>
     )

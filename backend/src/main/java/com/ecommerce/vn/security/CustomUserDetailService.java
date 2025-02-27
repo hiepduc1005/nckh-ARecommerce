@@ -16,12 +16,15 @@ import com.ecommerce.vn.entity.role.Role;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.service.user.UserService;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class CustomUserDetailService implements UserDetailsService{
 
 	@Autowired
 	private UserService userService;
 	
+	@Transactional
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userService.findUserByEmail(username); 

@@ -1,7 +1,10 @@
 package com.ecommerce.vn.entity.attribute;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.ecommerce.vn.entity.product.Variant;
 
@@ -21,8 +24,8 @@ import jakarta.persistence.Table;
 public class AttributeValue {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attribute_id", nullable = false)
@@ -32,13 +35,23 @@ public class AttributeValue {
     private String attributeValue;
     
     @ManyToMany(mappedBy = "attributeValues",fetch = FetchType.LAZY)
-    private Set<Variant> variants = new HashSet<Variant>();
+    private List<Variant> variants = new ArrayList<Variant>();
+    
+    
 
-	public Long getId() {
+	public List<Variant> getVariants() {
+		return variants;
+	}
+
+	public void setVariants(List<Variant> variants) {
+		this.variants = variants;
+	}
+
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 

@@ -18,5 +18,7 @@ public interface AttributeService {
     Attribute getAttributeById(UUID id);
 
     List<Attribute> getAllAttributes();
+    
+    Attribute createAttributeIfExist(String name);
 }
 
