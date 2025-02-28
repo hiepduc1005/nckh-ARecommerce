@@ -2,6 +2,7 @@
 import { Bounce, ToastContainer } from 'react-toastify'
 import './App.scss'
 import AppRoutes from './routes/AppRoutes'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
 

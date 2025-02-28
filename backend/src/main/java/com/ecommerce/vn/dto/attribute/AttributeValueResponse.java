@@ -22,7 +22,8 @@ public class AttributeValueResponse {
 		this.attributeValue = attributeValue;
 	}
 
-	public AttributeValueResponse(String attributeValue) {
+	public AttributeValueResponse(String attributeValue, UUID id) {
+		this.id = id;
 		this.attributeValue = attributeValue;
 	}
 

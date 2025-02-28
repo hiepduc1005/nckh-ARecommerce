@@ -144,10 +144,13 @@ public class ProductResponse {
 	public void setUpdatedBy(UUID updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+	
+	
 
 	public ProductResponse(UUID id, Boolean active, String productName, String description, String shortDescription,
-			String imagePath, Set<CategoryResponse> categories, Set<TagResponse> tags, LocalDateTime createdAt,
-			LocalDateTime updatedAt, UUID createdBy, UUID updatedBy) {
+			String imagePath, Set<CategoryResponse> categories, Set<TagResponse> tags,
+			List<AttributeResponse> attributeResponses, LocalDateTime createdAt, LocalDateTime updatedAt,
+			UUID createdBy, UUID updatedBy) {
 		this.id = id;
 		this.active = active;
 		this.productName = productName;
@@ -156,11 +159,14 @@ public class ProductResponse {
 		this.imagePath = imagePath;
 		this.categories = categories;
 		this.tags = tags;
+		this.attributeResponses = attributeResponses;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.createdBy = createdBy;
 		this.updatedBy = updatedBy;
 	}
+
+
 	
 
 	

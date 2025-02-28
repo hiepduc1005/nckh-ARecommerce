@@ -143,12 +143,15 @@ public class ProductController {
 
     // Phân trang và sắp xếp sản phẩm
     @GetMapping("/pagination")
-    public ResponseEntity<Page<Product>> getProductsWithPaginationAndSorting(
+    public ResponseEntity<Page<ProductResponse>> getProductsWithPaginationAndSorting(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @RequestParam("sortBy") String sortBy) {
-        Page<Product> products = productService.getProductsWithPaginationAndSorting(page, size, sortBy);
-        return new ResponseEntity<>(products, HttpStatus.OK);
+            @RequestParam(value ="sortBy" , required = false) String sortBy) {
+    	
+    	Page<Product> products = productService.getProductsWithPaginationAndSorting(page, size, sortBy);
+        
+    	Page<ProductResponse> productResponses = products.map(product -> productConvert.productConvertToProductResponse(product));
+    	return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
     // Lấy danh sách sản phẩm theo người bán 

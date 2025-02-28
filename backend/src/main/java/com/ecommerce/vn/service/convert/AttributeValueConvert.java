@@ -11,7 +11,7 @@ import com.ecommerce.vn.entity.attribute.AttributeValue;
 public class AttributeValueConvert {
 
     public AttributeValue attributeValueCreateRequestConvert(AttributeValueCreateRequest attributeValueCreateRequest) {
-        if (attributeValueCreateRequest != null) {
+        if (attributeValueCreateRequest == null) {
             return null;
         }
         
@@ -21,7 +21,6 @@ public class AttributeValueConvert {
         AttributeValue attributeValue = new AttributeValue();
         attributeValue.setAttribute(attribute);
         attributeValue.setAttributeValue(attributeValueCreateRequest.getAttributeValue());
-
         return attributeValue;
     }
 
@@ -30,6 +29,6 @@ public class AttributeValueConvert {
             return null;
         }
 
-        return new AttributeValueResponse(attributeValue.getAttributeValue());
+        return new AttributeValueResponse(attributeValue.getAttributeValue(),attributeValue.getId());
     }
 }

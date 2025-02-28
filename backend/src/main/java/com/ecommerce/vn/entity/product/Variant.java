@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.ecommerce.vn.entity.attribute.AttributeValue;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -58,7 +59,7 @@ public class Variant {
 	@Column(name = "updated_by")
 	private UUID updatedBy;
 	
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
         name = "variant_attribute_values",
         joinColumns = @JoinColumn(name = "variant_id"),

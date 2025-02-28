@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.vn.dto.attribute.AttributeResponse;
 import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.dto.product.ProductCreateRequest;
 import com.ecommerce.vn.dto.product.ProductResponse;
@@ -103,6 +104,11 @@ public class ProductConvert {
         Set<TagResponse> tagResponses = product.getTags().stream()
             .map(tagConvert::tagConvertToTagResponse) 
             .collect(Collectors.toSet());
+        
+        List<AttributeResponse> attributeResponses = product.getAttributes()
+        		.stream()
+        		.map((attribute) -> attributeConvert.attributeConvertToAttributeResponse(attribute) )
+        		.toList();
 
 
         return new ProductResponse(
@@ -114,6 +120,7 @@ public class ProductConvert {
             product.getImagePath(), 
             categoryResponses, 
             tagResponses, 
+            attributeResponses,
             product.getCreatedAt(), 
             product.getUpdateAt(), 
             product.getCreatedBy(), 

@@ -1,125 +1,196 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Table, Button, Image, Pagination, Form, Row, Col, Container } from "react-bootstrap";
 import "../assets/styles/pages/AdminProducts.scss";
 import useAuth from "../hooks/UseAuth";
-import { createProduct } from "../api/productApi";
+import { createProduct, getProductsPaginate } from "../api/productApi";
 import { toast } from "react-toastify";
+import AddVariantModal from "../components/AddVariantModal";
+
+const AttributeInput = ({ attributes, onAdd, onRemove, onChange }) => (
+  <div>
+    <h5 className="mt-3">Attributes</h5>
+    {attributes.map((attr, index) => (
+      <Row key={index} className="mb-2 align-items-center">
+        <Col md={10}>
+          <Form.Control
+            type="text"
+            placeholder="Attribute Name"
+            value={attr.name}
+            onChange={(e) => onChange(index, e.target.value)}
+          />
+        </Col>
+        <Col md={2}>
+          <Button variant="danger" size="sm" onClick={() => onRemove(index)}>❌</Button>
+        </Col>
+      </Row>
+    ))}
+    <Button variant="primary" onClick={onAdd}>➕ Add Attribute</Button>
+  </div>
+);
 
 const AdminProduct = () => {
-  // State lưu danh sách attributes
-  const [name,setName] = useState("");
-  const [description,setDescription] = useState("");
-  const [sortDescription,setSortDescription] = useState("");
-
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [shortDescription, setShortDescription] = useState("");
+  const [products, setProducts] = useState([]);
   const [attributes, setAttributes] = useState([]);
-  const [image, setImage] = useState();
-  const [imagePreview, setImagePreview] = useState();
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const {token} = useAuth();
+  const [showVariantModal, setShowVariantModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const { token } = useAuth();
 
-  // Hàm thêm attribute
-  const addAttribute = () => {
-    setAttributes([...attributes, {  name: ""}]);
+  useEffect(() => {
+    if (image) {
+      const objectURL = URL.createObjectURL(image);
+      setImagePreview(objectURL);
+      return () => URL.revokeObjectURL(objectURL);
+    }
+  }, [image]);
+
+  const handleAttributeChange = useCallback((index, value) => {
+    setAttributes((prev) => prev.map((attr, i) => (i === index ? { name: value } : attr)));
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name || !shortDescription || !description) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+
+    const productData = {
+      productName: name,
+      shortDescription,
+      description,
+      attributeCreateRequests: attributes,
+    };
+
+    const formData = new FormData();
+    formData.append("product", new Blob([JSON.stringify(productData)], { type: "application/json" }));
+    if (image) formData.append("image", image);
+
+    try {
+      await createProduct(formData, token);
+      toast.success("Tạo mới product thành công!");
+    } catch (error) {
+      toast.error("Tạo mới product thất bại!");
+    }
   };
 
   useEffect(() => {
-    if(image){
-      const objectURL = URL.createObjectURL(image);
-      setImagePreview(objectURL);
-      return () => URL.revokeObjectURL(objectURL); // Giải phóng bộ nhớ
-    }
-  },[image,setImage])
-
-  // Hàm cập nhật giá trị attribute
-  const handleAttributeChange = (index,  value) => {
-    const updatedAttributes = [...attributes];
-    updatedAttributes[index].name = value;
-    setAttributes(updatedAttributes);
-  };
-
-  // Hàm xóa attribute
-  const removeAttribute = (id) => {
-    setAttributes(attributes.filter(attr => attr.id !== id));
-  };
-
-  const handleSubmit = async  (e) => {
-    e.preventDefault()
-    console.log(attributes)
-    const productData = {productName:name, shortDescription:sortDescription,description:description,attributeCreateRequests: attributes}
-    const formData = new FormData();
-    console.log(productData)
-    formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
-    formData.append('image', image); 
-
-    
-    const data = await createProduct(formData,token);
-    toast.success("Tao moi product thanh cong");
-  }
+    const fetchProducts = async () => {
+      const data = await getProductsPaginate(currentPage);
+      setProducts(data.content);
+      setTotalPages(data.totalPages);
+    };
+    fetchProducts();
+  }, [currentPage]);
 
   return (
-    <div className="product-management">
-      <div className="title">Product Admin</div>
-      <div>Add Product</div>
-      <form onSubmit={(e) => handleSubmit(e)}>
-      <label htmlFor="productName">Name</label>
-        <input
-          type="text"
-          id="productName"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+    <Container className="product-management mt-4">
+      <h2 className="text-center mb-4">Product Management</h2>
+
+      <Form onSubmit={handleSubmit} className="mb-4 p-3 border rounded">
+        <Row className="mb-3">
+          <Col md={6}>
+            <Form.Group>
+              <Form.Label>Name</Form.Label>
+              <Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} />
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group>
+              <Form.Label>Short Description</Form.Label>
+              <Form.Control type="text" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} />
+            </Form.Group>
+          </Col>
+        </Row>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Description</Form.Label>
+          <Form.Control as="textarea" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Image</Form.Label>
+          <Form.Control type="file" onChange={(e) => setImage(e.target.files[0])} />
+          {imagePreview && <Image src={imagePreview} alt="Preview" fluid className="mt-2" />}
+        </Form.Group>
+
+        <AttributeInput attributes={attributes} onAdd={() => setAttributes([...attributes, { name: "" }])} onRemove={(index) => setAttributes(attributes.filter((_, i) => i !== index))} onChange={handleAttributeChange} />
+
+        <Button type="submit" className="mt-3 w-100">Submit</Button>
+      </Form>
+
+      <h2 className="my-3 text-center">Product List</h2>
+      <Table striped bordered hover responsive>
+        <thead className="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.length > 0 ? (
+            products.map((product, index) => (
+              <tr key={product.id}>
+                <td>{index + 1 + (currentPage - 1) * 5}</td>
+                <td>
+                  <Image src={`http://localhost:8080${product.imagePath}`} alt={product.productName} width={50} height={50} rounded />
+                </td>
+                <td>{product.productName}</td>
+                <td>{product.shortDescription}</td>
+                <td>{product.active ? "Active" : "Inactive"}</td>
+                <td>
+                  <Button variant="warning" size="sm" className="me-2">Edit</Button>
+                  <Button variant="danger" size="sm">Delete</Button>
+                  <Button
+                    variant="success"
+                    size="sm"
+                    className="ms-2"
+                    onClick={() => {
+                      setSelectedProduct(product);
+                      setShowVariantModal(true);
+                    }}
+                  >
+                    Add Variant
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className="text-center">No products available</td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+
+      <Pagination className="justify-content-center mt-3">
+        {[...Array(totalPages).keys()].map((num) => (
+          <Pagination.Item key={num + 1} active={num + 1 === currentPage} onClick={() => setCurrentPage(num + 1)}>
+            {num + 1}
+          </Pagination.Item>
+        ))}
+      </Pagination>
+
+      {selectedProduct && (
+        <AddVariantModal
+          show={showVariantModal}
+          handleClose={() => setShowVariantModal(false)}
+          product={selectedProduct}
+          token={token}
         />
-
-        <label htmlFor="description">Description</label>
-        <input
-          type="text"
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
-        <label htmlFor="sortDescription">Short Description</label>
-        <input
-          type="text"
-          id="sortDescription"
-          value={sortDescription}
-          onChange={(e) => setSortDescription(e.target.value)}
-        />
-
-        <label htmlFor="image">Image</label>
-        <input onChange={(e) => setImage(e.target.files[0])}  type="file" id="image" />
-
-        <img src={imagePreview}/>
-
-        {/* Danh sách các attribute */}
-        <div className="attributes">
-          <h3>Attributes</h3>
-          {attributes.map((attr, index) => (
-            <div key={attr.id} className="attribute-item">
-              <input
-                type="text"
-                placeholder="Attribute Name"
-                value={attr.name}
-                onChange={(e) =>
-                  handleAttributeChange(index, e.target.value)
-                }
-              />
-             
-              <button type="button" onClick={() => removeAttribute(attr.id)}>
-                ❌
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Nút thêm attribute */}
-        <button type="button" onClick={addAttribute}>
-          Add attribute
-        </button>
-
-        <button type="submit" >
-          Submit
-        </button>
-      </form>
-    </div>
+      )}
+    </Container>
   );
 };
 
