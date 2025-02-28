@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.ecommerce.vn.entity.attribute.AttributeValue;
 import com.ecommerce.vn.entity.product.Variant;
 
@@ -22,7 +25,7 @@ public interface VariantService {
 	
 	List<Variant> findAll();
 	
-	List<Variant> findAllVariantsByProduct(UUID ProductId);
+	Page<Variant> findAllVariantsByProduct(UUID ProductId, Pageable pageable);
 	
 	List<Variant> findVariantsByAttributeValues(Set<AttributeValue> attributeValues);
 	

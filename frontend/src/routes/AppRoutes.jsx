@@ -15,6 +15,8 @@ import SearchPage from '../pages/SearchPage'
 import AdminLayout from '../layouts/AdminLayout'
 import Dashboard from '../pages/Dashboard'
 import AdminProduct from '../pages/AdminProduct'
+import AdminProductVariants from '../pages/AdminProductVariants'
+import AdminVariants from '../pages/AdminVariants'
 
 const AppRoutes = () => {
   return (
@@ -39,6 +41,8 @@ const AppRoutes = () => {
         <Route path='/admin' element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path='products' element={<AdminProduct/>} />
+          <Route path="products/:productId" element={<AdminProductVariants />}/>
+          <Route path='variants' element={<AdminVariants />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

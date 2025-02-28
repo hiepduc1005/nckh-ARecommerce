@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from "react-router-dom";
 import './index.css'
@@ -7,7 +6,6 @@ import { LoadingProvider } from './contexts/LoadingProvider.jsx';
 import { AuthProvider } from './contexts/AuthProvider.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
     <BrowserRouter>
       <LoadingProvider>
         <AuthProvider>
@@ -15,5 +13,4 @@ createRoot(document.getElementById('root')).render(
         </AuthProvider>
       </LoadingProvider>
     </BrowserRouter>
-  </StrictMode>,
 )

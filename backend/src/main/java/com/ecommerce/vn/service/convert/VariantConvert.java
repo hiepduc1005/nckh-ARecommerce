@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.vn.dto.attribute.AttributeResponse;
 import com.ecommerce.vn.dto.attribute.AttributeValueResponse;
 import com.ecommerce.vn.dto.variant.VariantCreateRequest;
 import com.ecommerce.vn.dto.variant.VariantResponse;
@@ -21,6 +22,9 @@ public class VariantConvert {
 	
 	@Autowired
 	private AttributeValueConvert attributeValueConvert;
+	
+	@Autowired
+	private AttributeConvert attributeConvert;
 	
 	public VariantResponse variantConvertToVariantResponse(Variant variant) {
 		VariantResponse variantResponse = new VariantResponse();
@@ -39,8 +43,13 @@ public class VariantConvert {
 				.map((attributeValue) -> attributeValueConvert.attributeConvertToAttributeValuesResponse(attributeValue))
 				.toList();
 		
-		variantResponse.setAttributeValueResponses(attributeValueResponses);
+		List<AttributeResponse> attributeResponses = variant.getProduct().getAttributes()
+				.stream()
+				.map((attribute) -> attributeConvert.attributeConvertToAttributeResponse(attribute))
+				.toList();
 		
+		variantResponse.setAttributeValueResponses(attributeValueResponses);
+		variantResponse.setAttributeResponses(attributeResponses);
 		return variantResponse;
 	}
 	

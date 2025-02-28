@@ -98,8 +98,8 @@ public class ProductController {
     }
 
     //Xóa sản phẩm 
-    @DeleteMapping
-	public ResponseEntity<String> deleteProduct(@PathVariable UUID productId){
+    @DeleteMapping("/{productId}")
+	public ResponseEntity<String> deleteProduct(@PathVariable("productId") UUID productId){
 		try {
             productService.deleteProduct(productId);
             return ResponseEntity.ok("Product deleted successfully.");

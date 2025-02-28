@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.ecommerce.vn.dto.attribute.AttributeResponse;
 import com.ecommerce.vn.dto.attribute.AttributeValueResponse;
 import com.ecommerce.vn.dto.product.ProductResponse;
 
@@ -14,11 +15,20 @@ public class VariantResponse {
 	private BigDecimal price;
 	private BigDecimal discountPrice;
 	private Integer quantity;
+	private List<AttributeResponse> attributeResponses;
 	private List<AttributeValueResponse> attributeValueResponses;
 	private LocalDateTime createdAt;
 	private LocalDateTime updateAt;
 	private UUID createdBy;
 	private UUID updatedBy;
+	
+	
+	public List<AttributeResponse> getAttributeResponses() {
+		return attributeResponses;
+	}
+	public void setAttributeResponses(List<AttributeResponse> attributeResponses) {
+		this.attributeResponses = attributeResponses;
+	}
 	public UUID getId() {
 		return id;
 	}

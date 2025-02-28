@@ -2,9 +2,11 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Table, Button, Image, Pagination, Form, Row, Col, Container } from "react-bootstrap";
 import "../assets/styles/pages/AdminProducts.scss";
 import useAuth from "../hooks/UseAuth";
-import { createProduct, getProductsPaginate } from "../api/productApi";
+import { createProduct, deleteProduct, getProductsPaginate } from "../api/productApi";
 import { toast } from "react-toastify";
 import AddVariantModal from "../components/AddVariantModal";
+import useLoading from "../hooks/UseLoading";
+import { useNavigate } from "react-router-dom";
 
 const AttributeInput = ({ attributes, onAdd, onRemove, onChange }) => (
   <div>
@@ -41,7 +43,10 @@ const AdminProduct = () => {
 
   const [showVariantModal, setShowVariantModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const navigate = useNavigate();
   const { token } = useAuth();
+  const {setLoading} = useLoading();
 
   useEffect(() => {
     if (image) {
@@ -56,6 +61,7 @@ const AdminProduct = () => {
   }, []);
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
     if (!name || !shortDescription || !description) {
       toast.error("Vui lòng điền đầy đủ thông tin");
@@ -76,19 +82,48 @@ const AdminProduct = () => {
     try {
       await createProduct(formData, token);
       toast.success("Tạo mới product thành công!");
+      setLoading(false)
     } catch (error) {
       toast.error("Tạo mới product thất bại!");
+      setLoading(false)
     }
   };
 
   useEffect(() => {
+    setLoading(true)
     const fetchProducts = async () => {
       const data = await getProductsPaginate(currentPage);
       setProducts(data.content);
       setTotalPages(data.totalPages);
     };
     fetchProducts();
-  }, [currentPage]);
+    setLoading(false)
+  }, [currentPage]); 
+
+  const handleDeleteProduct = async (productId) => {
+    setLoading(true);
+    const data = await deleteProduct(token,productId);
+
+    if(data){
+      setProducts((pre) => {
+        const newProducts = pre.filter(product => product.id !== productId);
+        return newProducts;
+      })
+      toast.success("Xóa sản phẩm thành công!");
+      setLoading(false)
+      return;
+    }else {
+      toast.error("Có lỗi xảy ra!");
+      setLoading(false)
+      return;
+    }
+  }
+
+  const handleViewDetails = (product) => {
+    setLoading(true);
+    navigate(`${product.id}`);
+    setLoading(false);
+  }
 
   return (
     <Container className="product-management mt-4">
@@ -133,6 +168,7 @@ const AdminProduct = () => {
             <th>#</th>
             <th>Image</th>
             <th>Name</th>
+            <th>Short Description</th>
             <th>Description</th>
             <th>Status</th>
             <th>Actions</th>
@@ -148,10 +184,12 @@ const AdminProduct = () => {
                 </td>
                 <td>{product.productName}</td>
                 <td>{product.shortDescription}</td>
+                <td>{product.description}</td>
                 <td>{product.active ? "Active" : "Inactive"}</td>
                 <td>
+                  <Button variant="info" size="sm" className="me-2" onClick={() => handleViewDetails(product)}>View Variants</Button>
                   <Button variant="warning" size="sm" className="me-2">Edit</Button>
-                  <Button variant="danger" size="sm">Delete</Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDeleteProduct(product.id)}>Delete</Button>
                   <Button
                     variant="success"
                     size="sm"
@@ -176,7 +214,7 @@ const AdminProduct = () => {
 
       <Pagination className="justify-content-center mt-3">
         {[...Array(totalPages).keys()].map((num) => (
-          <Pagination.Item key={num + 1} active={num + 1 === currentPage} onClick={() => setCurrentPage(num + 1)}>
+          <Pagination.Item key={num + 1} active={num + 1 === currentPage} onClick={() => { setLoading(true); setCurrentPage(num + 1); setLoading(false);}}>
             {num + 1}
           </Pagination.Item>
         ))}

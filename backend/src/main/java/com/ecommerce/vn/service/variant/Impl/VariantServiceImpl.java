@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,8 +72,8 @@ public class VariantServiceImpl implements VariantService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Variant> findAllVariantsByProduct(UUID productId) {
-		return variantRepository.findByProductId(productId);
+	public Page<Variant> findAllVariantsByProduct(UUID productId, Pageable pageable) {
+		return variantRepository.findByProductId(productId, pageable);
 	}
 
 	@Override

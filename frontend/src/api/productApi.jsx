@@ -26,3 +26,18 @@ export const getProductsPaginate = async ( page ) => {
         return null;
     }
 } 
+
+export const deleteProduct = async ( token , productId ) => {
+    try {
+        const res = await axiosInstance.delete(`api/v1/products/${productId}`,{
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        return res.data
+    } catch (error) {
+        console.error(error)
+        return null;
+    }
+} 

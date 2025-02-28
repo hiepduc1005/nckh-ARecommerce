@@ -6,6 +6,8 @@ import java.util.Set;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -33,7 +35,7 @@ public interface VariantRepository extends JpaRepository<Variant, UUID>{
 	Integer findVariantQuantity(@Param("variantId") UUID variantId);
 	
 	@Query("SELECT v FROM Variant v WHERE v.product.id = :productId")
-	List<Variant> findByProductId(@Param("productId") UUID productId);
+	Page<Variant> findByProductId(@Param("productId") UUID productId ,  Pageable pageable);
 	
 	@Modifying
 	@Query("UPDATE Variant v SET v.quantity = v.quantity - :quantity WHERE v.id = :variantId AND v.quantity >= :quantity")

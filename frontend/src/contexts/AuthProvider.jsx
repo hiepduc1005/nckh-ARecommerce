@@ -18,7 +18,7 @@ export const AuthProvider = ({children}) => {
                 
                 setLoading(true); 
                 const token = localStorage.getItem("token");
-                
+                console.log(token)
                 if (!token) {
                     setIsAuthenticated(false);
                     const timeout = setTimeout(() => setLoading(false), 300); 
