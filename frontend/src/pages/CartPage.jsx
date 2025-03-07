@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import Select from 'react-select';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faMinus, faTrash, faTrashAlt, faTrashCan, faTrashRestore } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faMinus, faTrash} from "@fortawesome/free-solid-svg-icons";
 import "../assets/styles/pages/CartPage.scss"
+import { getCartByUserId } from '../api/cartApi';
+import useAuth from '../hooks/UseAuth';
+import useLoading from '../hooks/UseLoading';
+
 const options = [
   { value: "time", label: "Thời gian" },
   { value: "price", label: "Giá" },
@@ -12,46 +15,34 @@ const options = [
 
 
 const CartPage = () => {
-
   const [cartItems,setCartItems] = useState();
   const [quantity,setQuantity] = useState();
+
+  const {user} = useAuth();
+  const {setLoading} = useLoading();
   
   useEffect(() => {
-    const fetchCartProducts  = () => {
-      
+    const fetchCartProducts  = async () => {
+      const data = await getCartByUserId(user.id)
+
+      if(data){
+        setCartItems(data)
+      }
     }
+
+    setLoading(true)
+    fetchCartProducts();
+    setLoading(false)
+
   },[])
+
   return (
     <div className='cart-container'>
         <div className="cart-background-image">
             <span>Giỏ hàng</span>
         </div>
         <div className="cart-body">
-          {/* <div className="options">
-            <div className="left">
-              <input type="checkbox" />
-              <span>Chọn tất cả</span>
-            </div>
-            <div className="right">
-              <span>Sắp xếp theo:</span>
-              <div className="select-container">
-                <Select
-                  className="basic-single"
-                  classNamePrefix="select"
-                  defaultValue=""
-                  placeholder="Sắp xếp"
-                  isDisabled={false}
-                  isLoading={false}
-                  isClearable={true}
-                  isRtl={false}
-                  isSearchable={false}
-                  name="sort"
-                  options={options}
-                />
-              </div>
-            </div>
-          </div> */}
-          
+         
           <div className="cart-list">
             <div className="cart-button">
               <button className='update'>Update Cart</button>

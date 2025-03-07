@@ -16,3 +16,4 @@ export const getAttributeValue = async (attributeId , token) => {
         return null;
     }
 }
+
