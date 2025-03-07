@@ -6,7 +6,7 @@ $primaryColor: #207355;
     justify-content: space-between;
     align-items: center;
     background-color: $primaryColor;
-    padding: 0 28px;
+    padding: 0 120px;
 
     .header-left{
         display: flex;
@@ -41,14 +41,14 @@ $primaryColor: #207355;
             position: relative;
             background-color: #fff;
             border-radius: 4px;
-            height: 30px;
+            height: 34px;
 
             input{
                 outline: none; /* Loại bỏ đường viền khi input được focus */
                 border: none;  /* Nếu muốn loại bỏ luôn border */
                 border-radius: 4px;
                 height: 100%;
-                padding:0 32px 0 12px;
+                padding:0 38px 0 12px;
                 font-weight: 500;
 
                 &::placeholder{
@@ -63,7 +63,7 @@ $primaryColor: #207355;
                 top: 2px;
                 padding: 4px;
                 bottom: 2px;
-                width: 26px;
+                width: 30px;
                 background-color: $primaryColor;
                 border-radius: 2px;
             }

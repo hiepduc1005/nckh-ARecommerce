@@ -16,9 +16,20 @@ import axiosInstance from "../utils/axiosInstance";
     }
 } 
 
-export const getProductsPaginate = async ( page ) => {
+export const getProductsPaginate = async ( page , size) => {
     try {
-        const res = await axiosInstance.get(`api/v1/products/pagination?page=${page - 1}&size=5`);
+        const res = await axiosInstance.get(`api/v1/products/pagination?page=${page - 1}&size=${size}`);
+
+        return res.data;
+    } catch (error) {
+        console.error(error)
+        return null;
+    }
+} 
+
+export const getProductById = async ( productId ) => {
+    try {
+        const res = await axiosInstance.get(`api/v1/products/${productId}`);
 
         return res.data;
     } catch (error) {

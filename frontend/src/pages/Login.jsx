@@ -17,9 +17,7 @@ const Login = () => {
     if(isAuthenticated){
       setLoading(true);
       navigate("/")
-      const timeout = setTimeout(() => setLoading(false), 300);
-
-      return () => clearTimeout(timeout);
+     
     }
   },[isAuthenticated, navigate, setLoading])
 

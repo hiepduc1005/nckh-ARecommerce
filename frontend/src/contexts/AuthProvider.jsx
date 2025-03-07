@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { getAuthUser, loginUser, registerUser } from "../api/userApi";
 import {toast, ToastContainer} from "react-toastify"
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useLoading from "../hooks/UseLoading";
 export const AuthContext = createContext();
 
@@ -11,6 +11,7 @@ export const AuthProvider = ({children}) => {
     const [token , setToken] = useState();
     const navigate = useNavigate();
     const {loading,setLoading} = useLoading();
+    const location = useLocation();
 
     useEffect(() => {
         const fetchAuthUser = async () => {
@@ -49,7 +50,7 @@ export const AuthProvider = ({children}) => {
         };
 
         fetchAuthUser();
-    }, [setLoading]);
+    }, [setLoading , location]);
 
     useEffect(() => {
         console.log("Loading state changed: ", loading);

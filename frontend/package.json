@@ -36,6 +36,7 @@
     "react-select": "^5.10.0",
     "react-slick": "^0.30.3",
     "react-stars": "^2.2.5",
+    "react-tabs": "^6.1.0",
     "react-toastify": "^11.0.3",
     "sass": "^1.84.0",
     "slick-carousel": "^1.8.1",

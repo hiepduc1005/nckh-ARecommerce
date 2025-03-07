@@ -1,0 +1,53 @@
+$primaryColor: #207355;
+
+.topbar-container{
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 120px;
+    color: $primaryColor;
+    background-color: whitesmoke;
+
+    .left{
+        display: flex;
+        flex-direction: row;
+        gap: 40px;
+
+        .email-contact,.phone-contact {
+            font-size: 16px;
+            cursor: pointer;
+            span{
+                margin-left: 12px;
+            }
+        }
+    }
+
+    .right{
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+
+        .user {
+            font-size: 16px;
+            cursor: pointer;
+            span{
+                margin-left: 12px;
+            }
+        }
+
+        .lovelist-icon, .cart-icon{
+            display: flex;
+            flex-direction: row;
+            text-decoration: none;
+            align-items: center;
+            color: #207355;
+
+            span{
+                margin-left: 12px;
+            }
+                
+        }
+    }
+}

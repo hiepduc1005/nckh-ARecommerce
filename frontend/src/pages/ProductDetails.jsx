@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
@@ -12,7 +12,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faShareAlt } from '@fortawesome/free-solid-svg-icons';
 
 import ProductRecommend from '../components/ProductRecommend';
-import { Link } from 'react-router-dom'; // Import Link để điều hướng
+import { Link, useParams } from 'react-router-dom'; // Import Link để điều hướng
+import ProductDetailsTapList from '../components/ProductDetailsTapList';
+import { getProductById } from '../api/productApi';
+import { toast } from 'react-toastify';
+import useLoading from '../hooks/UseLoading';
 
 const products = [
   { id: 1, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 4.5, reviews: 120, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
@@ -29,6 +33,27 @@ const colors = ["red", "blue", "black", "green", "yellow"];
 
 const ProductDetails = () => {
   const [selectedColor, setSelectedColor] = useState(colors[0]);
+
+  const [product,setProduct] = useState()
+
+  const {productId} = useParams();
+  const {setLoading} = useLoading();
+
+  useEffect(() => {
+      const fetchProductById = async () => {
+          const data = await getProductById(productId);
+          console.log(data)
+          if(data){
+              setProduct(data);
+          }else{
+              toast.error("Có lỗi xảy ra!")
+          }
+      }
+
+      setLoading(true)
+      fetchProductById();
+      setLoading(false)
+  }, [productId])
 
   const settings = {
     dots: true,
@@ -66,6 +91,7 @@ const ProductDetails = () => {
             <span>Chia sẻ</span>
           </div>
         </div>
+        <ProductDetailsTapList product={product}/>
         <div className="products-recommend">
           <div className="title">Đề xuất cho bạn</div>
           <ProductRecommend products={products}/>

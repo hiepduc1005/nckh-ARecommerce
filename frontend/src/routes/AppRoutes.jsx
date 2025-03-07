@@ -17,6 +17,7 @@ import Dashboard from '../pages/Dashboard'
 import AdminProduct from '../pages/AdminProduct'
 import AdminProductVariants from '../pages/AdminProductVariants'
 import AdminVariants from '../pages/AdminVariants'
+import CartLayout from '../layouts/CartLayout'
 
 const AppRoutes = () => {
   return (
@@ -25,6 +26,8 @@ const AppRoutes = () => {
             <Route index element={<Home/>}/>
             <Route path='profile' element={<Profile/>}/>
         </Route>
+
+        <Route path='/cart' element={<CartLayout />}></Route>
 
         <Route path='/products' element={<ProductLayout/>} >
             <Route index element={<SearchPage/>}/>

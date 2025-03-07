@@ -30,6 +30,8 @@ const AttributeInput = ({ attributes, onAdd, onRemove, onChange }) => (
   </div>
 );
 
+const sizeProduct = 5;
+
 const AdminProduct = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -92,7 +94,7 @@ const AdminProduct = () => {
   useEffect(() => {
     setLoading(true)
     const fetchProducts = async () => {
-      const data = await getProductsPaginate(currentPage);
+      const data = await getProductsPaginate(currentPage,sizeProduct);
       setProducts(data.content);
       setTotalPages(data.totalPages);
     };

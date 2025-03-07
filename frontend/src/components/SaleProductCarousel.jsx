@@ -4,16 +4,16 @@ import Slider from 'react-slick'
 import { SampleNextArrow, SamplePrevArrow } from './ProductCarousel';
 import ReactStars from 'react-stars'
 
-const products = [
-    { id: 1, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 4.5, reviews: 120, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { id: 2, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 4.1, reviews: 32, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { id: 3, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 5, reviews: 3, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { id: 4, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 2.0, reviews: 42, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { id: 5, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 3.5, reviews: 21, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  ];
+// const products = [
+//     { id: 1, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 4.5, reviews: 120, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+//     { id: 2, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 4.1, reviews: 32, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+//     { id: 3, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 5, reviews: 3, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+//     { id: 4, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 2.0, reviews: 42, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+//     { id: 5, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 3.5, reviews: 21, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+//   ];
   
 
-const SaleProductCarousel = () => {
+const SaleProductCarousel = ({products}) => {
     const settings = {
         dots: false,
         infinite: true,
@@ -33,29 +33,32 @@ const SaleProductCarousel = () => {
         <div className="title">CÁC SẢN PHẨM ĐANG GIẢM GIÁ</div>
         <div className="carousel">
             <Slider {...settings}>
-                {products.map((product) => (
-                    <div key={product.id} className="product-item">
-                        <img src={product.image} alt={product.name} />
-                        <div className="product-name">{product.name}</div>
-                        
-                        {/* Giá sản phẩm */}
-                        <div className="product-prices">
-                            <span className="original-price">{product.originalPrice} </span>
-                            <span className="discounted-price">{product.discountedPrice} </span>
-                        </div>
+                {products?.map((product) => (
+                    <div key={product.id} className="product-item" >
+                        <img src={`http://localhost:8080${product.imagePath}`} alt={product.productName} />
+                        <div className="product-body">
 
-                        <div className="product-rating">
-                        <ReactStars
-                            count={5}
-                            value={product.rating}
-                            size={18}
-                            color2={"#f8b400"} 
-                            edit={false}
-                            half={true}
-                            style={{ display: 'flex', alignItems: 'center' }} // Căn chỉnh sao
-                        />
-                            <span className="rating-score">{product.rating.toFixed(1)}</span> {/* Điểm đánh giá */}
-                            <span className="reviews">({product.reviews} lượt đánh giá)</span>
+                            <div className="product-name">{product.productName}</div>
+                            
+                            {/* Giá sản phẩm */}
+                            <div className="product-prices">
+                                <span className="original-price">{product.price} </span>
+                                <span className="discounted-price">{product.price} </span>
+                            </div>
+
+                            <div className="product-rating">
+                            <ReactStars
+                                count={5}
+                                value={product.ratingValue}
+                                size={18}
+                                color2={"#f8b400"} 
+                                edit={false}
+                                half={true}
+                                style={{ display: 'flex', alignItems: 'center' }} // Căn chỉnh sao
+                            />
+                                <span className="rating-score">{product.ratingValue.toFixed(1)}</span> {/* Điểm đánh giá */}
+                                <span className="reviews">({product.ratingResponses.length} lượt đánh giá)</span>
+                            </div>
                         </div>
                     </div>
                 ))}

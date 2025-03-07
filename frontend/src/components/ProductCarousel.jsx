@@ -5,16 +5,17 @@ import "slick-carousel/slick/slick-theme.css";
 import "../assets/styles/components/ProductCarousel.scss";
 import nextIcon from "../assets/icons/next-icon.png"
 import prevIcon from "../assets/icons/prev-icon.png"
+import ReactStars from 'react-stars'
 
-const products = [
-  { id: 1, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 2, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 3, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 4, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 5, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-];
+// const products = [
+//   { id: 1, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+//   { id: 2, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+//   { id: 3, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+//   { id: 4, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+//   { id: 5, name: "TÊN SẢN PHẨM", price: "XXX.XXX đ", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+// ];
 
-const ProductCarousel = ({ category ,revertBanner}) => {
+const ProductCarousel = ({ category ,revertBanner ,products}) => {
   const settings = {
     dots: false,
     infinite: true,
@@ -45,11 +46,26 @@ const ProductCarousel = ({ category ,revertBanner}) => {
       {/* Slider sản phẩm */}
       <div className="product-carousel">
         <Slider {...settings}>
-          {products.map((product) => (
-            <div key={product.id} className="product-item">
-              <img src={product.image} alt={product.name} />
-              <div className="product-name">{product.name}</div>
-              <div className="product-price">{product.price}</div>
+          {products?.map((product) => (
+            <div key={product.id} className="product-item" style={{width: "auto", marginRight: "12px"}}>
+              <img src={`http://localhost:8080${product.imagePath}`} alt={product.productName} />
+              <div className="product-body">
+                <div className="product-name">{product.productName}</div>
+                <div className="product-price">{product.price}</div>
+                <div className="product-rating">
+                  <ReactStars
+                      count={5}
+                      value={product.ratingValue}
+                      size={18}
+                      color2={"#f8b400"} 
+                      edit={false}
+                      half={true}
+                      style={{ display: 'flex', alignItems: 'center' }} // Căn chỉnh sao
+                  />
+                      <span className="rating-score">{product.ratingValue.toFixed(1)}</span> {/* Điểm đánh giá */}
+                      <span className="reviews">({product.ratingResponses.length} lượt đánh giá)</span>
+                </div>
+              </div>
             </div>
           ))}
         </Slider>
