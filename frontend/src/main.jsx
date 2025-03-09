@@ -4,12 +4,15 @@ import './index.css'
 import App from './App.jsx'
 import { LoadingProvider } from './contexts/LoadingProvider.jsx';
 import { AuthProvider } from './contexts/AuthProvider.jsx';
+import CartProvider from './contexts/CartProvider.jsx';
 
 createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <LoadingProvider>
         <AuthProvider>
-          <App />
+          <CartProvider>
+            <App />
+          </CartProvider>
         </AuthProvider>
       </LoadingProvider>
     </BrowserRouter>
