@@ -11,6 +11,14 @@ public class CartResponse {
 	private UUID userId;
 	private List<CartItemResponse> cartItemResponses = new ArrayList<CartItemResponse>();
 	private CouponResponse couponResponse;
+	private double totalPrice;
+	
+	public double getTotalPrice() {
+		return totalPrice;
+	}
+	public void setTotalPrice(double totalPrice) {
+		this.totalPrice = totalPrice;
+	}
 	public UUID getId() {
 		return id;
 	}

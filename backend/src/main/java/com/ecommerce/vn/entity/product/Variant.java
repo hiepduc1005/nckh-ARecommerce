@@ -40,7 +40,8 @@ public class Variant {
 	private Product product;
 	
 	private BigDecimal price;
-	
+	 
+	@Column(name = "discount_price")
 	private BigDecimal discountPrice;
 	
 	private Integer quantity;

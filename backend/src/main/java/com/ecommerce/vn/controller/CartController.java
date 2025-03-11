@@ -4,7 +4,9 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,23 @@ public class CartController {
 	
 	@Autowired
 	private CartConvert cartConvert;
+	
+	@GetMapping("/{userId}")
+	public ResponseEntity<CartResponse> getCartByUserId(@PathVariable UUID userId){
+		Cart cart = cartService.getCartByUserId(userId);
+		CartResponse cartResponse = cartConvert.cartConvertToCartResponse(cart);
+		
+		return ResponseEntity.ok(cartResponse);
+	}
+	
+	@GetMapping
+	public ResponseEntity<CartResponse> getCartByAuthenticatedUser(){
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		Cart cart = cartService.getCartByEmail(email);
+		CartResponse cartResponse = cartConvert.cartConvertToCartResponse(cart);
+		
+		return ResponseEntity.ok(cartResponse);
+	}
 	
 	@PostMapping("/add/{cartId}")
 	private ResponseEntity<CartResponse> addItemToCart(@PathVariable("cartId") UUID cartId,@RequestBody CartItemCreateRequest cartItemCreateRequest){

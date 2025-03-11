@@ -24,6 +24,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -98,8 +99,20 @@ public class Product {
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
 	private List<Rating> ratings = new ArrayList<Rating>();
 	
+	@ManyToOne
+	@JoinColumn(name = "brand_id")
+	private Brand brand;
 	
 	
+	
+	public Brand getBrand() {
+		return brand;
+	}
+
+	public void setBrand(Brand brand) {
+		this.brand = brand;
+	}
+
 	public Integer getSoldQuantity() {
 		return soldQuantity;
 	}

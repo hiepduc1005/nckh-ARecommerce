@@ -24,7 +24,6 @@ const  useLoading = () => {
 
         }
 
-        console.log(loading)
     },[loading])
     
     return useContext(LoadingContext)

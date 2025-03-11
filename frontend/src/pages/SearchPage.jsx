@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "../assets/styles/pages/SearchPage.scss"
+import { useNavigate, useSearchParams } from "react-router-dom";
+
 import CheckBoxList from "../components/CheckBoxList";
 import Select from 'react-select';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faShare, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import ReactStars from 'react-stars'
-
+import { getProductsFilter } from "../api/productApi";
+import useCart from '../hooks/UseCart';
 const selectOptions = [
   { value: "latest", label: "Mới nhất" },
   { value: "oldest", label: "Cũ nhất" },
@@ -49,39 +52,151 @@ const SearchPage = () => {
   const [selectedCategories,setSelectedCategories] = useState([]);
   const [selectedBrands,setSelectedBrands] = useState([])
   const [selectedPriceRange,setSelectedPriceRange] = useState([])
+  const [maxPrice,setMaxPrice] = useState(1000000000)
+  const [minPrice,setMinPrice] = useState(0)
+  const [totalPage, setTotalPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0)
+  const [filters,setFilters] = useState({
+    page: 0,
+    size: 8,
+    categories: "",  // Thay bằng danh sách cần lọc
+    brands: "",
+    minPrice: 0,
+    maxPrice: 1000000000,
+    keyword: "",
+  })
+  const [filterProducts, setFilterProducts] = useState();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isFirstRender = useRef(true);
+
+  const navigate = useNavigate();
+  
+  const handleCartOnclick = (productId) => {
+    navigate(`${productId}`);
+  }
 
   useEffect(() => {
-    console.log(selectedBrands)
-    console.log(selectedPriceRange)
+  
+    const categoriesString = searchParams.get("categories") || "";
+    const brandsString = searchParams.get("brands") || "";
+    const pricesString = searchParams.get("priceRange") || "";
+    const search = searchParams.get("s") || "";
 
-    console.log(selectedCategories)
-  },[selectedCategories,selectedBrands,selectedPriceRange])
+    if(categoriesString){
+      setSelectedCategories(() => (
+        categories.filter(item => categoriesString.split(",").includes(item.name))
+      ))
+    }
+
+    if(brandsString){
+      setSelectedBrands(() => (
+        brands.filter(item => brandsString.split(",").includes(item.name))
+      ))
+    }
+
+    if(pricesString){
+      setSelectedPriceRange(() => (
+        priceRanges.filter(item => pricesString.split(",").includes(item.name))
+      ))
+    }
+
+    const newFilters = {
+      ...filters,
+      brands: brandsString,
+      categories: categoriesString,
+      maxPrice,
+      minPrice,
+      page: currentPage,
+      keyword: search,
+    };
+  
+    // Chỉ cập nhật nếu filters thực sự thay đổi
+    if (JSON.stringify(newFilters) !== JSON.stringify(filters)) {
+      setFilters(newFilters);
+    }
+  }, [searchParams, maxPrice, minPrice, currentPage]);
+  
+  // Khi filters thay đổi thì gọi API lấy sản phẩm
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return; // Bỏ qua lần đầu tiên
+    }
+    const fetchFilterProduct = async () => {
+      const data = await getProductsFilter(filters);
+  
+      if (data) {
+        setTotalPage(data?.totalPages);
+        setFilterProducts(data?.content);
+      }
+    };
+  
+    fetchFilterProduct();
+  }, [filters]); // Theo dõi filters, khi thay đổi thì gọi API
+
+  const updateUrlParams = (key, values, extractKey = "id") => {
+    const params = new URLSearchParams(searchParams);
+    if (values.length > 0) {
+      // Chuyển danh sách object thành mảng giá trị (id hoặc name)
+      params.set(key, values?.map(item => item[extractKey]).join(","));
+    } else {
+      params.delete(key);
+    }
+    setSearchParams(params);
+  };
+
+  const handleCategoryChange = (newSelected) => {
+    setSelectedCategories(newSelected);
+    updateUrlParams("categories", newSelected, "name");
+  };
+
+  const handleBrandChange = (newSelected) => {
+    setSelectedBrands(newSelected);
+    updateUrlParams("brands", newSelected, "name");
+  };
+
+  const handlePriceChange = (newSelected) => {
+    setSelectedPriceRange(newSelected);
+    updateUrlParams("priceRange", newSelected, "name");
+
+    const minPrice = Math.min(...newSelected.map(p => p.min));
+    const maxPrice = Math.max(...newSelected.map(p => p.max).filter(p => p !== null));
+  
+    setMinPrice(minPrice);
+    setMaxPrice(maxPrice);
+  };
+
 
   return (
     <div className="product-search">
       <div className="search-background-image">
           <span>Tìm kiếm</span>
-          <p>Kết quả cho từ khóa: ...</p>
+          {searchParams.get("s") 
+            ? 
+            <p>Kết quả cho từ khóa: {searchParams.get("s")}</p>
+            :
+             ""
+          }
       </div>
       <div className="body">
         <div className="left">
           <CheckBoxList 
             title={"Thương hiệu"}
             listCheckBox={brands}
-            setSelect={setSelectedBrands}
+            setSelect={handleBrandChange}
             selected={selectedBrands}
           />
           <CheckBoxList 
             title={"Phân loại"}
             listCheckBox={categories}
-            setSelect={setSelectedCategories}
+            setSelect={handleCategoryChange}
             selected={selectedCategories}
           />
           <CheckBoxList 
             title={"Khoảng giá"}
             listCheckBox={priceRanges}
-            setSelect={setSelectedPriceRange}
+            setSelect={handlePriceChange}
             selected={selectedPriceRange}
           />
         </div>
@@ -102,36 +217,41 @@ const SearchPage = () => {
             />
           </div>
           <div className="product-list">
-            <div className="item">
-              <div className="img">
-                <img src="https://sneakernews.com/wp-content/uploads/2023/01/nike-air-max-90-black-university-blue-FJ4218-001-5.jpg" alt="" />
-              </div>
-              <div className="info">
-                <div className="product-name">TÊN SẢN PHẨM</div>
-                <div className="prices">
-                  <div className="discount">XXX.XXX đ</div>
-                  <div className="original">XXX.XXX đ</div>
-                </div>
-                <div className="short-description">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad veniam, id vel est officia rem? Numquam consectetur aspernatur earum atque accusantium debitis ex error? Facilis repellat iusto eveniet harum similique.</div>
-                <div className="product-actions">
-                    <FontAwesomeIcon icon={faShoppingCart} className="icon cart" />
-                    <FontAwesomeIcon icon={faHeart} className="icon heart" />
-                    <FontAwesomeIcon icon={faShare} className="icon info" />
+            {filterProducts?.map(product => (
+              <div className="item">
+                <div className="" style={{display:"flex", flexDirection: "row" , gap: "12px" , }}>
+                  <div className="img">
+                    <img src={`http://localhost:8080${product.imagePath}`} alt="" />
                   </div>
+                  <div className="product-info">
+                    <div className="product-name">{product.productName}</div>
+                    <div className="prices">
+                      <div className="discount">{product.price}</div>
+                      <div className="original">{product.price}</div>
+                    </div>
+                    <div className="short-description">{product.shortDescription}</div>
+                    <div className="product-actions">
+                        <FontAwesomeIcon icon={faShoppingCart} onClick={() => handleCartOnclick(product.id)} className="icon cart" />
+                        <FontAwesomeIcon icon={faHeart} onClick={() => handleCartOnclick(product.id)} className="icon heart" />
+                        <FontAwesomeIcon icon={faShare} className="icon info" />
+                      </div>
+                  </div>
+                </div>
+                <div className="rating">
+                  <ReactStars
+                      count={5}
+                      value={product.ratingValue}
+                      size={18}
+                      color2={"#f8b400"}
+                      edit={false}
+                      className={"react-stars"}
+                      half={true}
+                      style={{ display: 'flex', alignItems: 'center'}} 
+                  />
+                  <span>(5)</span>
+                </div>
               </div>
-              <div className="rating">
-                <ReactStars
-                    count={5}
-                    value={4}
-                    size={18}
-                    color2={"#f8b400"}
-                    edit={false}
-                    half={true}
-                    style={{ display: 'flex', alignItems: 'center'}} 
-                />
-                <span>(5)</span>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

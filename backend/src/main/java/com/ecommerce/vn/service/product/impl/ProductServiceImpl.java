@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +19,6 @@ import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Tag;
 import com.ecommerce.vn.repository.ProductRepository;
 import com.ecommerce.vn.service.attribute.AttributeService;
-import com.ecommerce.vn.service.attribute.impl.AttributeServiceImpl;
 import com.ecommerce.vn.service.product.ProductService;
 
 @Service
@@ -85,16 +83,18 @@ public class ProductServiceImpl implements ProductService{
 		return null;
 	}
 
-	@Override
-	public List<Product> filterProducts(UUID category, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public Page<Product> getProductsWithPaginationAndSorting(int page, int size, String sortBy) {
 		Pageable pageable = PageRequest.of(page, size);
 		return productRepository.findAll(pageable);
+	}
+	
+	@Override
+	public Page<Product> filterProducts(List<String> categories, List<String> brands, BigDecimal minPrice,
+			BigDecimal maxPrice, String keyword, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return productRepository.filterProducts(categories, brands, minPrice, maxPrice, keyword , pageable);
 	}
 
 	@Override
@@ -167,4 +167,5 @@ public class ProductServiceImpl implements ProductService{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

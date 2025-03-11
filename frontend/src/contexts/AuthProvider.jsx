@@ -19,7 +19,6 @@ export const AuthProvider = ({children}) => {
                 
                 setLoading(true); 
                 const token = localStorage.getItem("token");
-                console.log(token)
                 if (!token) {
                     setIsAuthenticated(false);
                     const timeout = setTimeout(() => setLoading(false), 300); 
@@ -51,10 +50,6 @@ export const AuthProvider = ({children}) => {
 
         fetchAuthUser();
     }, [setLoading , location]);
-
-    useEffect(() => {
-        console.log("Loading state changed: ", loading);
-    }, [loading]);
 
     const login = async (email , password) => {
         try {

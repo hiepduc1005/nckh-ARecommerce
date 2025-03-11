@@ -110,4 +110,9 @@ public class CartServiceImpl implements CartService {
 		return cartRepository.findById(cartId).orElseThrow(() -> 
 			new RuntimeException("cart not found with id: " + cartId));
 	}
+
+	@Override
+	public Cart getCartByEmail(String email) {
+		return cartRepository.findByUserEmail(email).orElseThrow(() -> new RuntimeException("User email :" + email + " not exist!"));
+	}
 }

@@ -26,7 +26,7 @@ public interface ProductService {
     Product updateProductImage(UUID productId, MultipartFile image);
 
     // Lọc sản phẩm theo danh mục, giá, và các thuộc tính khác
-    List<Product> filterProducts(UUID category, BigDecimal minPrice, BigDecimal maxPrice, String keyword);
+    Page<Product> filterProducts(List<String> categories, List<String> brands, BigDecimal minPrice, BigDecimal maxPrice, String keyword, int page, int size);
 
     // Phân trang và sắp xếp sản phẩm
     Page<Product> getProductsWithPaginationAndSorting(int page, int size, String sortBy);

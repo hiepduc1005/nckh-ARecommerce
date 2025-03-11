@@ -1,11 +1,12 @@
 package com.ecommerce.vn.controller;
 
 import java.util.UUID;
+import java.util.Arrays;
 import java.util.List;
-import java.io.Console;
 import java.math.BigDecimal;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -70,7 +71,7 @@ public class ProductController {
     }
     
     //Tìm sản phẩm bằng id
-    @PostMapping("/{productId}")
+    @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> findProductById(@PathVariable("productId") UUID productId){
         Product product = productService.findProductByUuid(productId);
         if (product == null) {
@@ -126,20 +127,33 @@ public class ProductController {
 
     // Lọc sản phẩm theo danh mục, giá, và từ khóa
     @GetMapping("/filter")
-    public ResponseEntity<List<ProductResponse>> filterProducts(
-            @RequestParam(value = "category", required = false) UUID category,
+    public ResponseEntity<Page<ProductResponse>> filterProducts(
+            @RequestParam(value = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(value = "size", defaultValue = "8", required = false) int size,
+            @RequestParam(value = "categories", required = false, defaultValue = "") String categories,
+            @RequestParam(value = "brands", required = false, defaultValue = "") String brands,
             @RequestParam(value = "minPrice", required = false) BigDecimal minPrice,
             @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice,
             @RequestParam(value = "keyword", required = false) String keyword) {
-        List<Product> products = productService.filterProducts(category, minPrice, maxPrice, keyword);
         
-        List<ProductResponse> productResponses = products.stream()
-        		.map((product) -> 
-        			productConvert.productConvertToProductResponse(product)
-        			).toList();
+    	System.out.println(categories);
+    	System.out.println(brands);
+
+    	List<String> listCategory = categories.isEmpty() ? null : Arrays.asList(categories.split(","));
+    	List<String> listBrand = brands.isEmpty() ? null : Arrays.asList(brands.split(","));
+
+
+        Page<Product> products = productService.filterProducts(listCategory, listBrand, minPrice, maxPrice, keyword, page, size);
         
-        return new ResponseEntity<>(productResponses, HttpStatus.OK);
+        List<ProductResponse> productResponses = products.getContent().stream()
+                .map(productConvert::productConvertToProductResponse)
+                .toList();
+
+        Page<ProductResponse> responsePage = new PageImpl<>(productResponses, products.getPageable(), products.getTotalElements());
+
+        return ResponseEntity.ok(responsePage);
     }
+
 
     // Phân trang và sắp xếp sản phẩm
     @GetMapping("/pagination")

@@ -1,5 +1,6 @@
 package com.ecommerce.vn.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +35,26 @@ public interface ProductRepository extends JpaRepository<Product, UUID>{
     List<Product> findProductsActive();
     
     Page<Product> findAll(Pageable pageable);
+    
+    @Query("SELECT DISTINCT p FROM Product p "
+            + "LEFT JOIN p.categories c "
+            + "LEFT JOIN p.variants v "
+            + "LEFT JOIN p.brand b "
+            + "WHERE (:categories IS NULL OR c.categoryName IN :categories) "
+            + "AND ( :minPrice IS NULL OR (v.discountPrice IS NOT NULL AND v.discountPrice > 0 AND v.discountPrice >= :minPrice) OR v.price >= :minPrice) "
+            + "AND ( :maxPrice IS NULL OR (v.discountPrice IS NOT NULL AND v.discountPrice > 0 AND v.discountPrice <= :maxPrice) OR v.price <= :maxPrice) "
+            + "AND (:brands IS NULL OR b.name IN :brands) "
+            + "AND (:keyword IS NULL OR p.productName LIKE CONCAT('%', :keyword, '%')) "
+            + "ORDER BY p.createdAt DESC")
+    Page<Product> filterProducts(
+            @Param("categories") List<String> categories,
+            @Param("brands") List<String> brands,
+            @Param("minPrice") BigDecimal minPrice,
+            @Param("maxPrice") BigDecimal maxPrice,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
     
     @Query(value = "SELECT p.id AS id, " +
             "       p.active AS active, " +

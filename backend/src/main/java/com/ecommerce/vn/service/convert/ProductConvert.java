@@ -1,5 +1,6 @@
 package com.ecommerce.vn.service.convert;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.dto.product.ProductCreateRequest;
 import com.ecommerce.vn.dto.product.ProductResponse;
 import com.ecommerce.vn.dto.product.ProductUpdateRequest;
+import com.ecommerce.vn.dto.ratting.RatingResponse;
 import com.ecommerce.vn.dto.tag.TagResponse;
 import com.ecommerce.vn.entity.product.Category;
 import com.ecommerce.vn.entity.product.Product;
@@ -28,6 +30,9 @@ public class ProductConvert {
 
     @Autowired
     private CategoryConvert categoryConvert;
+    
+    @Autowired
+    private RatingConvert ratingConvert;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -109,6 +114,22 @@ public class ProductConvert {
         		.stream()
         		.map((attribute) -> attributeConvert.attributeConvertToAttributeResponse(attribute) )
         		.toList();
+        
+        List<RatingResponse> ratingResponses = product.getRatings().stream()
+        		.map(ratingConvert::ratingConvertToRatingResponse)
+        		.toList();
+        
+        Double minPrice = product.getVariants().stream()
+        		.map(variant -> variant.getPrice())
+        		.min(BigDecimal::compareTo)
+        		.orElse(BigDecimal.ZERO).doubleValue();
+        
+        Double rattingValue = product.getRatings().stream()
+        		.mapToDouble(ratting -> ratting.getRatingValue())
+        		.average()
+        		.orElse(0);
+        
+        
 
 
         return new ProductResponse(
@@ -124,7 +145,10 @@ public class ProductConvert {
             product.getCreatedAt(), 
             product.getUpdateAt(), 
             product.getCreatedBy(), 
-            product.getUpdatedBy()
+            product.getUpdatedBy(),
+            minPrice,
+            rattingValue,
+            ratingResponses
             ); 
     }
 

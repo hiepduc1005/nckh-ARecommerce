@@ -27,6 +27,21 @@ export const getProductsPaginate = async ( page , size) => {
     }
 } 
 
+export const getProductsFilter = async ( filters) => {
+    try {
+        const res = await axiosInstance.get(`api/v1/products/filter`, 
+            { 
+                params: filters
+            }
+        );
+
+        return res.data;
+    } catch (error) {
+        console.error(error)
+        return null;
+    }
+} 
+
 export const getProductById = async ( productId ) => {
     try {
         const res = await axiosInstance.get(`api/v1/products/${productId}`);

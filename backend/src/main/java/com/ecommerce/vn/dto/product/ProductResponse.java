@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import com.ecommerce.vn.dto.attribute.AttributeResponse;
 import com.ecommerce.vn.dto.category.CategoryResponse;
+import com.ecommerce.vn.dto.ratting.RatingResponse;
 import com.ecommerce.vn.dto.tag.TagResponse;
 
 public class ProductResponse {
@@ -37,6 +38,42 @@ public class ProductResponse {
 	private UUID createdBy;
 	
 	private UUID updatedBy;
+	
+	private Double price;
+	
+	private Double ratingValue;
+	
+	private List<RatingResponse> ratingResponses;
+	
+	public Double getRatingValue() {
+		return ratingValue;
+	}
+
+
+	public void setRatingValue(Double ratingValue) {
+		this.ratingValue = ratingValue;
+	}
+
+
+	public List<RatingResponse> getRatingResponses() {
+		return ratingResponses;
+	}
+
+
+	public void setRatingResponses(List<RatingResponse> ratingResponses) {
+		this.ratingResponses = ratingResponses;
+	}
+
+
+	public Double getPrice() {
+		return price;
+	}
+
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+
 
 	public UUID getId() {
 		return id;
@@ -150,7 +187,7 @@ public class ProductResponse {
 	public ProductResponse(UUID id, Boolean active, String productName, String description, String shortDescription,
 			String imagePath, Set<CategoryResponse> categories, Set<TagResponse> tags,
 			List<AttributeResponse> attributeResponses, LocalDateTime createdAt, LocalDateTime updatedAt,
-			UUID createdBy, UUID updatedBy) {
+			UUID createdBy, UUID updatedBy, Double price , Double ratingValue, List<RatingResponse> ratingResponses) {
 		this.id = id;
 		this.active = active;
 		this.productName = productName;
@@ -164,6 +201,9 @@ public class ProductResponse {
 		this.updatedAt = updatedAt;
 		this.createdBy = createdBy;
 		this.updatedBy = updatedBy;
+		this.price = price;
+		this.ratingResponses = ratingResponses;
+		this.ratingValue = ratingValue;
 	}
 
 
