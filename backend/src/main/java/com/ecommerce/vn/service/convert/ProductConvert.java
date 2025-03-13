@@ -127,7 +127,7 @@ public class ProductConvert {
         Double rattingValue = product.getRatings().stream()
         		.mapToDouble(ratting -> ratting.getRatingValue())
         		.average()
-        		.orElse(0);
+        		.orElse(5);
         
         
 

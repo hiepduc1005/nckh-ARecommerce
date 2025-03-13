@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@popperjs/core": "^2.11.8",
     "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^8.17.14",
     "@tanstack/react-query": "^5.66.0",
@@ -30,6 +32,7 @@
     "react-dropzone": "^14.3.5",
     "react-icons": "^5.4.0",
     "react-list": "^0.8.18",
+    "react-popper": "^2.3.0",
     "react-pro-sidebar": "^0.7.1",
     "react-rating-stars-component": "^2.2.0",
     "react-router-dom": "^6.29.0",

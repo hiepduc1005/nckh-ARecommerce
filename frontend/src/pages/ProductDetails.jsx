@@ -74,9 +74,9 @@ const ProductDetails = () => {
       <div className="left">
         <div className="carousel">
           <Slider {...settings}>
-            {products.map((product, index) => (
-              <div key={product.id} className='item'>
-                <img src={product.image} alt={`slide-${index}`} className="slide-image" />
+            {products?.map((product, index) => (
+              <div key={product?.id} className='item'>
+                <img src={product?.image} alt={`slide-${index}`} className="slide-image" />
               </div>
             ))}
           </Slider>
@@ -104,23 +104,23 @@ const ProductDetails = () => {
         </div>
       </div>
       <div className="right">
-        <div className="product-name">Tên sản phẩm</div>
+        <div className="product-name">{product?.productName}</div>
         <div className="rating">
           <ReactStars 
               count={5}
-              value={4}
+              value={product?.ratingValue}
               size={24}
               color2={"#f8b400"} 
               edit={false}
               half={true}
               style={{ display: 'flex', alignItems: 'center' }}
           />
-          <div className="score">4.0</div>
-          <div className="reviews">xx đánh giá</div>
+          <div className="score">{product?.ratingValue}</div>
+          <div className="reviews">( {product?.ratingResponses.length} đánh giá)</div>
         </div>
         <div className="prices">
-          <div className="original">5xx.xxx đ</div>
-          <div className="discounted">3xx.xxx đ</div>
+          <div className="original">{product?.price} đ</div>
+          <div className="discounted">{product?.price} đ</div>
         </div>
         <div className="benefits">
           <h3>Quyền lợi</h3>

@@ -56,15 +56,7 @@ const SearchPage = () => {
   const [minPrice,setMinPrice] = useState(0)
   const [totalPage, setTotalPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(0)
-  const [filters,setFilters] = useState({
-    page: 0,
-    size: 8,
-    categories: "",  // Thay bằng danh sách cần lọc
-    brands: "",
-    minPrice: 0,
-    maxPrice: 1000000000,
-    keyword: "",
-  })
+  
   const [filterProducts, setFilterProducts] = useState();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -75,6 +67,16 @@ const SearchPage = () => {
   const handleCartOnclick = (productId) => {
     navigate(`${productId}`);
   }
+
+  const fetchFilterProduct = async (newFilters) => { 
+    console.log("filter " , newFilters)
+    const data = await getProductsFilter(newFilters);
+
+    if (data) {
+      setTotalPage(data?.totalPages);
+      setFilterProducts(data?.content);
+    }
+  };
 
   useEffect(() => {
   
@@ -102,7 +104,7 @@ const SearchPage = () => {
     }
 
     const newFilters = {
-      ...filters,
+      size: 8,
       brands: brandsString,
       categories: categoriesString,
       maxPrice,
@@ -110,30 +112,11 @@ const SearchPage = () => {
       page: currentPage,
       keyword: search,
     };
+    
+    fetchFilterProduct(newFilters)
   
-    // Chỉ cập nhật nếu filters thực sự thay đổi
-    if (JSON.stringify(newFilters) !== JSON.stringify(filters)) {
-      setFilters(newFilters);
-    }
   }, [searchParams, maxPrice, minPrice, currentPage]);
   
-  // Khi filters thay đổi thì gọi API lấy sản phẩm
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return; // Bỏ qua lần đầu tiên
-    }
-    const fetchFilterProduct = async () => {
-      const data = await getProductsFilter(filters);
-  
-      if (data) {
-        setTotalPage(data?.totalPages);
-        setFilterProducts(data?.content);
-      }
-    };
-  
-    fetchFilterProduct();
-  }, [filters]); // Theo dõi filters, khi thay đổi thì gọi API
 
   const updateUrlParams = (key, values, extractKey = "id") => {
     const params = new URLSearchParams(searchParams);
@@ -224,7 +207,7 @@ const SearchPage = () => {
                     <img src={`http://localhost:8080${product.imagePath}`} alt="" />
                   </div>
                   <div className="product-info">
-                    <div className="product-name">{product.productName}</div>
+                    <div className="product-name" onClick={() => handleCartOnclick(product.id)}>{product.productName}</div>
                     <div className="prices">
                       <div className="discount">{product.price}</div>
                       <div className="original">{product.price}</div>
@@ -248,7 +231,7 @@ const SearchPage = () => {
                       half={true}
                       style={{ display: 'flex', alignItems: 'center'}} 
                   />
-                  <span>(5)</span>
+                  <span>({product?.ratingResponses?.length})</span>
                 </div>
               </div>
             ))}
