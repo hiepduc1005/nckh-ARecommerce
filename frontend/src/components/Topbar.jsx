@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import useLoading from '../hooks/UseLoading'
 
 import AccountPopper from './AccountPopper'
-const Topbar = ({user,isAuthenticated}) => {
+const Topbar = ({user,isAuthenticated,logout}) => {
 
     const [isOpen,setIsOpen] = useState(false);
 
@@ -21,7 +21,7 @@ const Topbar = ({user,isAuthenticated}) => {
         setLoading(true)
 
         if(user && isAuthenticated){
-            naviate(`/profile/${user.id}`)
+            naviate(`/user/profile`)
             setLoading(false)
             return;
         }
@@ -61,13 +61,17 @@ const Topbar = ({user,isAuthenticated}) => {
             </Link>
             <div 
                 className="user" 
-                onClick={() => handleClickUser()}
+                onClick={(event) => {
+                    event.stopPropagation();
+                    handleClickUser();
+                }}
                 onMouseEnter={() => setIsOpen(true)}
                 onMouseLeave={() => setIsOpen(false)}
+                
             >
                 <FontAwesomeIcon size="lg" icon={faUser} />
                 <span>{(isAuthenticated && user) ? user.firstname + " " + user.lastname : "Đăng nhập"}</span>
-                {(isAuthenticated && user) ? <AccountPopper isOpen = {isOpen}/> : "" }
+                {(isAuthenticated && user) ? <AccountPopper logout={logout} isOpen = {isOpen}/> : "" }
             </div>
         </div>
     </div>

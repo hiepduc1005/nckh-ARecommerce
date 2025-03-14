@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import Home from '../pages/Home'
 import Login from '../pages/Login'
 import Register from '../pages/Register'
@@ -18,16 +18,24 @@ import AdminProduct from '../pages/AdminProduct'
 import AdminProductVariants from '../pages/AdminProductVariants'
 import AdminVariants from '../pages/AdminVariants'
 import CartLayout from '../layouts/CartLayout'
+import UserAccountLayout from '../layouts/UserAccountLayout'
+import UserAddress from '../pages/UserAddress'
 
 const AppRoutes = () => {
   return (
     <Routes>
         <Route path='/' element={<DefaultLayout/>} >
             <Route index element={<Home/>}/>
-            <Route path='profile' element={<Profile/>}/>
         </Route>
 
         <Route path='/cart' element={<CartLayout />}></Route>
+
+        <Route path='/user' element={<UserAccountLayout />}>
+          <Route index element={<Navigate to="profile" replace />} />
+          <Route path='profile' element={<Profile/>}/>
+          <Route path='address' element={<UserAddress/>}/>
+
+        </Route>
 
         <Route path='/products' element={<ProductLayout/>} >
             <Route index element={<SearchPage/>}/>

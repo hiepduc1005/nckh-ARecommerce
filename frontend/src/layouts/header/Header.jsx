@@ -12,7 +12,7 @@ import { faCartShopping, faHeart } from '@fortawesome/free-solid-svg-icons'
 import CartPopper from '../../components/CartPopper'
 import WishListPopper from '../../components/WishListPopper'
 const Header = () => {
-  const {user,isAuthenticated} = useAuth();
+  const {user,isAuthenticated,logout} = useAuth();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishListOpen,setIsWishListOpen] = useState(false)
 
@@ -49,7 +49,11 @@ const Header = () => {
   ];
   return (
     <>
-      <Topbar user = {user} isAuthenticated = {isAuthenticated} />
+      <Topbar 
+        user = {user} 
+        logout={logout} 
+        isAuthenticated = {isAuthenticated} 
+      />
       <header className='header-container'>
           <div className="header-left">
             <div className='webicon-container'>

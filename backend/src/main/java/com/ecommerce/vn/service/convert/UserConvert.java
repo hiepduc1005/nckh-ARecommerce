@@ -1,5 +1,7 @@
 package com.ecommerce.vn.service.convert;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,12 +42,21 @@ public class UserConvert {
         if(userUpdateRequest == null){
             return null;
         }
+        
+        String dateBirthStr = userUpdateRequest.getDateOfBirth();
+        System.out.println(dateBirthStr);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dateBirth = LocalDate.parse(dateBirthStr, formatter);
 
         User user = userService.findUserByUuId((userUpdateRequest.getId()));
         user.setFirstName(userUpdateRequest.getFirstname());
-        user.setFirstName(userUpdateRequest.getLastname());
+        user.setLastName(userUpdateRequest.getLastname());
         user.setEmail(userUpdateRequest.getEmail());
         user.setUserName(userUpdateRequest.getUsername());
+        user.setGender(userUpdateRequest.getGender());
+        user.setPhoneNumber(userUpdateRequest.getPhone());
+        user.setDateOfBirth(dateBirth);
+        
         return user;
     }
 
@@ -58,21 +69,30 @@ public class UserConvert {
         Set<UserAddressResponse> addressResponses = user.getAddresses().stream()
             .map(userAdressConvert::userAddressConvertToUsserAddressReponse) 
             .collect(Collectors.toSet());
+        
+        
 
+        UserResponse userResponse = new UserResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getUserName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getActive(),
+                user.getLoyaltyPoint(),
+                addressResponses,
+                user.getCreatedAt(),
+                user.getDeletedAt()
+                );
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");        
+        String birthDate = user.getDateOfBirth().format(formatter);
+        
+        userResponse.setGender(user.getGender());
+        userResponse.setDateOfBirth(birthDate);
             
-        return new UserResponse(
-        user.getId(),
-        user.getFirstName(),
-        user.getLastName(),
-        user.getUserName(),
-        user.getEmail(),
-        user.getPhoneNumber(),
-        user.getActive(),
-        user.getLoyaltyPoint(),
-        addressResponses,
-        user.getCreatedAt(),
-        user.getDeletedAt()
-        );
+        return userResponse;
 
     }
 }

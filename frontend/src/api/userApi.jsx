@@ -63,3 +63,19 @@ export const registerUser = async (email, firstname, lastname, password) => {
 
    
 } 
+
+export const updateUser = async (data,token) => {
+    try {
+        const res = await axiosInstance.put("api/v1/users", data , {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+
+        return res.data;
+        
+    } catch (error) {
+        console.error("Login failed",error)
+        throw error;
+    }
+}

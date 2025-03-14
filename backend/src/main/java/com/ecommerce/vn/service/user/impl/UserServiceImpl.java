@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ecommerce.vn.entity.cart.Cart;
 import com.ecommerce.vn.entity.role.Role;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.repository.UserRepository;
@@ -82,6 +83,7 @@ public class UserServiceImpl implements UserService{
 			user.setLastName(lastName);
 			user.setPassword(hashPassword);
 			user.setRoles(List.of(roleUser));
+			user.setCart(new Cart());
 			
 			return createUser(user);
 		}

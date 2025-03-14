@@ -1,56 +1,69 @@
 package com.ecommerce.vn.dto.user;
 
+import java.util.UUID;
+
 public class UserAddressCreateRequest {
+	private UUID userId;
 	
-	private String addressLine1;
+	private String name;
 	
-	private String addressLine2;
+	private String phone;
 	
-	private String postalCode;
+	private String address;
 	
-	private String country;
+	private String district;
 	
-	private String city;
+	private boolean isDefault = false;
 
-	public String getAddressLine1() {
-		return addressLine1;
+	public UUID getUserId() {
+		return userId;
 	}
 
-	public void setAddressLine1(String addressLine1) {
-		this.addressLine1 = addressLine1;
+	public void setUserId(UUID userId) {
+		this.userId = userId;
 	}
 
-	public String getAddressLine2() {
-		return addressLine2;
+	public String getName() {
+		return name;
 	}
 
-	public void setAddressLine2(String addressLine2) {
-		this.addressLine2 = addressLine2;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getPostalCode() {
-		return postalCode;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setPostalCode(String postalCode) {
-		this.postalCode = postalCode;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
-	public String getCountry() {
-		return country;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setCountry(String country) {
-		this.country = country;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
-	public String getCity() {
-		return city;
+	public String getDistrict() {
+		return district;
 	}
 
-	public void setCity(String city) {
-		this.city = city;
+	public void setDistrict(String district) {
+		this.district = district;
 	}
+
+	public boolean isDefault() {
+		return isDefault;
+	}
+
+	public void setDefault(boolean isDefault) {
+		this.isDefault = isDefault;
+	}
+
+	
 	
 	
 }

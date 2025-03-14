@@ -12,10 +12,53 @@ public class UserUpdateRequest {
 	
 	private String username;
 	
-
+	private String phone;
+	
+	private String dateOfBirth;
+	
+	private String gender;
+	
+	
+	
+	
 
 	
 	
+	@Override
+	public String toString() {
+		return "UserUpdateRequest [id=" + id + ", email=" + email + ", firstname=" + firstname + ", lastname="
+				+ lastname + ", username=" + username + ", phone=" + phone + ", dateOfBirth=" + dateOfBirth
+				+ ", gender=" + gender + ", getPhone()=" + getPhone() + ", getDateOfBirth()=" + getDateOfBirth()
+				+ ", getGender()=" + getGender() + ", getUsername()=" + getUsername() + ", getId()=" + getId()
+				+ ", getEmail()=" + getEmail() + ", getFirstname()=" + getFirstname() + ", getLastname()="
+				+ getLastname() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + "]";
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(String dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
 	public String getUsername() {
 		return username;
 	}

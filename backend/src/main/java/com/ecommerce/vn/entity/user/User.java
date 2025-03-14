@@ -1,5 +1,6 @@
 package com.ecommerce.vn.entity.user;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,9 @@ public class User {
     private String email;
     
     private String gender;
+    
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
 
     @Column(name = "password_hash")
     private String password;
@@ -100,7 +104,17 @@ public class User {
 	private List<Notification> notifications  = new ArrayList<Notification>();
 	
 
-    public String getGender() {
+	
+	
+    public LocalDate getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(LocalDate dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
+
+	public String getGender() {
 		return gender;
 	}
 

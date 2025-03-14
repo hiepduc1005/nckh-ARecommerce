@@ -95,7 +95,8 @@ public class UserController {
 	}
 
 	@PutMapping
-	public ResponseEntity<UserResponse> updateUser(UserUpdateRequest request){
+	public ResponseEntity<UserResponse> updateUser(@RequestBody UserUpdateRequest request){
+		System.out.println(request.toString());
 		User userToUpdate = userConvert.userUpdateRequestConvert(request); 
 		User updatedUser = userService.updateUser(userToUpdate);
 		UserResponse response = userConvert.userConvertToUserResponse(updatedUser); 

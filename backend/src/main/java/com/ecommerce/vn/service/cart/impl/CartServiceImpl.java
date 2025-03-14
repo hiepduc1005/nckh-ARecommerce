@@ -113,6 +113,6 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	public Cart getCartByEmail(String email) {
-		return cartRepository.findByUserEmail(email).orElseThrow(() -> new RuntimeException("User email :" + email + " not exist!"));
+		return cartRepository.findByUserEmail(email).get();
 	}
 }

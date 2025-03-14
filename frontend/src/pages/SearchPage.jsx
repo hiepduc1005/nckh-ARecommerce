@@ -9,6 +9,7 @@ import { faHeart, faShare, faShoppingCart } from "@fortawesome/free-solid-svg-ic
 import ReactStars from 'react-stars'
 import { getProductsFilter } from "../api/productApi";
 import useCart from '../hooks/UseCart';
+import useLoading from "../hooks/UseLoading";
 const selectOptions = [
   { value: "latest", label: "Mới nhất" },
   { value: "oldest", label: "Cũ nhất" },
@@ -61,6 +62,7 @@ const SearchPage = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const isFirstRender = useRef(true);
+  const {loading, setLoading } = useLoading();
 
   const navigate = useNavigate();
   
@@ -69,13 +71,15 @@ const SearchPage = () => {
   }
 
   const fetchFilterProduct = async (newFilters) => { 
-    console.log("filter " , newFilters)
+    setLoading(true);
     const data = await getProductsFilter(newFilters);
 
     if (data) {
       setTotalPage(data?.totalPages);
       setFilterProducts(data?.content);
     }
+
+    setLoading(false)
   };
 
   useEffect(() => {
@@ -169,18 +173,21 @@ const SearchPage = () => {
             listCheckBox={brands}
             setSelect={handleBrandChange}
             selected={selectedBrands}
+            loading={loading}
           />
           <CheckBoxList 
             title={"Phân loại"}
             listCheckBox={categories}
             setSelect={handleCategoryChange}
             selected={selectedCategories}
+            loading={loading}
           />
           <CheckBoxList 
             title={"Khoảng giá"}
             listCheckBox={priceRanges}
             setSelect={handlePriceChange}
             selected={selectedPriceRange}
+            loading={loading}
           />
         </div>
         <div className="right">

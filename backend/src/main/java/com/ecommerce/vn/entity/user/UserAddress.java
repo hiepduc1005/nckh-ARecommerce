@@ -1,8 +1,6 @@
 package com.ecommerce.vn.entity.user;
 
 import java.util.UUID;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,83 +14,99 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "user_addresses")
 public class UserAddress {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @Column(name = "address_line1")
-    private String addressLine1;
-
-    @Column(name = "address_line2")
-    private String addressLine2;
-
-    @Column(name = "postal_code")
-    private String postalCode;
-
-    private String country;
-
-    private String city;
-
-    //Getter and Setter
+    
+    @Column(name = "name", nullable = false)
+    private String name;
+    
+    @Column(name = "phone", nullable = false)
+    private String phone;
+    
+    @Column(name = "address", nullable = false)
+    private String address;
+    
+    @Column(name = "district", nullable = false)
+    private String district;
+    
+    @Column(name = "is_default")
+    private boolean isDefault;
+    
+    // Constructor mặc định
+    public UserAddress() {
+    }
+    
+    // Constructor đầy đủ
+    public UserAddress(UUID id, User user, String name, String phone, String address, 
+                      String district, boolean isDefault) {
+        this.id = id;
+        this.user = user;
+        this.name = name;
+        this.phone = phone;
+        this.address = address;
+        this.district = district;
+        this.isDefault = isDefault;
+    }
+    
+    // Getter and Setter
     public User getUser() {
         return user;
     }
-
+    
     public void setUser(User user) {
         this.user = user;
     }
-
+    
     public UUID getId() {
         return id;
     }
-
+    
     public void setId(UUID id) {
         this.id = id;
     }
-
-    public String getAddressLine1() {
-        return addressLine1;
+    
+    public String getName() {
+        return name;
     }
-
-    public void setAddressLine1(String addressLine1) {
-        this.addressLine1 = addressLine1;
+    
+    public void setName(String name) {
+        this.name = name;
     }
-
-    public String getAddressLine2() {
-        return addressLine2;
+    
+    public String getPhone() {
+        return phone;
     }
-
-    public void setAddressLine2(String addressLine2) {
-        this.addressLine2 = addressLine2;
+    
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
-
-    public String getPostalCode() {
-        return postalCode;
+    
+    public String getAddress() {
+        return address;
     }
-
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
+    
+    public void setAddress(String address) {
+        this.address = address;
     }
-
-    public String getCountry() {
-        return country;
+    
+    public String getDistrict() {
+        return district;
     }
-
-    public void setCountry(String country) {
-        this.country = country;
+    
+    public void setDistrict(String district) {
+        this.district = district;
     }
-
-    public String getCity() {
-        return city;
+    
+    public boolean isDefault() {
+        return isDefault;
     }
-
-    public void setCity(String city) {
-        this.city = city;
+    
+    public void setDefault(boolean isDefault) {
+        this.isDefault = isDefault;
     }
-
 }

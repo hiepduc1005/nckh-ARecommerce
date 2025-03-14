@@ -6,8 +6,8 @@ import useLoading from "../hooks/UseLoading";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
-    const [user,setUser] = useState(null);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user,setUser] = useState();
+    const [isAuthenticated, setIsAuthenticated] = useState();
     const [token , setToken] = useState();
     const navigate = useNavigate();
     const {loading,setLoading} = useLoading();
@@ -21,7 +21,6 @@ export const AuthProvider = ({children}) => {
                 const token = localStorage.getItem("token");
                 if (!token) {
                     setIsAuthenticated(false);
-                    const timeout = setTimeout(() => setLoading(false), 300); 
 
                     return () => clearTimeout(timeout);
                 }
@@ -40,22 +39,21 @@ export const AuthProvider = ({children}) => {
             } catch (error) {
                 console.error(error)
             }finally{
-                const timeout = setTimeout(() => setLoading(false), 300); 
-                return () => clearTimeout(timeout);
             }
             
-           
+           setLoading(false)
           
         };
 
         fetchAuthUser();
-    }, [setLoading , location]);
+    }, [ location , token]);
 
     const login = async (email , password) => {
         try {
             setLoading(true);
             const data = await loginUser(email,password);
             localStorage.setItem("token" , data.token);
+            setToken(data.token)
             setIsAuthenticated(true);
             
             
@@ -72,6 +70,7 @@ export const AuthProvider = ({children}) => {
         setLoading(true);
 
         localStorage.removeItem("token");
+        setToken(null); 
         setIsAuthenticated(false);
         setUser(null);
 

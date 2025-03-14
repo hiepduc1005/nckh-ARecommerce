@@ -2,10 +2,8 @@ package com.ecommerce.vn.dto.user;
 
 import java.util.UUID;
 
-public class UserAddressResponse {
+public class UserAddressUpdateRequest {
 	private UUID id;
-	
-	private UUID userId;
 	
 	private String name;
 	
@@ -17,20 +15,14 @@ public class UserAddressResponse {
 	
 	private boolean isDefault;
 
+	
+
 	public UUID getId() {
 		return id;
 	}
 
 	public void setId(UUID id) {
 		this.id = id;
-	}
-
-	public UUID getUserId() {
-		return userId;
-	}
-
-	public void setUserId(UUID userId) {
-		this.userId = userId;
 	}
 
 	public String getName() {
@@ -73,6 +65,7 @@ public class UserAddressResponse {
 		this.isDefault = isDefault;
 	}
 
+	
 	
 	
 }

@@ -9,43 +9,52 @@ export const CartContext = createContext();
 const CartProvider = ({children}) => {
 
     const [cart,setCart] = useState();
+    const [token,setToken] = useState(() => localStorage.getItem("token"))
 
     const {setLoading} = useLoading();
-    const {token} = useAuth();
 
     useEffect(() => {
         const fetchCart = async () => {
-            const data = await getCartByToken(token);
-
-            if(data){
-                setCart(data);
+            try {
+                setLoading(true);
+                if (token) {
+                    const data = await getCartByToken(token);
+                    if (data) {
+                        setCart(data);
+                    }
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy giỏ hàng:", error);
+            } finally {
+                setLoading(false);
             }
-        }
-
-        setLoading(true);
+        };
+    
         fetchCart();
-        setLoading(false);
-    },[token])
+    }, [token, setLoading]);
 
     const removeItem = async (cartItemId) => {
         setLoading(true);
-        const data = {
-            id: cartItemId
-        }
-
-        if(cart){
-            const cartResponse = await removeVariantFromCart(data,cart?.id,token);
-
-            if(cartResponse){
+        try {
+            if (!cart) return;
+    
+            const data = { id: cartItemId };
+            const cartResponse = await removeVariantFromCart(data, cart?.id, token);
+    
+            if (cartResponse) {
                 setCart(cartResponse);
-                setLoading(false)
-                toast.success("Xóa sản phẩm khỏi giỏ hàng thành công!")
-                return;
+                toast.success("Xóa sản phẩm khỏi giỏ hàng thành công!");
+            } else {
+                toast.error("Xóa sản phẩm khỏi giỏ hàng thất bại!");
             }
+        } catch (error) {
+            console.error("Lỗi khi xóa sản phẩm:", error);
+            toast.error("Lỗi hệ thống khi xóa sản phẩm!");
+        } finally {
+            setLoading(false);
         }
-        toast.error("Xóa sản phẩm khỏi thất bại!")
-        setLoading(false)
-    }
+    };
+    
 
     const addItem = async (variantId,quantity) => {
         setLoading(true);
@@ -71,18 +80,23 @@ const CartProvider = ({children}) => {
     }
 
     const clearCart = async () => {
-        setLoading(true)
-        if(cart && token){
-            clearFromCart(cart?.id , token);
-            setCart(null)
-            toast.success("Clear giỏ hàng thành công")
-        }else{
-            toast.error("Clear giỏ hàng thất bại")
+        setLoading(true);
+        try {
+            if (cart && token) {
+                await clearFromCart(cart?.id, token);
+                setCart(null);
+                toast.success("Clear giỏ hàng thành công");
+            } else {
+                toast.error("Clear giỏ hàng thất bại");
+            }
+        } catch (error) {
+            console.error("Lỗi khi clear giỏ hàng:", error);
+            toast.error("Có lỗi xảy ra khi clear giỏ hàng");
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false)
-
-    }
+    };
+    
 
 
 
