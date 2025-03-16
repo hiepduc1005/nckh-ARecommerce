@@ -2,6 +2,8 @@ package com.ecommerce.vn.dto.user;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class UserAddressResponse {
 	private UUID id;
 	
@@ -15,6 +17,7 @@ public class UserAddressResponse {
 	
 	private String district;
 	
+	@JsonProperty("isDefault")
 	private boolean isDefault;
 
 	public UUID getId() {

@@ -1,13 +1,19 @@
 package com.ecommerce.vn.dto.category;
 
-import org.springframework.web.multipart.MultipartFile;
 
 public class CategoryCreateRequest {
 	private String categoryName;
 	
 	private String categoryDescription;
 	
-	private MultipartFile file;
+	
+	
+
+	@Override
+	public String toString() {
+		return "CategoryCreateRequest [categoryName=" + categoryName + ", categoryDescription=" + categoryDescription
+				+ "]";
+	}
 
 	public String getCategoryName() {
 		return categoryName;
@@ -23,14 +29,6 @@ public class CategoryCreateRequest {
 
 	public void setCategoryDescription(String categoryDescription) {
 		this.categoryDescription = categoryDescription;
-	}
-
-	public MultipartFile getFile() {
-		return file;
-	}
-
-	public void setFile(MultipartFile file) {
-		this.file = file;
 	}
 
 	

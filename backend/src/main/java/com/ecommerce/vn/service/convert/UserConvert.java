@@ -2,12 +2,14 @@ package com.ecommerce.vn.service.convert;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.vn.dto.role.RoleResponse;
 import com.ecommerce.vn.dto.user.UserAddressResponse;
 import com.ecommerce.vn.dto.user.UserCreateRequest;
 import com.ecommerce.vn.dto.user.UserResponse;
@@ -19,6 +21,9 @@ import com.ecommerce.vn.service.user.UserService;
 public class UserConvert {
     @Autowired
     private UserAdressConvert userAdressConvert;
+    
+    @Autowired
+    private RoleConvert roleConvert;
     
     @Autowired
     private UserService userService;
@@ -70,6 +75,10 @@ public class UserConvert {
             .map(userAdressConvert::userAddressConvertToUsserAddressReponse) 
             .collect(Collectors.toSet());
         
+        List<RoleResponse> roleResponses = user.getRoles()
+        		.stream()
+        		.map((role) -> roleConvert.roleConvertToRoleResponse(role))
+        		.toList();
         
 
         UserResponse userResponse = new UserResponse(
@@ -86,11 +95,14 @@ public class UserConvert {
                 user.getDeletedAt()
                 );
         
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");        
-        String birthDate = user.getDateOfBirth().format(formatter);
+        if(user.getDateOfBirth() != null) {
+        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");        
+        	String birthDate = user.getDateOfBirth().format(formatter);
+        	userResponse.setDateOfBirth(birthDate);        	
+        }
         
         userResponse.setGender(user.getGender());
-        userResponse.setDateOfBirth(birthDate);
+        userResponse.setRoles(roleResponses);
             
         return userResponse;
 

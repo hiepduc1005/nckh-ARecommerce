@@ -2,6 +2,8 @@ package com.ecommerce.vn.dto.user;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty; 
+
 public class UserAddressCreateRequest {
 	private UUID userId;
 	
@@ -13,7 +15,16 @@ public class UserAddressCreateRequest {
 	
 	private String district;
 	
-	private boolean isDefault = false;
+	@JsonProperty("isDefault")
+	private Boolean isDefault;
+	
+	
+
+	@Override
+	public String toString() {
+		return "UserAddressCreateRequest [userId=" + userId + ", name=" + name + ", phone=" + phone + ", address="
+				+ address + ", district=" + district + ", isDefault=" + isDefault + "]";
+	}
 
 	public UUID getUserId() {
 		return userId;
@@ -55,11 +66,11 @@ public class UserAddressCreateRequest {
 		this.district = district;
 	}
 
-	public boolean isDefault() {
+	public Boolean isDefault() {
 		return isDefault;
 	}
 
-	public void setDefault(boolean isDefault) {
+	public void setDefault(Boolean isDefault) {
 		this.isDefault = isDefault;
 	}
 

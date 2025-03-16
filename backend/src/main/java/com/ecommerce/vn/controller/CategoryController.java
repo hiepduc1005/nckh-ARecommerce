@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +16,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.dto.category.CategoryCreateRequest;
 import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.dto.category.CategoryUpdateRequest;
+import com.ecommerce.vn.dto.product.ProductCreateRequest;
+import com.ecommerce.vn.dto.product.ProductResponse;
 import com.ecommerce.vn.entity.product.Category;
+import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.service.FileUploadService;
 import com.ecommerce.vn.service.convert.CategoryConvert;
 import com.ecommerce.vn.service.tag.CategoryService;
@@ -37,17 +45,20 @@ public class CategoryController {
 	@Autowired
 	private FileUploadService fileUploadService;
 	
-	@PostMapping
-	public ResponseEntity<?> createCategory(@ModelAttribute CategoryCreateRequest categoryCreateRequest) {
+	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<?> createCategory (
+			@RequestPart("image") MultipartFile image, 
+			@RequestPart("category")  CategoryCreateRequest categoryCreateRequest) {
 		
-		if(categoryCreateRequest.getFile() == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category empty!");
+		if(image == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category image empty!");
 		}
-		
-		String imagePath = fileUploadService.uploadFileToServer(categoryCreateRequest.getFile());
+				
+		String imagePath = fileUploadService.uploadFileToServer(image);
 		
 		Category category = categoryConvert.categoryCreateRequestConvert(categoryCreateRequest);
-		category.setImagePath(imagePath);
+ 		category.setImagePath(imagePath);
+ 		category.setActive(false);
 		
 		CategoryResponse categoryResponse = categoryConvert.categoryConvertToCategoryResponse(categoryService.createCategory(category));
 		return ResponseEntity.status(200).body(categoryResponse);
@@ -91,6 +102,19 @@ public class CategoryController {
 		return ResponseEntity.ok(categoryResponses);
 	}
 	
+	@GetMapping("/pagination")
+    public ResponseEntity<Page<CategoryResponse>> getCategoriesWithPaginationAndSorting(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam(value ="sortBy" , required = false) String sortBy) {
+    	
+    	Page<Category> categoryPage = categoryService.getCategoriesWithPaginationAndSorting(page, size, sortBy);
+        
+    	Page<CategoryResponse> productResponses = categoryPage.map(category -> categoryConvert.categoryConvertToCategoryResponse(category));
+    	return new ResponseEntity<>(productResponses, HttpStatus.OK);
+    }
+
+	
 	@GetMapping("/search/{keyword}")
 	public ResponseEntity<List<CategoryResponse>> searchCategory(@PathVariable("keyword") String keyword){
 		List<Category> categories = categoryService.searchCategory(keyword);
@@ -103,14 +127,18 @@ public class CategoryController {
 	}
 	
 	
-	@PutMapping
-	public ResponseEntity<?> updateCategory(@RequestBody CategoryUpdateRequest categoryUpdateRequest) {
+	@PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<?> updateCategory(
+			@RequestPart("image") MultipartFile image, 
+			@RequestPart("category")  CategoryUpdateRequest categoryUpdateRequest) {
 		
-		if(categoryUpdateRequest.getImage() == null) {
+		if(image == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category empty!");
 		}
 		
-		String imagePath = fileUploadService.uploadFileToServer(categoryUpdateRequest.getImage());
+		System.out.println(categoryUpdateRequest.toString());
+		
+		String imagePath = fileUploadService.uploadFileToServer(image);
 		
 		Category category = categoryConvert.categoryUpdateConvertToCategory(categoryUpdateRequest);
 		category.setImagePath(imagePath);

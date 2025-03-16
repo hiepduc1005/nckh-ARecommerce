@@ -20,6 +20,8 @@ import AdminVariants from '../pages/AdminVariants'
 import CartLayout from '../layouts/CartLayout'
 import UserAccountLayout from '../layouts/UserAccountLayout'
 import UserAddress from '../pages/UserAddress'
+import AdminProductDetails from '../pages/AdminProductDetails'
+import AdminCategory from '../pages/AdminCategory'
 
 const AppRoutes = () => {
   return (
@@ -52,7 +54,8 @@ const AppRoutes = () => {
         <Route path='/admin' element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path='products' element={<AdminProduct/>} />
-          <Route path="products/:productId" element={<AdminProductVariants />}/>
+          <Route path='categories' element={<AdminCategory/>} />
+          <Route path="products/:productId" element={<AdminProductDetails />}/>
           <Route path='variants' element={<AdminVariants />} />
         </Route>
 

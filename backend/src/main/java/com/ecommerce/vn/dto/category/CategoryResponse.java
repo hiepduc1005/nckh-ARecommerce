@@ -3,6 +3,8 @@ package com.ecommerce.vn.dto.category;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 public class CategoryResponse {
 	
@@ -14,7 +16,12 @@ public class CategoryResponse {
 	
 	private String imagePath;
 	
+	private String slug;
+	
+	@JsonProperty("active")	
 	private Boolean active;
+	
+	private int totalProduct;
 	
 	private LocalDateTime createdAt;
 	
@@ -23,6 +30,24 @@ public class CategoryResponse {
 	private UUID createdBy;
 	
 	private UUID updatedBy;
+	
+	
+
+	public int getTotalProduct() {
+		return totalProduct;
+	}
+
+	public void setTotalProduct(int totalProduct) {
+		this.totalProduct = totalProduct;
+	}
+
+	public String getSlug() {
+		return slug;
+	}
+
+	public void setSlug(String slug) {
+		this.slug = slug;
+	}
 
 	public UUID getId() {
 		return id;
@@ -108,6 +133,22 @@ public class CategoryResponse {
 		this.createdBy = createdBy;
 		this.updatedBy = updatedBy;
 	}
+
+	public CategoryResponse(UUID id, String categoryName, String categoryDescription, String imagePath, String slug,
+			Boolean active, LocalDateTime createdAt, LocalDateTime updateAt, UUID createdBy, UUID updatedBy) {
+		this.id = id;
+		this.categoryName = categoryName;
+		this.categoryDescription = categoryDescription;
+		this.imagePath = imagePath;
+		this.slug = slug;
+		this.active = active;
+		this.createdAt = createdAt;
+		this.updateAt = updateAt;
+		this.createdBy = createdBy;
+		this.updatedBy = updatedBy;
+	}
+	
+	
 	
 	
 }

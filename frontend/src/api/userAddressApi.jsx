@@ -1,9 +1,26 @@
 import { toast } from "react-toastify";
 import axiosInstance from "../utils/axiosInstance";
 
-export const userAddressById = async (userAddressId,token) => {
+export const getUserAddressById = async (userAddressId,token) => {
     try {
         const res = await axiosInstance.get(`api/v1/user-address/${userAddressId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        )
+
+        return res.data;
+    } catch (error) {
+        console.error()
+        return null;
+    }
+}
+
+export const getUserAddressByUserId = async (userId,token) => {
+    try {
+        const res = await axiosInstance.get(`api/v1/user-address/user/${userId}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -28,12 +45,9 @@ export const createUserAddress = async (data,token) => {
             }
         )
 
-        if(res.data == 200){
+        if(res.status == 200){
             toast.success("Tạo địa chỉ thành công!")
-        }else {
-            toast.error("Tạo chỉ thất bại!")
         }
-
         return res.data
         
     } catch (error) {
@@ -68,7 +82,7 @@ export const updateUserAddress = async (data,token) => {
 
 export const deleteUserAddress = async (userAddressId,token) => {
     try {
-        const res = await axiosInstance.delete(`api/v1/user-address/${userAddressId}`, data , {
+        const res = await axiosInstance.delete(`api/v1/user-address/${userAddressId}` , {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -76,12 +90,10 @@ export const deleteUserAddress = async (userAddressId,token) => {
 
         if(res.status == 200){
             toast.success("Xóa địa chỉ thành công!")
-        }else{
-            toast.error("Xóa địa chỉ thất bại!")
         }
         
     } catch (error) {
-        
+        console.log(error)
         toast.error("Xóa địa chỉ thất bại!")
     }
 }

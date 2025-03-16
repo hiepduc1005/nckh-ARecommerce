@@ -2,7 +2,8 @@ package com.ecommerce.vn.dto.category;
 
 import java.util.UUID;
 
-import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 public class CategoryUpdateRequest {
 	
@@ -12,11 +13,17 @@ public class CategoryUpdateRequest {
 	
 	private String categoryDescription;
 	
-	private MultipartFile image;
-	
+	@JsonProperty("active")	
 	private Boolean active;
 	
 	
+	
+
+	@Override
+	public String toString() {
+		return "CategoryUpdateRequest [id=" + id + ", categoryName=" + categoryName + ", categoryDescription="
+				+ categoryDescription + ", active=" + active + "]";
+	}
 
 	public UUID getId() {
 		return id;
@@ -43,13 +50,6 @@ public class CategoryUpdateRequest {
 	}
 
 
-	public MultipartFile getImage() {
-		return image;
-	}
-
-	public void setImage(MultipartFile image) {
-		this.image = image;
-	}
 
 	public Boolean getActive() {
 		return active;

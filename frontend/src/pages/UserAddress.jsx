@@ -1,17 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "../assets/styles/pages/UserAddress.scss";
+import useAuth from '../hooks/UseAuth';
+import { createUserAddress, deleteUserAddress, getUserAddressByUserId } from '../api/userAddressApi';
+import useLoading from '../hooks/UseLoading';
 
 const UserAddress = () => {
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      name: "Đức Hiệp",
-      phone: "(+84) 903 403 668",
-      address: "Số Nhà 19, Ngõ 15b Tà Thanh Oai",
-      district: "Xã Tà Thanh Oai, Huyện Thanh Trì, Hà Nội",
-      isDefault: true
-    }
-  ]);
+  const [addresses, setAddresses] = useState([]);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newAddress, setNewAddress] = useState({
@@ -21,6 +15,37 @@ const UserAddress = () => {
     district: "",
     isDefault: false
   });
+  const {user,token} = useAuth();
+  const {setLoading} = useLoading();
+
+  useEffect(() => {
+
+    const fetchUserAddress = async () => {
+      setLoading(true)
+      if(user && token){
+        const data = await getUserAddressByUserId(user.id , token);      
+        if(data){
+          setAddresses(data)
+        }
+      }
+
+      setLoading(false)
+    }
+
+    fetchUserAddress();
+    console.log(addresses)
+  },[ user , token])
+
+
+  const handleDeleteUserAddress = async (userAddressId) => {
+    setLoading(true)
+
+    await deleteUserAddress(userAddressId,token)
+    setAddresses((prev) => prev.filter(item => item.id !== userAddressId))
+
+    setLoading(false)
+  }
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,26 +62,22 @@ const UserAddress = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Create new address with unique ID
-    const newAddressWithId = {
-      ...newAddress,
-      id: Date.now()
-    };
-    
-    // If this is set as default, update other addresses
-    let updatedAddresses = [...addresses];
-    if (newAddress.isDefault) {
-      updatedAddresses = updatedAddresses.map(addr => ({
-        ...addr,
-        isDefault: false
-      }));
+    setLoading(true)
+    const data = {
+      userId: user.id,
+      phone: newAddress.phone,
+      address: newAddress.address,
+      district: newAddress.district,
+      isDefault: newAddress.isDefault,
+      name: newAddress.name,
     }
-    
-    // Add the new address to the list
-    setAddresses([...updatedAddresses, newAddressWithId]);
+
+    const newUserAddress = await createUserAddress(data,token);
+    if(newUserAddress){
+      setAddresses((prevAddresses) => [...prevAddresses, newUserAddress]);
+    }
     
     // Reset form
     setNewAddress({
@@ -69,6 +90,7 @@ const UserAddress = () => {
     
     // Hide form
     setShowAddForm(false);
+    setLoading(false)
   };
 
   return (
@@ -184,7 +206,7 @@ const UserAddress = () => {
             </div>
             <div className="address-actions">
               <button className="update-btn">Cập nhật</button>
-              <button className="delete-btn">Xóa</button>
+              <button className="delete-btn" onClick={() => handleDeleteUserAddress(address.id)}>Xóa</button>
               {!address.isDefault && (
                 <button className="default-btn">Thiết lập mặc định</button>
               )}

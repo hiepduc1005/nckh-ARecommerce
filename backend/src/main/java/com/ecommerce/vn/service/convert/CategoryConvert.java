@@ -17,14 +17,15 @@ public class CategoryConvert {
 	
     @SuppressWarnings("null")
     public Category categoryCreateRequestConvert(CategoryCreateRequest categoryCreateRequest) {
-        if (categoryCreateRequest != null) {
+        if (categoryCreateRequest == null) {
             return null;
         }
-
+        
+        String slug = String.join("-", categoryCreateRequest.getCategoryName().toLowerCase().split(" ") );
         Category category = new Category();
         category.setCategoryName(categoryCreateRequest.getCategoryName());
         category.setCategoryDescription(categoryCreateRequest.getCategoryDescription());
-        
+        category.setSlug(slug);
 
         return category;
     }
@@ -43,17 +44,22 @@ public class CategoryConvert {
         if (category == null) {
             return null;
         }
-
-        return new CategoryResponse(
+        
+        CategoryResponse categoryResponse = new CategoryResponse(
                 category.getId(),
                 category.getCategoryName(),
                 category.getCategoryDescription(),
                 category.getImagePath(),
+                category.getSlug(),
                 category.getActive(),
                 category.getCreatedAt(),
                 category.getUpdateAt(),
                 category.getCreatedBy(),
                 category.getUpdatedBy()
         );
+        
+        categoryResponse.setTotalProduct(category.getProducts().size());
+
+        return categoryResponse;
     }
 }

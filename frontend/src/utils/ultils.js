@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 const isLeapYear = (year) => {
     if(+year % 400 === 0 || (+year % 4 === 0 && +year % 100 !== 0)){
         return true;
@@ -34,4 +36,8 @@ export const isValidDate = (day , month, year) => {
 export const isValidPhoneNum = (phone) => {
     const regexPhoneNumber = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g;
     return phone.match(regexPhoneNumber) ? true : false;
+}
+
+export const formatToVNDate = (date) => {
+    return format(new Date(date), "dd/MM/yyyy");
 }

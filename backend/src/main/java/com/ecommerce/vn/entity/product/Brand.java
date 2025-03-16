@@ -31,6 +31,8 @@ public class Brand {
 	@Column( unique = true)
 	private String name;
 	
+	private String slug;
+	
 	@OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Product> products = new ArrayList<>();
 
@@ -47,8 +49,18 @@ public class Brand {
     public Brand(String name) {
         this.name = name;
     }
-
     
+    
+    
+    
+	public String getSlug() {
+		return slug;
+	}
+
+	public void setSlug(String slug) {
+		this.slug = slug;
+	}
+
 	public List<Product> getProducts() {
 		return products;
 	}

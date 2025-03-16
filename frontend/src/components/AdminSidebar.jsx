@@ -1,131 +1,65 @@
-import React, { useState } from 'react'
-import {
-  ProSidebar,
-  Menu,
-  MenuItem,
-  SubMenu,
-  SidebarHeader,
-  SidebarFooter,
-  SidebarContent
-} from 'react-pro-sidebar';
-import {
-  FaUser,
-  FaAngleDoubleLeft,
-  FaAngleDoubleRight,
-  FaTachometerAlt,
-  FaGem,
-  FaList,
-  FaRegLaughWink,
-  FaHeart
-} from 'react-icons/fa';
-import { Link, NavLink } from 'react-router-dom';
-import 'react-pro-sidebar/dist/css/styles.css';
-
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { FiHome, FiBox, FiTag, FiLayers, FiBriefcase, FiMenu, FiX } from 'react-icons/fi';
+import '../assets/styles/components/AdminSidebar.scss';
 
 const AdminSidebar = () => {
-  const [toggled , setToggled] = useState(false)
-  const [collapsed , setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
 
-  const handleToggleSidebar = () => {
-    setToggled(prev => !prev)
-  }
+  const menuItems = [
+    { name: 'Dashboard', icon: <FiHome />, path: '/admin/dashboard' },
+    { name: 'Products', icon: <FiBox />, path: '/admin/products' },
+    { name: 'Brands', icon: <FiBriefcase />, path: '/admin/brands' },
+    { name: 'Tags', icon: <FiTag />, path: '/admin/tags' },
+    { name: 'Categories', icon: <FiLayers />, path: '/admin/categories' },
+  ];
 
-  const handleCollapsedChange = () => {
-    setCollapsed(prev => !prev)
-  }
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+  };
+
   return (
-    <ProSidebar
-
-      collapsed={collapsed}
-      toggled={toggled}
-      onToggle={handleToggleSidebar}
-      breakPoint="md"
-    >
-      {/* Header */}
-      <SidebarHeader>
-        <Menu iconShape="circle">
-          {collapsed ? (
-            <MenuItem
-              icon={<FaAngleDoubleRight />}
-              onClick={handleCollapsedChange}
-            ></MenuItem>
-          ) : (
-            <MenuItem
-              suffix={<FaAngleDoubleLeft />}
-              onClick={handleCollapsedChange}
-            >
-              <div
-                style={{
-                  padding: '9px',
-                  textTransform: 'uppercase',
-                  fontWeight: 'bold',
-                  fontSize: 15,
-                  letterSpacing: '1px'
-                }}
-              >
-                Pro Sidebar
-              </div>
-            </MenuItem>
-          )}
-        </Menu>
-      </SidebarHeader>
-      {/* Content */}
-      <SidebarContent>
-        <Menu iconShape="circle">
-          <MenuItem
-            icon={<FaTachometerAlt />}
-            suffix={<span className="badge red">NEW</span>}
-          >
-            Dashboard
-            <NavLink to="/admin" />
-          </MenuItem>
-          {/* <MenuItem icon={<FaGem />}>Components </MenuItem> */}
-          <MenuItem icon={<FaGem />}>
-            Product <Link to="/admin/products" />
-          </MenuItem>
-          <SubMenu
-            suffix={<span className="badge yellow">3</span>}
-            title={'With Suffix'}
-            icon={<FaRegLaughWink />}
-          >
-            <MenuItem>Submenu 1</MenuItem>
-            <MenuItem>Submenu 2</MenuItem>
-            <MenuItem>Submenu 3</MenuItem>
-          </SubMenu>
-          <SubMenu
-            prefix={<span className="badge gray">3</span>}
-            title={'With Prefix'}
-            icon={<FaHeart />}
-          >
-            <MenuItem>Submenu 1</MenuItem>
-            <MenuItem>Submenu 2</MenuItem>
-            <MenuItem>Submenu 3</MenuItem>
-          </SubMenu>
-          <SubMenu title={'Multi Level'} icon={<FaList />}>
-            <MenuItem>Submenu 1 </MenuItem>
-            <MenuItem>Submenu 2 </MenuItem>
-            <SubMenu title={'Submenu 3'}>
-              <MenuItem>Submenu 3.1 </MenuItem>
-              <MenuItem>Submenu 3.2 </MenuItem>
-            </SubMenu>
-          </SubMenu>
-        </Menu>
-      </SidebarContent>
-      {/* Footer */}
-      <SidebarFooter style={{ textAlign: 'center' }}>
-        <div className="sidebar-btn-wrapper" style={{ padding: '16px' }}>
-          <Link
-            className="sidebar-btn"
-            style={{ cursor: 'pointer' }}
-            to="/profile"
-          >
-            <FaUser />
-            <span>My Account</span>
-          </Link>
+    <div className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
+      <div className="sidebar-header">
+        <div className="logo-container">
+          <div className="logo">
+            <span>A</span>
+          </div>
+          {!collapsed && <h2>Admin</h2>}
         </div>
-      </SidebarFooter>
-    </ProSidebar>
-  )
-}
+        <button className="toggle-btn" onClick={toggleSidebar}>
+          {collapsed ? <FiMenu /> : <FiX />}
+        </button>
+      </div>
+      
+      <div className="sidebar-menu">
+        {menuItems.map((item) => (
+          <Link 
+            to={item.path} 
+            key={item.name}
+            className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
+          >
+            <div className="icon">{item.icon}</div>
+            {!collapsed && <span>{item.name}</span>}
+            {collapsed && <div className="tooltip">{item.name}</div>}
+          </Link>
+        ))}
+      </div>
+      
+      <div className="sidebar-footer">
+        <div className="user-profile">
+          <div className="avatar">AD</div>
+          {!collapsed && (
+            <div className="user-info">
+              <h4>Admin User</h4>
+              <p>admin@example.com</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-export default AdminSidebar
+export default AdminSidebar;

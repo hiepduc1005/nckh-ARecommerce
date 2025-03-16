@@ -40,6 +40,8 @@ public class Category {
 	
 	private String icon;
 	
+	private String slug;
+	
 	@Column(name = "image_path")
 	private String imagePath;
 	
@@ -64,8 +66,18 @@ public class Category {
 	private Set<Product> products = new HashSet<>();
 	
 	//Getter and Setter
+	
+	
 	public Set<Product> getProducts() {
 		return products;
+	}
+
+	public String getSlug() {
+		return slug;
+	}
+
+	public void setSlug(String slug) {
+		this.slug = slug;
 	}
 
 	public void setProducts(Set<Product> products) {

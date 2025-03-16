@@ -24,7 +24,7 @@ const Profile = () => {
 
   useEffect(() => {
     if(user){
-      const [birthDay, birthMonth, birthYear] = user.dateOfBirth.split("/");
+      const [birthDay, birthMonth, birthYear] = user?.dateOfBirth ? user.dateOfBirth.split("/") : ["",'',''];
       setUserInfo({
         ...userInfo,
         firstname: user.firstname || '',
@@ -32,9 +32,9 @@ const Profile = () => {
         username: user.userName || '9n4yikub10',
         email: user.email || 'hi********@gmail.com',
         phone: user.phoneNumber || '0903403668',
-        birthDay : +birthDay,
-        birthMonth : +birthMonth,
-        birthYear: +birthYear,
+        birthDay : +birthDay || '',
+        birthMonth : +birthMonth || '',
+        birthYear: +birthYear || '',
         gender:user.gender
       });
 

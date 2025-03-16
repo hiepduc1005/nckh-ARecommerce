@@ -1,9 +1,14 @@
 package com.ecommerce.vn.dto.user;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import com.ecommerce.vn.dto.role.RoleResponse;
+import com.ecommerce.vn.entity.role.Role;
 
 public class UserResponse {
 	
@@ -28,6 +33,8 @@ public class UserResponse {
 	private Integer loyaltyPoint;
 	
 	private Set<UserAddressResponse> addressResponses = new HashSet<UserAddressResponse>();
+	
+	private List<RoleResponse> roles = new ArrayList<>();
 	
 	private LocalDateTime createdAt;
 	
@@ -71,6 +78,22 @@ public class UserResponse {
 	}
 	
 	
+
+    
+
+	
+
+
+
+	public List<RoleResponse> getRoles() {
+		return roles;
+	}
+
+
+
+	public void setRoles(List<RoleResponse> roles) {
+		this.roles = roles;
+	}
 
 
 

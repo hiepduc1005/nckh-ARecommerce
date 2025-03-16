@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import AddVariantModal from "../components/AddVariantModal";
 import useLoading from "../hooks/UseLoading";
 import { useNavigate } from "react-router-dom";
+import { FiPlus, FiSearch, FiFilter, FiTrash2, FiEdit2, FiChevronDown, FiChevronRight } from 'react-icons/fi';
+import ProductFormModal from "../components/AdminProductFormModal";
 
 const AttributeInput = ({ attributes, onAdd, onRemove, onChange }) => (
   <div>
@@ -33,63 +35,22 @@ const AttributeInput = ({ attributes, onAdd, onRemove, onChange }) => (
 const sizeProduct = 5;
 
 const AdminProduct = () => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [shortDescription, setShortDescription] = useState("");
-  const [products, setProducts] = useState([]);
-  const [attributes, setAttributes] = useState([]);
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [showVariantModal, setShowVariantModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
+  const [expandedProducts, setExpandedProducts] = useState([]);
+
+  const [productUpdate,setProductUpdate] = useState();
+  const [products,setProducts] = useState([]);
 
   const navigate = useNavigate();
   const { token } = useAuth();
   const {setLoading} = useLoading();
 
-  useEffect(() => {
-    if (image) {
-      const objectURL = URL.createObjectURL(image);
-      setImagePreview(objectURL);
-      return () => URL.revokeObjectURL(objectURL);
-    }
-  }, [image]);
-
-  const handleAttributeChange = useCallback((index, value) => {
-    setAttributes((prev) => prev.map((attr, i) => (i === index ? { name: value } : attr)));
-  }, []);
-
-  const handleSubmit = async (e) => {
-    setLoading(true)
-    e.preventDefault();
-    if (!name || !shortDescription || !description) {
-      toast.error("Vui lòng điền đầy đủ thông tin");
-      return;
-    }
-
-    const productData = {
-      productName: name,
-      shortDescription,
-      description,
-      attributeCreateRequests: attributes,
-    };
-
-    const formData = new FormData();
-    formData.append("product", new Blob([JSON.stringify(productData)], { type: "application/json" }));
-    if (image) formData.append("image", image);
-
-    try {
-      await createProduct(formData, token);
-      toast.success("Tạo mới product thành công!");
-      setLoading(false)
-    } catch (error) {
-      toast.error("Tạo mới product thất bại!");
-      setLoading(false)
-    }
-  };
 
   useEffect(() => {
     setLoading(true)
@@ -121,117 +82,222 @@ const AdminProduct = () => {
     }
   }
 
-  const handleViewDetails = (product) => {
-    setLoading(true);
-    navigate(`${product.id}`);
-    setLoading(false);
+  const handleOpenEditModal = (product) => {
+    setIsModalOpen(true);
+    setProductUpdate(product)
   }
+  
+  // Handle select all
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedProducts(products.map(product => product.id));
+    } else {
+      setSelectedProducts([]);
+    }
+  };
+  
+  // Handle select individual product
+  const handleSelectProduct = (productId) => {
+    if (selectedProducts.includes(productId)) {
+      setSelectedProducts(selectedProducts.filter(id => id !== productId));
+    } else {
+      setSelectedProducts([...selectedProducts, productId]);
+    }
+  };
+  
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+  
+  // Toggle product expansion
+  const toggleProductExpansion = (productId) => {
+    if (expandedProducts.includes(productId)) {
+      setExpandedProducts(expandedProducts.filter(id => id !== productId));
+    } else {
+      setExpandedProducts([...expandedProducts, productId]);
+    }
+  };
 
+  // Format price display
+  const formatPrice = (min, max) => {
+    if (min === max) {
+      return `$${min}`;
+    }
+    return `$${min} - $${max}`;
+  };
+  
   return (
-    <Container className="product-management mt-4">
-      <h2 className="text-center mb-4">Product Management</h2>
-
-      <Form onSubmit={handleSubmit} className="mb-4 p-3 border rounded">
-        <Row className="mb-3">
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Name</Form.Label>
-              <Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} />
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Short Description</Form.Label>
-              <Form.Control type="text" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Description</Form.Label>
-          <Form.Control as="textarea" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Image</Form.Label>
-          <Form.Control type="file" onChange={(e) => setImage(e.target.files[0])} />
-          {imagePreview && <Image src={imagePreview} alt="Preview" fluid className="mt-2" />}
-        </Form.Group>
-
-        <AttributeInput attributes={attributes} onAdd={() => setAttributes([...attributes, { name: "" }])} onRemove={(index) => setAttributes(attributes.filter((_, i) => i !== index))} onChange={handleAttributeChange} />
-
-        <Button type="submit" className="mt-3 w-100">Submit</Button>
-      </Form>
-
-      <h2 className="my-3 text-center">Product List</h2>
-      <Table striped bordered hover responsive>
-        <thead className="table-dark">
-          <tr>
-            <th>#</th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Short Description</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.length > 0 ? (
-            products.map((product, index) => (
-              <tr key={product.id}>
-                <td>{index + 1 + (currentPage - 1) * 5}</td>
-                <td>
-                  <Image src={`http://localhost:8080${product.imagePath}`} alt={product.productName} width={50} height={50} rounded />
-                </td>
-                <td>{product.productName}</td>
-                <td>{product.shortDescription}</td>
-                <td>{product.description}</td>
-                <td>{product.active ? "Active" : "Inactive"}</td>
-                <td>
-                  <Button variant="info" size="sm" className="me-2" onClick={() => handleViewDetails(product)}>View Variants</Button>
-                  <Button variant="warning" size="sm" className="me-2">Edit</Button>
-                  <Button variant="danger" size="sm" onClick={() => handleDeleteProduct(product.id)}>Delete</Button>
-                  <Button
-                    variant="success"
-                    size="sm"
-                    className="ms-2"
-                    onClick={() => {
-                      setSelectedProduct(product);
-                      setShowVariantModal(true);
-                    }}
-                  >
-                    Add Variant
-                  </Button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className="text-center">No products available</td>
-            </tr>
+    <div className="admin-product">
+      <div className="page-header">
+        <h1>Products Management</h1>
+        <button className="add-product-btn" onClick={() => setIsModalOpen(true)}>
+          <FiPlus />
+          <span>Add Product</span>
+        </button>
+      </div>
+      
+      <div className="product-controls">
+        <div className="search-container">
+          <div className="search-input">
+            <FiSearch />
+            <input 
+              type="text" 
+              placeholder="Search products..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+        
+        <div className="filter-options">
+          <button className="filter-btn">
+            <FiFilter />
+            <span>Filters</span>
+          </button>
+          
+          <select className="sort-select">
+            <option value="name_asc">Name (A-Z)</option>
+            <option value="name_desc">Name (Z-A)</option>
+            <option value="price_asc">Price (Low-High)</option>
+            <option value="price_desc">Price (High-Low)</option>
+            <option value="stock_asc">Stock (Low-High)</option>
+            <option value="stock_desc">Stock (High-Low)</option>
+          </select>
+        </div>
+      </div>
+      
+      <div className="product-list-container">
+        <div className="bulk-actions">
+          <div className="select-all">
+            <input 
+              type="checkbox" 
+              id="select-all" 
+              checked={selectedProducts.length === products.length && products.length > 0}
+              onChange={handleSelectAll}
+            />
+            <label htmlFor="select-all">Select All</label>
+          </div>
+          
+          {selectedProducts.length > 0 && (
+            <div className="bulk-action-buttons">
+              <button className="delete-btn">
+                <FiTrash2 />
+                <span>Delete Selected</span>
+              </button>
+            </div>
           )}
-        </tbody>
-      </Table>
+        </div>
+        
+        <div className="product-table">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Attribute</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map(product => (
+                <React.Fragment key={product.id}>
+                  <tr className=''>
+                    <td>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedProducts.includes(product.id)}
+                        onChange={() => handleSelectProduct(product.id)}
+                      />
+                    </td>
+                    
+                    <td>
+                      <div className="product-image">
+                        <img 
+                          src={"http://localhost:8080/uploads/22df2ba3-0757-4909-8611-e406706d7eb3_giaoducqp.jpg"} 
+                          alt={product.name}
+                          onError={(e) => {e.target.src = '/api/placeholder/60/60'; e.target.alt = 'No image'}}
+                          width="60" 
+                          height="60" 
+                        />
+                      </div>
+                    </td>
+                    <td>{product.productName}</td>
+                    <td>{product.category}</td>
+                    <td>{product.brand}</td>
+                    <td>Attribute</td>
+                    <td>{formatPrice(product.minPrice, product.maxPrice)}</td>
+                    <td>{product.totalStock}</td>
+                    <td>
+                      <span className={`status-badge ${product.status === 'Active' ? 'active' : 'low-stock'}`}>
+                        {product.status}
+                      </span>
+                    </td>
+                    <td className="actions">
+                      <button className="edit-btn" onClick={() => handleOpenEditModal(product)}>
+                        <FiEdit2 />
+                      </button>
+                      <button className="delete-btn" onClick={() => handleDeleteProduct(product.id)}>
+                        <FiTrash2 />
+                      </button>
+                    </td>
+                  </tr>
+                 
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        <div className="pagination">
+          <button 
+            className="prev-btn" 
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          
+          <div className="page-numbers">
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <button 
+                key={index} 
+                className={`page-number ${currentPage === index + 1 ? 'active' : ''}`}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+          
+          <button 
+            className="next-btn" 
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
 
-      <Pagination className="justify-content-center mt-3">
-        {[...Array(totalPages).keys()].map((num) => (
-          <Pagination.Item key={num + 1} active={num + 1 === currentPage} onClick={() => { setLoading(true); setCurrentPage(num + 1); setLoading(false);}}>
-            {num + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
-
-      {selectedProduct && (
-        <AddVariantModal
-          show={showVariantModal}
-          handleClose={() => setShowVariantModal(false)}
-          product={selectedProduct}
-          token={token}
+      {isModalOpen && (
+        <ProductFormModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          product={currentProduct}
         />
       )}
-    </Container>
+    </div>
   );
 };
+
+// Placeholder for ProductFormModal component
+
 
 export default AdminProduct;

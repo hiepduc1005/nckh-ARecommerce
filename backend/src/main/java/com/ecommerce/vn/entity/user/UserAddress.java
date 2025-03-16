@@ -35,7 +35,7 @@ public class UserAddress {
     private String district;
     
     @Column(name = "is_default")
-    private boolean isDefault;
+    private Boolean isDefault;
     
     // Constructor mặc định
     public UserAddress() {
@@ -43,7 +43,7 @@ public class UserAddress {
     
     // Constructor đầy đủ
     public UserAddress(UUID id, User user, String name, String phone, String address, 
-                      String district, boolean isDefault) {
+                      String district, Boolean isDefault) {
         this.id = id;
         this.user = user;
         this.name = name;
@@ -102,11 +102,11 @@ public class UserAddress {
         this.district = district;
     }
     
-    public boolean isDefault() {
+    public Boolean isDefault() {
         return isDefault;
     }
     
-    public void setDefault(boolean isDefault) {
+    public void setDefault(Boolean isDefault) {
         this.isDefault = isDefault;
     }
 }

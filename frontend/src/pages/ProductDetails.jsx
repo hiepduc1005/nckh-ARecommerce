@@ -70,7 +70,7 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="product-details">
+    <div className="product-details-container">
       <div className="left">
         <div className="carousel">
           <Slider {...settings}>
