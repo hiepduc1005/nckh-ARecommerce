@@ -7,9 +7,8 @@ const AdminBrandModal = ({ editingBrand, onClose, formData, setFormData, handleE
     useEffect(() => {
         if (editingBrand) {
             setFormData({
-                brandName: editingBrand.brandName || '',
-                brandDescription: editingBrand.brandDescription || '',
-                status: editingBrand.status || true,
+                brandName: editingBrand.name || '',
+                brandDescription: editingBrand.description || '',
                 image: editingBrand.imagePath
             });
         }
@@ -45,7 +44,6 @@ const AdminBrandModal = ({ editingBrand, onClose, formData, setFormData, handleE
         setFormData({
             brandName: '',
             brandDescription: '',
-            status: true,
             image: null
         });
     };
@@ -79,18 +77,7 @@ const AdminBrandModal = ({ editingBrand, onClose, formData, setFormData, handleE
                             rows="3"
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="status">Status</label>
-                        <select
-                            id="status"
-                            name="status"
-                            value={formData.status}
-                            onChange={handleInputChange}
-                        >
-                            <option value="true">Active</option>
-                            <option value="false">Inactive</option>
-                        </select>
-                    </div>
+                   
                     
                     <div className="form-group">
                         <label htmlFor="image">Image</label>

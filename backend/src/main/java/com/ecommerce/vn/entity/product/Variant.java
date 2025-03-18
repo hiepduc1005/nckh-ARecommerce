@@ -46,6 +46,9 @@ public class Variant {
 	
 	private Integer quantity;
 	
+	@Column(name = "image_path")
+	private String imagePath;
+	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -73,6 +76,20 @@ public class Variant {
 	public List<AttributeValue> getAttributeValues() {
 		return attributeValues;
 	}
+	
+	
+
+	public String getImagePath() {
+		return imagePath;
+	}
+
+
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
+
+
 
 	public void setAttributeValues(List<AttributeValue> attributeValues) {
 		this.attributeValues = attributeValues;

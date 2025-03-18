@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiPackage, FiSearch } from 'react-icons/fi';
 import '../assets/styles/pages/AdminBrand.scss';
-import AdminBrandModal from '../components/modal/AdminBrandModal';
+import AdminBrandModal from '../components/modal/AdminBrandModal.jsx';
 import { toast } from 'react-toastify';
-import { createBrand, deleteBrand, getBrandsPaginate, updateBrand } from '../api/BrandApi';
 import useAuth from '../hooks/UseAuth';
 import { formatToVNDate } from '../utils/ultils';
+import { createBrand, deleteBrand, getBrandsPaginate, updateBrand } from '../api/brandApi.jsx';
 
 const AdminBrand = () => {
   const [brands, setBrands] = useState([]);
@@ -62,8 +62,8 @@ const AdminBrand = () => {
 
   const handleCreateBrand = async () => {
     const formCreateBrand = {
-        brandName: formData.brandName,
-        brandDescription: formData.brandDescription
+        name: formData.brandName,
+        description: formData.brandDescription
     }
 
     const imageCreateRequest = formData.image;
@@ -88,9 +88,8 @@ const AdminBrand = () => {
   const handleEditBrand = async () => {
     const formUpdateBrand = {
         id: editingBrand.id,
-        brandName: formData.brandName,
-        brandDescription: formData.brandDescription,
-        active: formData.status
+        name: formData.brandName,
+        description: formData.brandDescription,
     }
 
     const imageUpdateRequest = formData.image;
@@ -199,9 +198,9 @@ const AdminBrand = () => {
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Image</th>
                 <th>Description</th>
                 <th>Products</th>
-                <th>Status</th>
                 <th>Created Date</th>
                 <th>Actions</th>
               </tr>
@@ -211,16 +210,23 @@ const AdminBrand = () => {
                 <tr key={brand.id}>
                   <td className="brand-name">
                     <div className="name-with-icon">
-                      <span>{brand.brandName}</span>
+                      <span>{brand.name}</span>
                     </div>
                   </td>
-                  <td className="brand-description">{brand.brandDescription}</td>
-                  <td className="brand-products">{brand.totalProduct}</td>
-                  <td className="brand-status">
-                    <span className={`status-badge ${brand.active}`}>
-                      {brand.active === true ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
+                  <td>
+                      <div className="brand-image">
+                        <img 
+                          src={`http://localhost:8080${brand.imagePath}`}
+                          alt={brand.name}
+                          onError={(e) => {e.target.src = '/api/placeholder/60/60'; e.target.alt = 'No image'}}
+                          width="60" 
+                          height="60" 
+                        />
+                      </div>
+                    </td>
+                  <td className="brand-description">{brand.description}</td>
+                  <td className="brand-products">{brand.totalProducts}</td>
+                  
                   <td className="brand-date">{formatToVNDate(brand.createdAt)}</td>
                   <td className="brand-actions">
                     <button 

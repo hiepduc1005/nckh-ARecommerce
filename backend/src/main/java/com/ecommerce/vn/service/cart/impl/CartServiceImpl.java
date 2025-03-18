@@ -103,6 +103,7 @@ public class CartServiceImpl implements CartService {
     }
 
 	@Override
+	@Transactional
 	public Cart getCartById(UUID cartId) {
 		if (cartId == null) {
             throw new RuntimeException("Cart Id is missing!");
@@ -112,7 +113,9 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
+	@Transactional
 	public Cart getCartByEmail(String email) {
-		return cartRepository.findByUserEmail(email).get();
+		System.out.println(email);
+		return cartRepository.findByUser_Email(email).get();
 	}
 }

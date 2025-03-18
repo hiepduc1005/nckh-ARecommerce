@@ -6,9 +6,9 @@ const CartPopper = ({isCartOpen,cart}) => {
     <div className={`cart-popper ${!isCartOpen ? "hidden" : ""}`}>
       <div className="cart-header">Sản Phẩm Mới Thêm</div>
       <div className="cart-content">
-        {cart?.length > 0 ? (
-          cart?.map((item, index) => (
-            <div key={index} className="cart-item">
+        {cart?.variantResponse?.length > 0 ? (
+          cart?.variantResponse?.map((item, index) => (
+            <div key={item?.id} className="cart-item">
               <img src={item.image} alt={item.name} className="cart-image" />
               <div className="cart-details">
                 <div style={{display: "flex" , flexDirection: "column"}}>

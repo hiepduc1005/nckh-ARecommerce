@@ -24,7 +24,10 @@ public class CartConvert {
 		CartResponse cartResponse = new CartResponse();
 		cartResponse.setId(cart.getId());
 		cartResponse.setUserId(cart.getUser().getId());
-		cartResponse.setCouponResponse(couponConvert.couponConvertToCouponResponse(cart.getCoupon()));
+		
+		if(cart.getCoupon() != null) {
+			cartResponse.setCouponResponse(couponConvert.couponConvertToCouponResponse(cart.getCoupon()));			
+		}
 		
 		List<CartItemResponse> cartItemResponses = cart.getCartItems().stream()
 				.map(

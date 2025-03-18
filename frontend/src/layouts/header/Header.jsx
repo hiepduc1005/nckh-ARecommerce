@@ -11,27 +11,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCartShopping, faHeart } from '@fortawesome/free-solid-svg-icons'
 import CartPopper from '../../components/CartPopper'
 import WishListPopper from '../../components/WishListPopper'
+import useCart from '../../hooks/UseCart'
 const Header = () => {
   const {user,isAuthenticated,logout} = useAuth();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishListOpen,setIsWishListOpen] = useState(false)
+  
+  const {cart} = useCart();
 
   const cartItemCount = 2; 
 
-  const cart = [
-    {
-      id: 1,
-      name: "Khăn giấy gấu trúc Top Gia Sắc Hạ",
-      price: 179000,
-      image: "http://localhost:8080/uploads/8d2bbbec-d731-4855-a270-e94c4f554eef_giaoducqp.jpg"
-    },
-    {
-      id: 2,
-      name: "Bánh quy Oreo Chocolate 288g",
-      price: 45000,
-      image: "http://localhost:8080/uploads/8d2bbbec-d731-4855-a270-e94c4f554eef_giaoducqp.jpg", // Thay bằng ảnh thực tế
-    },
-  ];
+  // const cart = [
+  //   {
+  //     id: 1,
+  //     name: "Khăn giấy gấu trúc Top Gia Sắc Hạ",
+  //     price: 179000,
+  //     image: "http://localhost:8080/uploads/8d2bbbec-d731-4855-a270-e94c4f554eef_giaoducqp.jpg"
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Bánh quy Oreo Chocolate 288g",
+  //     price: 45000,
+  //     image: "http://localhost:8080/uploads/8d2bbbec-d731-4855-a270-e94c4f554eef_giaoducqp.jpg", // Thay bằng ảnh thực tế
+  //   },
+  // ];
 
   const wishList = [
     {
@@ -90,8 +93,8 @@ const Header = () => {
                 onMouseLeave={() => setIsCartOpen(false)}
               >
                 <FontAwesomeIcon style={{color: "white"}} icon={faCartShopping} size="lg" color="#207355" />
-                {cartItemCount > 0 && (
-                    <span className="cart-badge">{cartItemCount}</span>
+                {cart?.cartItemResponses.length > 0 && (
+                    <span className="cart-badge">{cart?.cartItemResponses}</span>
                 )}
                 <CartPopper isCartOpen={isCartOpen} cart = {cart}/>
               </Link>

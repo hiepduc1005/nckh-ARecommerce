@@ -16,8 +16,12 @@ public class BrandConvert {
 	private BrandService brandService;
 
 	public Brand brandCreateRequestConvertToBrand(BrandCreateRequest brandCreateRequest) {
+		if(brandCreateRequest == null) {
+			return null;
+		}
+		
 		Brand brand = new Brand();
-		brand.setName(brand.getName());
+		brand.setName(brandCreateRequest.getName());
 		brand.setDescription(brandCreateRequest.getDescription());
 		
 		return brand;
@@ -37,6 +41,10 @@ public class BrandConvert {
 	}
 	
 	public Brand brandUpdateRequestConvertToBrand(BrandUpdateRequest brandUpdateRequest) {
+		if(brandUpdateRequest == null) {
+			return null;
+		}
+		
 		Brand brand = brandService.getBrandById(brandUpdateRequest.getId());
 		
 		brand.setName(brandUpdateRequest.getName());

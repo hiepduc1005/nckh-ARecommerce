@@ -71,8 +71,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public User registerUser(String email, String password, String firstName, String lastName) {
 		Boolean isUserRegister = userRepository.findByEmail(email).isPresent();
-//		roleService.createCustomerRole();
-//		roleService.createAdminRole();
+
 		if(isUserRegister == false) {
 			Role roleUser = roleService.getRoleByName("USER");
 			String hashPassword = passwordEncoder.encode(password);
@@ -83,7 +82,10 @@ public class UserServiceImpl implements UserService{
 			user.setLastName(lastName);
 			user.setPassword(hashPassword);
 			user.setRoles(List.of(roleUser));
-			user.setCart(new Cart());
+			
+			Cart cart = new Cart();
+			cart.setUser(user);
+			user.setCart(cart);
 			
 			return createUser(user);
 		}

@@ -8,7 +8,7 @@ const AdminSidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { name: 'Dashboard', icon: <FiHome />, path: '/admin/dashboard' },
+    { name: 'Dashboard', icon: <FiHome />, path: '/admin' },
     { name: 'Products', icon: <FiBox />, path: '/admin/products' },
     { name: 'Brands', icon: <FiBriefcase />, path: '/admin/brands' },
     { name: 'Tags', icon: <FiTag />, path: '/admin/tags' },

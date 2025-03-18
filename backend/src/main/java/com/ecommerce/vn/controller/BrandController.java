@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -22,9 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ecommerce.vn.dto.product.BrandCreateRequest;
 import com.ecommerce.vn.dto.product.BrandResponse;
 import com.ecommerce.vn.dto.product.BrandUpdateRequest;
-import com.ecommerce.vn.dto.product.ProductResponse;
 import com.ecommerce.vn.entity.product.Brand;
-import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.service.FileUploadService;
 import com.ecommerce.vn.service.convert.BrandConvert;
 import com.ecommerce.vn.service.product.BrandService;
@@ -52,7 +49,9 @@ public class BrandController {
     		return ResponseEntity.badRequest().body("Brand image is empty!");
     	}
 		
+		
 		Brand brand = brandConvert.brandCreateRequestConvertToBrand(brandCreateRequest);
+		
 		
 		String imagePath = fileUploadService.uploadFileToServer(image);
 		

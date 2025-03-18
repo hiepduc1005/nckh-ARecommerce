@@ -5,6 +5,13 @@ public class BrandCreateRequest {
 	private String name;
 	
 	private String description;
+	
+	
+
+	@Override
+	public String toString() {
+		return "BrandCreateRequest [name=" + name + ", description=" + description + "]";
+	}
 
 	public String getName() {
 		return name;
