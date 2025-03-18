@@ -20,12 +20,20 @@ const AdminLayout = () => {
   },[isAuthenticated,navigate])
 
   return (
+    isAuthenticated 
+    
+    ? 
+    
     <div className="admin-layout">
       <AdminSidebar />
       <main className="admin-content">
         <Outlet />
       </main>
     </div>
+
+    : 
+    
+    ""
   )
 }
 

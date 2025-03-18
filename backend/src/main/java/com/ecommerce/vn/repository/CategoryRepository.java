@@ -12,7 +12,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ecommerce.vn.entity.product.Category;
-import com.ecommerce.vn.entity.product.Product;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, UUID>{

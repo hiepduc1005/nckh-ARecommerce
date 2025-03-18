@@ -31,7 +31,11 @@ public class Brand {
 	@Column( unique = true)
 	private String name;
 	
+	private String description;
+	
 	private String slug;
+	
+	private String imagePath;
 	
 	@OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Product> products = new ArrayList<>();
@@ -53,6 +57,22 @@ public class Brand {
     
     
     
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
+
 	public String getSlug() {
 		return slug;
 	}

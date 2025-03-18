@@ -3,7 +3,7 @@ import { FiPlus, FiEdit2, FiTrash2, FiChevronRight, FiPackage, FiSearch } from '
 import '../assets/styles/pages/AdminCategory.scss';
 import AdminCategoryModal from '../components/modal/AdminCategoryModal';
 import { toast } from 'react-toastify';
-import { createCategory, getCategoriesPaginate, updateCategory } from '../api/categoryApi';
+import { createCategory, deleteCategory, getCategoriesPaginate, updateCategory } from '../api/categoryApi';
 import useAuth from '../hooks/UseAuth';
 import { formatToVNDate } from '../utils/ultils';
 
@@ -118,11 +118,13 @@ const AdminCategory = () => {
     }
   }
 
-  const handleDeleteCategory = (categoryId) => {
-    // In a real application, you would call an API to delete the category
-    if (window.confirm('Are you sure you want to delete this category?')) {
+  const handleDeleteCategory = async (categoryId) => {
+    if (window.confirm('Bạn có chắc muốn xóa category này?')) {
+      await deleteCategory(token,categoryId);
       const updatedCategories = categories.filter(category => category.id !== categoryId);
       setCategories(updatedCategories);
+
+      toast.success("Xóa category thành công!")
     }
   };
 

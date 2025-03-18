@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import "../../assets/styles/components/modal/Modal.scss"
 import ImageDropUploader from '../ImageDropUploader';
 
-const AdminCategoryModal = ({ editingCategory, categories, onClose,formData,setFormData, handleEditCategory,handleCreateCategory}) => {
+const AdminCategoryModal = ({ editingCategory, onClose,formData,setFormData, handleEditCategory,handleCreateCategory}) => {
   
 
   useEffect(() => {
