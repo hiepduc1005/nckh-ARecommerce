@@ -8,6 +8,7 @@ import com.ecommerce.vn.service.convert.TagConvert;
 import com.ecommerce.vn.service.tag.TagService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,16 +31,18 @@ public class TagController {
     // Tạo thẻ mới
     @PostMapping
     public ResponseEntity<TagResponse> createTag(@RequestBody TagCreateRequest tagCreateRequest) {
-        Tag tagEntity = tagConvert.tagCreateConvert(tagCreateRequest);
-        Tag createdTag = tagService.createTag(tagEntity.getTagName());
-        TagResponse response = tagConvert.tagConvertToTagResponse(createdTag);
+    	System.out.println(tagCreateRequest.toString());
+    	Tag tagEntity = tagService.createTag(tagCreateRequest.getTagName(), tagCreateRequest.getActive());
+        
+        
+        TagResponse response = tagConvert.tagConvertToTagResponse(tagEntity);
         return ResponseEntity.ok(response);
     }
 
     // Cập nhật thẻ
     @PutMapping
     public ResponseEntity<TagResponse> updateTag(@RequestBody TagUpdateRequest tagUpdateRequest) {
-        Tag updatedTag = tagService.updateTag(tagUpdateRequest.getId(),tagUpdateRequest.getTagName()); // Tìm thẻ hiện có (thay thế bằng phương thức tìm thẻ nếu cần)
+        Tag updatedTag = tagService.updateTag(tagUpdateRequest.getId(),tagUpdateRequest.getTagName(), tagUpdateRequest.getActive()); // Tìm thẻ hiện có (thay thế bằng phương thức tìm thẻ nếu cần)
         TagResponse response = tagConvert.tagConvertToTagResponse(updatedTag);
         return ResponseEntity.ok(response);
     }
@@ -96,4 +99,16 @@ public class TagController {
         boolean exists = tagService.isTagExist(tagName);
         return ResponseEntity.ok(exists);
     }
+    
+    @GetMapping("/pagination")
+    public ResponseEntity<Page<TagResponse>> getBrandsWithPaginationAndSorting(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam(value ="sortBy" , required = false) String sortBy) {
+    	
+    	Page<Tag> tags = tagService.getTagsWithPaginationAndSorting(page, size, sortBy);
+        
+    	Page<TagResponse> tagResponses = tags.map(tag -> tagConvert.tagConvertToTagResponse(tag));
+    	return new ResponseEntity<>(tagResponses, HttpStatus.OK);
+   }
 }

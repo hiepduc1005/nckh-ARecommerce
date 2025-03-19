@@ -58,7 +58,6 @@ public class ProductController {
     		return ResponseEntity.badRequest().body("Product image is empty!");
     	}
     	
-    	System.out.println(request.toString());
         Product product = productConvert.productCreateRequestConver(request);
         String imagePath = fileUploadService.uploadFileToServer(image);
         product.setImagePath(imagePath);

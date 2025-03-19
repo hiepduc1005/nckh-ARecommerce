@@ -5,6 +5,7 @@ export const createVariant = async (data , token) => {
         const res = await axiosInstance.post("api/v1/variants",data,{
             headers: {
                 'Authorization': `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
             }
         })
 

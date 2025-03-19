@@ -22,4 +22,5 @@ public interface TagRepository extends JpaRepository<Tag, UUID> {
 	 
 	 @Query("SELECT t FROM Tag t WHERE t.active = false")
 	 List<Tag> getUnactiveTag();
+	 
 }

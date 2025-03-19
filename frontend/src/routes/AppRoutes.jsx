@@ -23,6 +23,7 @@ import UserAddress from '../pages/UserAddress'
 import AdminProductDetails from '../pages/AdminProductDetails'
 import AdminCategory from '../pages/AdminCategory'
 import AdminBrand from '../pages/AdminBrand'
+import AdminTag from '../pages/AdminTag'
 
 const AppRoutes = () => {
   return (
@@ -54,6 +55,7 @@ const AppRoutes = () => {
 
         <Route path='/admin' element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path='tags' element={<AdminTag/>} />
           <Route path='brands' element={<AdminBrand/>} />
           <Route path='products' element={<AdminProduct/>} />
           <Route path='categories' element={<AdminCategory/>} />

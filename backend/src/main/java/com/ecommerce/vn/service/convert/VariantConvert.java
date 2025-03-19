@@ -50,6 +50,7 @@ public class VariantConvert {
 		
 		variantResponse.setAttributeValueResponses(attributeValueResponses);
 		variantResponse.setAttributeResponses(attributeResponses);
+		variantResponse.setImagePath(variant.getImagePath());
 		return variantResponse;
 	}
 	

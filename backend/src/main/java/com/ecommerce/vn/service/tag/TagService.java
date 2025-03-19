@@ -3,14 +3,16 @@ package com.ecommerce.vn.service.tag;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Tag;
 
 public interface TagService {
 
-    Tag createTag(String name);
+    Tag createTag(String name,Boolean active);
 
-    Tag updateTag(UUID tagId, String newName);
+    Tag updateTag(UUID tagId, String newName,Boolean active);
 
     void deleteTag(UUID tagId);
     
@@ -25,6 +27,8 @@ public interface TagService {
     List<Tag> getActiveTag();
     
     List<Tag> getUnactiveTag();
+    
+    Page<Tag> getTagsWithPaginationAndSorting(int page,int size,String sortBy);
 
     // Thêm thẻ vào sản phẩm
     void addTagToProduct(UUID productId, UUID tagId);

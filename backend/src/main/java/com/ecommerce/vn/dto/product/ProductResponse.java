@@ -25,6 +25,8 @@ public class ProductResponse {
 	
 	private String imagePath;
 	
+	private Integer stock;
+	
 	private Set<CategoryResponse> categories = new HashSet<CategoryResponse>();
 	
 	private Set<TagResponse> tags = new HashSet<TagResponse>();
@@ -39,7 +41,9 @@ public class ProductResponse {
 	
 	private UUID updatedBy;
 	
-	private Double price;
+	private Double minPrice;
+	
+	private Double maxPrice;
 	
 	private Double ratingValue;
 	
@@ -65,14 +69,38 @@ public class ProductResponse {
 	}
 
 
-	public Double getPrice() {
-		return price;
+	
+
+
+	public Integer getStock() {
+		return stock;
 	}
 
 
-	public void setPrice(Double price) {
-		this.price = price;
+	public void setStock(Integer stock) {
+		this.stock = stock;
 	}
+
+
+	public Double getMinPrice() {
+		return minPrice;
+	}
+
+
+	public void setMinPrice(Double minPrice) {
+		this.minPrice = minPrice;
+	}
+
+
+	public Double getMaxPrice() {
+		return maxPrice;
+	}
+
+
+	public void setMaxPrice(Double maxPrice) {
+		this.maxPrice = maxPrice;
+	}
+
 
 
 	public UUID getId() {
@@ -201,7 +229,6 @@ public class ProductResponse {
 		this.updatedAt = updatedAt;
 		this.createdBy = createdBy;
 		this.updatedBy = updatedBy;
-		this.price = price;
 		this.ratingResponses = ratingResponses;
 		this.ratingValue = ratingValue;
 	}

@@ -20,7 +20,6 @@ const Home = () => {
     const fetchProducts = async () => {
       const data = await getProductsPaginate(1,8);
       setProducts(data.content);
-      console.log(data)
 
     };
     fetchProducts();

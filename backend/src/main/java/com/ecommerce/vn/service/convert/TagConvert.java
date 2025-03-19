@@ -14,11 +14,12 @@ public class TagConvert {
         if (tagCreateRequest == null) {
             return null;
         }
+        
 
         Tag tag = new Tag();
         tag.setTagName(tagCreateRequest.getTagName());
+        tag.setActive(tagCreateRequest.getActive());
          
-
         return tag;
     }
 

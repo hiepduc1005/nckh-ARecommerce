@@ -124,32 +124,45 @@ public class ProductConvert {
         		.min(BigDecimal::compareTo)
         		.orElse(BigDecimal.ZERO).doubleValue();
         
+        Double maxPrice = product.getVariants().stream()
+        		.map(variant -> variant.getPrice())
+        		.max(BigDecimal::compareTo)
+        		.orElse(BigDecimal.ZERO).doubleValue();
+        
         Double rattingValue = product.getRatings().stream()
         		.mapToDouble(ratting -> ratting.getRatingValue())
         		.average()
         		.orElse(5);
         
+        Integer stock = product.getVariants()
+        		.stream()
+        		.mapToInt(variant -> variant.getQuantity())
+        		.sum();
         
+        
+        ProductResponse productResponse = new ProductResponse(
+                product.getId(), 
+                product.getActive(), 
+                product.getProductName(), 
+                product.getDescription(), 
+                product.getShortDescription(), 
+                product.getImagePath(), 
+                categoryResponses, 
+                tagResponses, 
+                attributeResponses,
+                product.getCreatedAt(), 
+                product.getUpdateAt(), 
+                product.getCreatedBy(), 
+                product.getUpdatedBy(),
+                minPrice,
+                rattingValue,
+                ratingResponses
+                ); 
+        
+        productResponse.setStock(stock);
+        productResponse.setMaxPrice(maxPrice);
 
-
-        return new ProductResponse(
-            product.getId(), 
-            product.getActive(), 
-            product.getProductName(), 
-            product.getDescription(), 
-            product.getShortDescription(), 
-            product.getImagePath(), 
-            categoryResponses, 
-            tagResponses, 
-            attributeResponses,
-            product.getCreatedAt(), 
-            product.getUpdateAt(), 
-            product.getCreatedBy(), 
-            product.getUpdatedBy(),
-            minPrice,
-            rattingValue,
-            ratingResponses
-            ); 
+        return productResponse;
     }
 
 }

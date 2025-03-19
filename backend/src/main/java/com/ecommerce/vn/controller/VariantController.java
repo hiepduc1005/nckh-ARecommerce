@@ -6,19 +6,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.dto.variant.VariantCreateRequest;
 import com.ecommerce.vn.dto.variant.VariantResponse;
 import com.ecommerce.vn.entity.product.Variant;
+import com.ecommerce.vn.service.FileUploadService;
 import com.ecommerce.vn.service.convert.VariantConvert;
 import com.ecommerce.vn.service.variant.VariantService;
 
@@ -32,11 +35,24 @@ public class VariantController {
 	@Autowired
 	public VariantConvert variantConvert;
 	
-	@PostMapping
-	public ResponseEntity<VariantResponse> createVariant(@RequestBody VariantCreateRequest variantCreateRequest){
-		Variant variant = variantConvert.variantCreateRequestConvertToVariant(variantCreateRequest);
+	@Autowired
+	public FileUploadService fileUploadService;
+	
+	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<?> createVariant(
+			@RequestPart("image") MultipartFile image,
+			@RequestPart("variant") VariantCreateRequest variantCreateRequest
+			){
 		
-		variant = variantService.createVariant(variant);
+		if(image == null) {
+    		return ResponseEntity.badRequest().body("Variant image is empty!");
+    	}
+		Variant variant = variantConvert.variantCreateRequestConvertToVariant(variantCreateRequest);
+        
+		String imagePath = fileUploadService.uploadFileToServer(image);
+        variant.setImagePath(imagePath);
+		
+        variant = variantService.createVariant(variant);
 		
 		VariantResponse variantResponse = variantConvert.variantConvertToVariantResponse(variant);
 		

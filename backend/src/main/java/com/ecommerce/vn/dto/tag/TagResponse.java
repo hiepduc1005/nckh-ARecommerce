@@ -3,11 +3,14 @@ package com.ecommerce.vn.dto.tag;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TagResponse {
 	private UUID id;
 
 	private String tagName;
 	
+	@JsonProperty("active")	
 	private Boolean active;
 	
 	private LocalDateTime createdAt;

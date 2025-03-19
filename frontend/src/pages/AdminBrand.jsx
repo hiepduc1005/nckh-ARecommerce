@@ -6,10 +6,10 @@ import { toast } from 'react-toastify';
 import useAuth from '../hooks/UseAuth';
 import { formatToVNDate } from '../utils/ultils';
 import { createBrand, deleteBrand, getBrandsPaginate, updateBrand } from '../api/brandApi.jsx';
+import useLoading from '../hooks/UseLoading.jsx';
 
 const AdminBrand = () => {
   const [brands, setBrands] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
@@ -24,6 +24,7 @@ const AdminBrand = () => {
   });
 
   const {token} = useAuth();
+  const {setLoading} = useLoading();
   const pageSize = 5;
 
   useEffect(() => {
@@ -128,10 +129,6 @@ const AdminBrand = () => {
   // Count statistics
   const activeBrands = brands.filter(cat => cat.active).length;
   const totalProducts = brands.reduce((sum, cat) => sum + cat.totalProduct, 0);
-
-  if (loading) {
-    return <div className="loading">Loading brands...</div>;
-  }
 
   return (
     <div className="admin-brand">

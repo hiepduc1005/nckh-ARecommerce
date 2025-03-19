@@ -121,6 +121,7 @@ const AdminProduct = () => {
 
   // Format price display
   const formatPrice = (min, max) => {
+    min = min ? min : 0;
     if (min === max) {
       return `$${min}`;
     }
@@ -233,10 +234,10 @@ const AdminProduct = () => {
                     <td>{product.brand}</td>
                     <td>Attribute</td>
                     <td>{formatPrice(product.minPrice, product.maxPrice)}</td>
-                    <td>{product.totalStock}</td>
+                    <td>{product.stock}</td>
                     <td>
-                      <span className={`status-badge ${product.status === 'Active' ? 'active' : 'low-stock'}`}>
-                        {product.status}
+                      <span className={`status-badge ${product.active ? 'active' : 'low-stock'}`}>
+                        {product.active ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="actions">
