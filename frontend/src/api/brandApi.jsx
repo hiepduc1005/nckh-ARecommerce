@@ -27,6 +27,17 @@ export const getBrandsPaginate = async ( page , size) => {
     }
 } 
 
+export const getAllBrands = async () => {
+    try {
+        const res = await axiosInstance.get(`api/v1/brands`);
+
+        return res.data;
+    } catch (error) {
+        console.error(error)
+        return null;
+    }
+} 
+
 export const updateBrand = async (data , token) => {
     try {
         const res = await axiosInstance.put("api/v1/brands",data,{

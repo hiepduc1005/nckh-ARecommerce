@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiChevronRight, FiPackage, FiSearch } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiPackage, FiSearch } from 'react-icons/fi';
 import '../assets/styles/pages/AdminCategory.scss';
 import AdminCategoryModal from '../components/modal/AdminCategoryModal';
 import { toast } from 'react-toastify';
@@ -202,6 +202,7 @@ const AdminCategory = () => {
               <tr>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Image</th>
                 <th>Products</th>
                 <th>Status</th>
                 <th>Created Date</th>
@@ -211,19 +212,29 @@ const AdminCategory = () => {
             <tbody>
               {categories.map(category => (
                 <tr key={category.id}>
-                  <td className="category-name">
+                  <td className="category-name truncate">
                     <div className="name-with-icon">
-                      <span>{category.categoryName}</span>
+                      <span className='truncate'>{category.categoryName}</span>
                     </div>
                   </td>
-                  <td className="category-description">{category.categoryDescription}</td>
-                  <td className="category-products">{category.totalProduct}</td>
-                  <td className="category-status">
+                  <td className="category-description truncate">{category.categoryDescription}</td>
+                  <td>
+                      <div className="category-image">
+                        <img 
+                          src={`http://localhost:8080${category.imagePath}`}
+                          alt={category.categoryName}
+                          width="60" 
+                          height="60" 
+                        />
+                      </div>
+                    </td>
+                  <td className="category-products truncate">{category.totalProduct}</td>
+                  <td className="category-status truncate">
                     <span className={`status-badge ${category.active}`}>
                       {category.active === true ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="category-date">{formatToVNDate(category.createdAt)}</td>
+                  <td className="category-date truncate">{formatToVNDate(category.createdAt)}</td>
                   <td className="category-actions">
                     <button 
                       className="edit-btn" 

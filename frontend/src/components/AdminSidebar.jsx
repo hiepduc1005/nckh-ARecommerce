@@ -29,7 +29,7 @@ const AdminSidebar = () => {
           {!collapsed && <h2>Admin</h2>}
         </div>
         <button className="toggle-btn" onClick={toggleSidebar}>
-          {collapsed ? <FiMenu /> : <FiX />}
+          {collapsed ? <FiMenu size={12}/> : <FiX />}
         </button>
       </div>
       

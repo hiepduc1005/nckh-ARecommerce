@@ -1,5 +1,6 @@
 package com.ecommerce.vn.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,18 +68,17 @@ public class BrandController {
 	@PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<?> updateBrand(
 			@RequestPart("brand") BrandUpdateRequest brandUpdateRequest,
-			@RequestPart("image") MultipartFile image
+			@RequestPart(name = "image", required = false) MultipartFile image
 			){
 		
-		if(image == null) {
-    		return ResponseEntity.badRequest().body("Brand image is empty!");
-    	}
 		
 		Brand brand = brandConvert.brandUpdateRequestConvertToBrand(brandUpdateRequest);
 		
-		String imagePath = fileUploadService.uploadFileToServer(image);
 		
-		brand.setImagePath(imagePath); 
+		if(image != null) {
+			String imagePath = fileUploadService.uploadFileToServer(image);
+			brand.setImagePath(imagePath); 
+		}
 		
 		brand = brandService.updateBrand(brand);
 		BrandResponse brandResponse = brandConvert.brandConvertToBrandResponse(brand);
@@ -113,6 +113,17 @@ public class BrandController {
 		BrandResponse brandResponse = brandConvert.brandConvertToBrandResponse(brand);
 		
 		return new ResponseEntity<>(brandResponse, HttpStatus.OK);
+	}
+	
+	@GetMapping
+	public ResponseEntity<List<BrandResponse>> getAllBrands(){
+		List<Brand> brands = brandService.getAllBrands();
+		List<BrandResponse> brandResponses = brands
+				.stream()
+				.map(brand -> brandConvert.brandConvertToBrandResponse(brand))
+				.toList();
+		
+		return new ResponseEntity<>(brandResponses, HttpStatus.OK);
 	}
 	
 	@GetMapping("/name/{name}")

@@ -207,7 +207,7 @@ const AdminBrand = () => {
                 <tr key={brand.id}>
                   <td className="brand-name">
                     <div className="name-with-icon">
-                      <span>{brand.name}</span>
+                      <span className='truncate'>{brand.name}</span>
                     </div>
                   </td>
                   <td>
@@ -221,10 +221,10 @@ const AdminBrand = () => {
                         />
                       </div>
                     </td>
-                  <td className="brand-description">{brand.description}</td>
-                  <td className="brand-products">{brand.totalProducts}</td>
+                  <td className="brand-description truncate">{brand.description}</td>
+                  <td className="brand-products truncate">{brand.totalProducts}</td>
                   
-                  <td className="brand-date">{formatToVNDate(brand.createdAt)}</td>
+                  <td className="brand-date truncate">{formatToVNDate(brand.createdAt)}</td>
                   <td className="brand-actions">
                     <button 
                       className="edit-btn" 

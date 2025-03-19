@@ -2,19 +2,19 @@ package com.ecommerce.vn.dto.product;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import com.ecommerce.vn.dto.attribute.AttributeResponse;
 import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.dto.ratting.RatingResponse;
 import com.ecommerce.vn.dto.tag.TagResponse;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ProductResponse {
 	private UUID id;
 	
+	@JsonProperty("active")
 	private Boolean active;
 	
 	private String productName;
@@ -27,12 +27,16 @@ public class ProductResponse {
 	
 	private Integer stock;
 	
-	private Set<CategoryResponse> categories = new HashSet<CategoryResponse>();
+	private Integer solded;
 	
-	private Set<TagResponse> tags = new HashSet<TagResponse>();
+	private BrandResponse brandResponse;
+	
+	private List<CategoryResponse> categories = new ArrayList<CategoryResponse>();
+	
+	private List<TagResponse> tags = new ArrayList<TagResponse>();
 	
 	private List<AttributeResponse> attributeResponses = new ArrayList<AttributeResponse>();
-
+	
 	private LocalDateTime createdAt;
 	
 	private LocalDateTime updatedAt;
@@ -49,6 +53,18 @@ public class ProductResponse {
 	
 	private List<RatingResponse> ratingResponses;
 	
+	
+	
+	public BrandResponse getBrandResponse() {
+		return brandResponse;
+	}
+
+
+	public void setBrandResponse(BrandResponse brandResponse) {
+		this.brandResponse = brandResponse;
+	}
+
+
 	public Double getRatingValue() {
 		return ratingValue;
 	}
@@ -70,6 +86,17 @@ public class ProductResponse {
 
 
 	
+	
+
+
+	public Integer getSolded() {
+		return solded;
+	}
+
+
+	public void setSolded(Integer solded) {
+		this.solded = solded;
+	}
 
 
 	public Integer getStock() {
@@ -162,21 +189,27 @@ public class ProductResponse {
 		this.imagePath = imagePath;
 	}
 
-	public Set<CategoryResponse> getCategories() {
+	
+
+	public List<CategoryResponse> getCategories() {
 		return categories;
 	}
 
-	public void setCategories(Set<CategoryResponse> categories) {
+
+	public void setCategories(List<CategoryResponse> categories) {
 		this.categories = categories;
 	}
 
-	public Set<TagResponse> getTags() {
+
+	public List<TagResponse> getTags() {
 		return tags;
 	}
 
-	public void setTags(Set<TagResponse> tags) {
+
+	public void setTags(List<TagResponse> tags) {
 		this.tags = tags;
 	}
+
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
@@ -213,7 +246,7 @@ public class ProductResponse {
 	
 
 	public ProductResponse(UUID id, Boolean active, String productName, String description, String shortDescription,
-			String imagePath, Set<CategoryResponse> categories, Set<TagResponse> tags,
+			String imagePath, List<CategoryResponse> categories, List<TagResponse> tags,
 			List<AttributeResponse> attributeResponses, LocalDateTime createdAt, LocalDateTime updatedAt,
 			UUID createdBy, UUID updatedBy, Double price , Double ratingValue, List<RatingResponse> ratingResponses) {
 		this.id = id;

@@ -1,20 +1,19 @@
 package com.ecommerce.vn.service.convert;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.vn.dto.attribute.AtributeUpdateRequest;
 import com.ecommerce.vn.dto.attribute.AttributeCreateRequest;
 import com.ecommerce.vn.dto.attribute.AttributeResponse;
-import com.ecommerce.vn.dto.attribute.AttributeValueResponse;
 import com.ecommerce.vn.entity.attribute.Attribute;
+import com.ecommerce.vn.service.attribute.AttributeService;
 
 @Service
 public class AttributeConvert {
     
-    @Autowired
-    private AttributeValueConvert attributeValueConvert;
+	@Autowired
+	private AttributeService attributeService;
 
     public Attribute attributeCreateRequestConvert(AttributeCreateRequest attributeCreateRequest){
         if (attributeCreateRequest == null) {
@@ -23,6 +22,22 @@ public class AttributeConvert {
 
         Attribute attribute = new Attribute();
         attribute.setAttributeName(attributeCreateRequest.getName());
+        attribute.setActive(attributeCreateRequest.getActive());
+       
+
+        return attribute;
+    }
+    
+
+    public Attribute attributeUpdateRequestConvert(AtributeUpdateRequest atributeUpdateRequest){
+        if (atributeUpdateRequest == null) {
+            return null;
+        }
+
+        
+        Attribute attribute = attributeService.getAttributeById(atributeUpdateRequest.getId());
+        attribute.setAttributeName(atributeUpdateRequest.getName());
+        attribute.setActive(atributeUpdateRequest.getActive());
        
 
         return attribute;
@@ -33,15 +48,10 @@ public class AttributeConvert {
             return null;
         }
 
-        Set<AttributeValueResponse> attributeValueResponses = attribute.getAttributeValues()
-        .stream().map(attributeValueConvert::attributeConvertToAttributeValuesResponse)
-        .collect(Collectors.toSet());
-
         return new AttributeResponse(
             attribute.getId(), 
             attribute.getAttributeName(), 
             attribute.getActive(), 
-            attributeValueResponses, 
             attribute.getCreatedAt(), 
             attribute.getUpdatedAt(), 
             attribute.getCreatedBy(), 

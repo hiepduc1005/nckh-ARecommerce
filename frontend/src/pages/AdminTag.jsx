@@ -4,6 +4,7 @@ import '../assets/styles/pages/AdminTag.scss';
 import { createTag, deleteTag, getTagsPaginate, updateTag } from '../api/tagApi';
 import useAuth from '../hooks/UseAuth';
 import useLoading from '../hooks/UseLoading';
+import { formatToVNDate } from '../utils/ultils';
 
 const AdminTag = () => {
   const [tags, setTags] = useState([]);
@@ -17,7 +18,6 @@ const AdminTag = () => {
     active: true
   });
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const {token} = useAuth();
   const {setLoading,loading} = useLoading();
 
@@ -141,10 +141,6 @@ const AdminTag = () => {
     setFormData({ tagName: '', active: true });
   };
 
-  const formatDateTime = (dateTimeString) => {
-    return new Date(dateTimeString).toLocaleString();
-  };
-
   return (
     <div className="admin-tag">
       <div className="admin-tag__header">
@@ -179,7 +175,6 @@ const AdminTag = () => {
       </div>
       
       {error && <div className="admin-tag__error">{error}</div>}
-      {successMessage && <div className="admin-tag__success">{successMessage}</div>}
       
       {showAddForm && (
         <div className="admin-tag__form-container">
@@ -278,8 +273,8 @@ const AdminTag = () => {
                       </span>
                     )}
                   </td>
-                  <td>{formatDateTime(tag.createdAt)}</td>
-                  <td>{formatDateTime(tag.updateAt)}</td>
+                  <td>{formatToVNDate(tag.createdAt)}</td>
+                  <td>{formatToVNDate(tag.updateAt)}</td>
                   <td>
                     {editingTag === tag.id ? (
                       <div className="action-buttons">

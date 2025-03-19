@@ -1,13 +1,11 @@
 package com.ecommerce.vn.dto.product;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.web.multipart.MultipartFile;
 
-import com.ecommerce.vn.dto.attribute.AttributeCreateRequest;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 public class ProductCreateRequest {
@@ -19,19 +17,17 @@ public class ProductCreateRequest {
 	private String shortDescription;
 	
 	
-//	private Set<UUID> categoryIds = new HashSet<UUID>();
-//	
-//	private Set<UUID> tagIds = new HashSet<UUID>();
+	private List<UUID> categoryIds = new ArrayList<UUID>();
 	
-	private List<AttributeCreateRequest> attributeCreateRequests;
+	private List<UUID> tagIds = new ArrayList<UUID>();
+	
+	private List<UUID> attributeIds = new ArrayList<UUID>();
 
+	private UUID brandId;
 	
-	@Override
-	public String toString() {
-		return "ProductCreateRequest [productName=" + productName + ", description=" + description
-				+ ", shortDescription=" + shortDescription + ", attributeCreateRequests=" + attributeCreateRequests
-				+ "]";
-	}
+	@JsonProperty("active")
+	private Boolean active;
+
 
 	public String getProductName() {
 		return productName;
@@ -58,31 +54,46 @@ public class ProductCreateRequest {
 	}
 
 	
-	public List<AttributeCreateRequest> getAttributeCreateRequests() {
-		return attributeCreateRequests;
+	public List<UUID> getCategoryIds() {
+		return categoryIds;
 	}
 
-	public void setAttributeCreateRequests(List<AttributeCreateRequest> attributeCreateRequests) {
-		this.attributeCreateRequests = attributeCreateRequests;
+	public void setCategoryIds(List<UUID> categoryIds) {
+		this.categoryIds = categoryIds;
 	}
-	
-	
 
-//	public Set<UUID> getCategoryIds() {
-//		return categoryIds;
-//	}
-//
-//	public void setCategoryIds(Set<UUID> categoryIds) {
-//		this.categoryIds = categoryIds;
-//	}
-//
-//	public Set<UUID> getTagIds() {
-//		return tagIds;
-//	}
-//
-//	public void setTagIds(Set<UUID> tagIds) {
-//		this.tagIds = tagIds;
-//	}
+	public List<UUID> getTagIds() {
+		return tagIds;
+	}
 
+	public void setTagIds(List<UUID> tagIds) {
+		this.tagIds = tagIds;
+	}
+
+	public List<UUID> getAttributeIds() {
+		return attributeIds;
+	}
+
+	public void setAttributeIds(List<UUID> attributeIds) {
+		this.attributeIds = attributeIds;
+	}
+
+	public UUID getBrandId() {
+		return brandId;
+	}
+
+	public void setBrandId(UUID brandId) {
+		this.brandId = brandId;
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+	
 	
 }

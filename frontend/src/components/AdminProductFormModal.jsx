@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiX, FiUpload } from 'react-icons/fi';
 import '../assets/styles/components/AdminProductFormModal.scss';
+import { getAllCategories } from '../api/categoryApi';
+import { getAllBrands } from '../api/brandApi';
+import makeAnimated from 'react-select/animated';
+import Select from 'react-select';
+
 
 const ProductFormModal = ({ isOpen, onClose, product = null }) => {
   const [formData, setFormData] = useState(
@@ -15,7 +20,50 @@ const ProductFormModal = ({ isOpen, onClose, product = null }) => {
       images: []
     }
   );
+
+  const [categoryOptions,setCategoryOptions] = useState([]);
+  const [brandOptions,setBrandOptions] = useState([])
+
   
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getAllCategories();
+        if(data){
+          const options = data.map(category => ({
+            value: category.id,
+            label: category.categoryName,
+          }));
+          setCategoryOptions(options)
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh mục:", error);
+        return [];
+      }
+    };
+    
+    const fetchBrands = async () => {
+      try {
+        const data = await getAllBrands();
+        if(data){
+          const options = data.map(brand => ({
+            value: brand.id,
+            label: brand.name,
+          }));
+          setBrandOptions(options)
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh mục:", error);
+        return [];
+      }
+    };
+
+    fetchCategories()
+    fetchBrands()
+
+  },[])
+  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -30,8 +78,12 @@ const ProductFormModal = ({ isOpen, onClose, product = null }) => {
     console.log('Submitted data:', formData);
     onClose();
   };
+
+  const animatedComponents = makeAnimated();
+
   
   if (!isOpen) return null;
+
   
   return (
     <div className="modal-overlay">
@@ -59,40 +111,22 @@ const ProductFormModal = ({ isOpen, onClose, product = null }) => {
             
             <div className="form-group">
               <label htmlFor="category">Category</label>
-              <select
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Category</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Computers">Computers</option>
-                <option value="Accessories">Accessories</option>
-                <option value="Audio">Audio</option>
-                <option value="Tablets">Tablets</option>
-                <option value="Cameras">Cameras</option>
-              </select>
+               <Select
+                  closeMenuOnSelect={false}
+                  components={animatedComponents}
+                  isMulti
+                  options={categoryOptions}
+                  placeholder="Chọn danh mục..."
+                />
             </div>
             
             <div className="form-group">
               <label htmlFor="brand">Brand</label>
-              <select
-                id="brand"
-                name="brand"
-                value={formData.brand}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Brand</option>
-                <option value="Apple">Apple</option>
-                <option value="Samsung">Samsung</option>
-                <option value="Sony">Sony</option>
-                <option value="Dell">Dell</option>
-                <option value="Canon">Canon</option>
-                <option value="Other">Other</option>
-              </select>
+                <Select
+                  components={animatedComponents}
+                  options={brandOptions}
+                  placeholder="Chọn thương hiệu..."
+                />
             </div>
             
             <div className="form-group">

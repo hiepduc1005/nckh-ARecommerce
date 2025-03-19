@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
 
@@ -82,14 +81,16 @@ public class ProductController {
     }
 
     //Update sản phẩm
-    @PutMapping
-    public ResponseEntity<?> updateProduct( @RequestBody ProductUpdateRequest productUpdateRequest) {
-    	if(productUpdateRequest.getImage() == null) {
-    		return ResponseEntity.badRequest().body("Product image is empty!");
-    	}
+    @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> updateProduct(
+            @RequestPart("image") MultipartFile image, 
+            @RequestPart("product")  ProductUpdateRequest productUpdateRequest) {
+    	
     	Product productToUpdate = productConvert.productUpdateRequestConver(productUpdateRequest);
-    	String imagePath = fileUploadService.uploadFileToServer(productUpdateRequest.getImage());
-    	productToUpdate.setImagePath(imagePath);
+    	if(image != null) {
+    		String imagePath = fileUploadService.uploadFileToServer(image);    		
+    		productToUpdate.setImagePath(imagePath);
+    	}
     	
         Product updateProduct = productService.updateProduct(productToUpdate);
         ProductResponse response = productConvert.productConvertToProductResponse(updateProduct);

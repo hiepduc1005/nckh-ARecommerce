@@ -27,6 +27,17 @@ export const getCategoriesPaginate = async ( page , size) => {
     }
 } 
 
+export const getAllCategories = async () => {
+    try {
+        const res = await axiosInstance.get(`api/v1/categories`);
+
+        return res.data;
+    } catch (error) {
+        console.error(error)
+        return null;
+    }
+} 
+
 export const updateCategory = async (data , token) => {
     try {
         const res = await axiosInstance.put("api/v1/categories",data,{

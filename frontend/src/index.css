@@ -46,7 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 
 body {
   scrollbar-width: thin;  /* Thanh cuộn mỏng hơn */
-  scrollbar-color: #2d6a4f #e5e5e5; /* Màu thanh cuộn */
+  scrollbar-color: #2d6a4f #fff; /* Màu thanh cuộn */
 }
 
 /* Custom scrollbar cho Chrome, Edge, Safari */
@@ -68,6 +68,8 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #1b4332; /* Màu khi hover */
 }
+
+
 
 /*
   9. Create a root stacking context

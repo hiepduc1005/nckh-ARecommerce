@@ -1,26 +1,42 @@
 package com.ecommerce.vn.dto.attribute;
 
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class AtributeUpdateRequest {
+	private UUID id;
 	
-	private String attributeName;
+	private String name;
 	
-	private Boolean update;
+	@JsonProperty("active")
+	private Boolean active;
 
-	public String getAttributeName() {
-		return attributeName;
-	}
-
-	public void setAttributeName(String attributeName) {
-		this.attributeName = attributeName;
-	}
-
-	public Boolean getUpdate() {
-		return update;
-	}
-
-	public void setUpdate(Boolean update) {
-		this.update = update;
-	}
 	
+
+	public UUID getId() {
+		return id;
+	}
+
+	public void setId(UUID id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
 	
 }

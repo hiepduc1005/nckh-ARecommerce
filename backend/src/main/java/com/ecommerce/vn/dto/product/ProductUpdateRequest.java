@@ -1,10 +1,11 @@
 package com.ecommerce.vn.dto.product;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ProductUpdateRequest {
 	private UUID id;
@@ -14,14 +15,18 @@ public class ProductUpdateRequest {
 	private String description;
 	
 	private String shortDescription;
+		
+	private List<UUID> categoryIds = new ArrayList<UUID>();
 	
-	private MultipartFile image;
+	private List<UUID> tagIds = new ArrayList<UUID>();
 	
-	private Set<UUID> categoryIds = new HashSet<UUID>();
+	private List<UUID> attributeIds = new ArrayList<UUID>();
 	
-	private Set<UUID> tagIds = new HashSet<UUID>();
+	private UUID brandId;
 	
-	private Set<UUID> attributeIds = new HashSet<UUID>();
+	@JsonProperty("active")
+	private Boolean active;
+
 
 	public String getProductName() {
 		return productName;
@@ -55,37 +60,49 @@ public class ProductUpdateRequest {
 		this.id = id;
 	}
 
-	public MultipartFile getImage() {
-		return image;
+
+
+	public UUID getBrandId() {
+		return brandId;
 	}
 
-	public void setImage(MultipartFile image) {
-		this.image = image;
+	public void setBrandId(UUID brandId) {
+		this.brandId = brandId;
 	}
 
-	public Set<UUID> getCategoryIds() {
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+	public List<UUID> getCategoryIds() {
 		return categoryIds;
 	}
 
-	public void setCategoryIds(Set<UUID> categoryIds) {
+	public void setCategoryIds(List<UUID> categoryIds) {
 		this.categoryIds = categoryIds;
 	}
 
-	public Set<UUID> getTagIds() {
+	public List<UUID> getTagIds() {
 		return tagIds;
 	}
 
-	public void setTagIds(Set<UUID> tagIds) {
+	public void setTagIds(List<UUID> tagIds) {
 		this.tagIds = tagIds;
 	}
 
-	public Set<UUID> getAttributeIds() {
+	public List<UUID> getAttributeIds() {
 		return attributeIds;
 	}
 
-	public void setAttributeIds(Set<UUID> attributeIds) {
+	public void setAttributeIds(List<UUID> attributeIds) {
 		this.attributeIds = attributeIds;
 	}
+
+	
 
 
 

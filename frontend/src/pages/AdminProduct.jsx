@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Table, Button, Image, Pagination, Form, Row, Col, Container } from "react-bootstrap";
 import "../assets/styles/pages/AdminProducts.scss";
 import useAuth from "../hooks/UseAuth";
 import { createProduct, deleteProduct, getProductsPaginate } from "../api/productApi";
@@ -7,30 +6,8 @@ import { toast } from "react-toastify";
 import AddVariantModal from "../components/AddVariantModal";
 import useLoading from "../hooks/UseLoading";
 import { useNavigate } from "react-router-dom";
-import { FiPlus, FiSearch, FiFilter, FiTrash2, FiEdit2, FiChevronDown, FiChevronRight } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiFilter, FiTrash2, FiEdit2} from 'react-icons/fi';
 import ProductFormModal from "../components/AdminProductFormModal";
-
-const AttributeInput = ({ attributes, onAdd, onRemove, onChange }) => (
-  <div>
-    <h5 className="mt-3">Attributes</h5>
-    {attributes.map((attr, index) => (
-      <Row key={index} className="mb-2 align-items-center">
-        <Col md={10}>
-          <Form.Control
-            type="text"
-            placeholder="Attribute Name"
-            value={attr.name}
-            onChange={(e) => onChange(index, e.target.value)}
-          />
-        </Col>
-        <Col md={2}>
-          <Button variant="danger" size="sm" onClick={() => onRemove(index)}>❌</Button>
-        </Col>
-      </Row>
-    ))}
-    <Button variant="primary" onClick={onAdd}>➕ Add Attribute</Button>
-  </div>
-);
 
 const sizeProduct = 5;
 
@@ -41,24 +18,22 @@ const AdminProduct = () => {
 
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState(null);
-  const [expandedProducts, setExpandedProducts] = useState([]);
 
-  const [productUpdate,setProductUpdate] = useState();
+  const [productUpdate,setProductUpdate] = useState(null);
   const [products,setProducts] = useState([]);
 
   const navigate = useNavigate();
   const { token } = useAuth();
   const {setLoading} = useLoading();
 
+  const fetchProducts = async () => {
+    const data = await getProductsPaginate(currentPage,sizeProduct);
+    setProducts(data.content);
+    setTotalPages(data.totalPages);
+  };
 
   useEffect(() => {
     setLoading(true)
-    const fetchProducts = async () => {
-      const data = await getProductsPaginate(currentPage,sizeProduct);
-      setProducts(data.content);
-      setTotalPages(data.totalPages);
-    };
     fetchProducts();
     setLoading(false)
   }, [currentPage]); 
@@ -82,9 +57,44 @@ const AdminProduct = () => {
     }
   }
 
+  const handleAddProduct = async (data) => {
+    setLoading(true);
+
+    const createdProduct = await createProduct(data,token);
+
+    if(createdProduct){
+      setProducts((prev) => [...prev,createdProduct]);
+      toast.success("Thêm sản phẩm thành công!")
+    }else{
+      toast.error("Có lỗi xảy ra!")
+    }
+
+    setLoading(false);
+  }
+
+  const handleUpdateProduct = async (data) => {
+    setLoading(true);
+
+    const updatedProduct = await createProduct(data,token);
+
+    if(updatedProduct){
+      fetchProducts();
+      toast.success("Thêm sản phẩm thành công!")
+    }else{
+      toast.error("Có lỗi xảy ra!")
+    }
+
+    setLoading(false);
+  }
+
   const handleOpenEditModal = (product) => {
     setIsModalOpen(true);
     setProductUpdate(product)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setProductUpdate(null);
   }
   
   // Handle select all
@@ -110,15 +120,6 @@ const AdminProduct = () => {
     setCurrentPage(page);
   };
   
-  // Toggle product expansion
-  const toggleProductExpansion = (productId) => {
-    if (expandedProducts.includes(productId)) {
-      setExpandedProducts(expandedProducts.filter(id => id !== productId));
-    } else {
-      setExpandedProducts([...expandedProducts, productId]);
-    }
-  };
-
   // Format price display
   const formatPrice = (min, max) => {
     min = min ? min : 0;
@@ -132,7 +133,7 @@ const AdminProduct = () => {
     <div className="admin-product">
       <div className="page-header">
         <h1>Products Management</h1>
-        <button className="add-product-btn" onClick={() => setIsModalOpen(true)}>
+        <button className="add-product-btn" onClick={() => {setProductUpdate(null);setIsModalOpen(true);}}>
           <FiPlus />
           <span>Add Product</span>
         </button>
@@ -197,9 +198,7 @@ const AdminProduct = () => {
                 <th></th>
                 <th>Image</th>
                 <th>Name</th>
-                <th>Category</th>
                 <th>Brand</th>
-                <th>Attribute</th>
                 <th>Price</th>
                 <th>Stock</th>
                 <th>Status</th>
@@ -230,9 +229,7 @@ const AdminProduct = () => {
                       </div>
                     </td>
                     <td>{product.productName}</td>
-                    <td>{product.category}</td>
-                    <td>{product.brand}</td>
-                    <td>Attribute</td>
+                    <td>{product.brandResponse}</td>
                     <td>{formatPrice(product.minPrice, product.maxPrice)}</td>
                     <td>{product.stock}</td>
                     <td>
@@ -241,12 +238,14 @@ const AdminProduct = () => {
                       </span>
                     </td>
                     <td className="actions">
-                      <button className="edit-btn" onClick={() => handleOpenEditModal(product)}>
-                        <FiEdit2 />
-                      </button>
-                      <button className="delete-btn" onClick={() => handleDeleteProduct(product.id)}>
-                        <FiTrash2 />
-                      </button>
+                      <div style={{display: "flex", gap: "8px"}}>
+                        <button className="edit-btn" onClick={() => handleOpenEditModal(product)}>
+                          <FiEdit2 />
+                        </button>
+                        <button className="delete-btn" onClick={() => handleDeleteProduct(product.id)}>
+                          <FiTrash2 />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                  
@@ -290,8 +289,10 @@ const AdminProduct = () => {
       {isModalOpen && (
         <ProductFormModal 
           isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
-          product={currentProduct}
+          onClose={() => handleCloseModal()} 
+          product={productUpdate}
+          handleAddProduct={handleAddProduct}
+          handleUpdateProduct={handleUpdateProduct}
         />
       )}
     </div>

@@ -21,6 +21,10 @@ public class BrandConvert {
 		}
 		
 		Brand brand = new Brand();
+		
+        String slug = String.join("-", brandCreateRequest.getName().toLowerCase().split(" ") );
+
+        brand.setSlug(slug);
 		brand.setName(brandCreateRequest.getName());
 		brand.setDescription(brandCreateRequest.getDescription());
 		
@@ -28,6 +32,9 @@ public class BrandConvert {
 	}
 	
 	public BrandResponse brandConvertToBrandResponse(Brand brand) {
+		if(brand == null) {
+			return null;
+		}
 		BrandResponse brandResponse = new BrandResponse();
 		brandResponse.setName(brand.getName());
 		brandResponse.setDescription(brand.getDescription());
@@ -46,7 +53,9 @@ public class BrandConvert {
 		}
 		
 		Brand brand = brandService.getBrandById(brandUpdateRequest.getId());
-		
+		String slug = String.join("-", brandUpdateRequest.getName().toLowerCase().split(" ") );
+
+        brand.setSlug(slug);
 		brand.setName(brandUpdateRequest.getName());
 		brand.setDescription(brandUpdateRequest.getDescription());
 		

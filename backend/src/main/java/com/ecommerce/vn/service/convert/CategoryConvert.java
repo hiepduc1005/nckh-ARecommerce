@@ -32,7 +32,9 @@ public class CategoryConvert {
     
     public Category categoryUpdateConvertToCategory(CategoryUpdateRequest categoryUpdateRequest) {
     	Category category = categoryService.getCategoryById(categoryUpdateRequest.getId());
-    	
+        String slug = String.join("-", categoryUpdateRequest.getCategoryName().toLowerCase().split(" ") );
+
+        category.setSlug(slug);
     	category.setCategoryName(categoryUpdateRequest.getCategoryName());
     	category.setCategoryDescription(categoryUpdateRequest.getCategoryDescription());
     	category.setActive(categoryUpdateRequest.getActive());

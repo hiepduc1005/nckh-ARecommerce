@@ -2,9 +2,9 @@ package com.ecommerce.vn.dto.attribute;
 
 import java.time.LocalDateTime;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AttributeResponse {
 	
@@ -12,9 +12,8 @@ public class AttributeResponse {
 	
 	private String attributeName;
 	
+	@JsonProperty("active")
 	private Boolean active;
-
-	private Set<AttributeValueResponse> attributeValueResponses = new HashSet<AttributeValueResponse>();
 	
 	private LocalDateTime createdAt;
 	
@@ -46,14 +45,6 @@ public class AttributeResponse {
 
 	public void setActive(Boolean active) {
 		this.active = active;
-	}
-
-	public Set<AttributeValueResponse> getAttributeValueResponses() {
-		return attributeValueResponses;
-	}
-
-	public void setAttributeValueResponses(Set<AttributeValueResponse> attributeValueResponses) {
-		this.attributeValueResponses = attributeValueResponses;
 	}
 
 	public LocalDateTime getCreatedAt() {
@@ -89,12 +80,11 @@ public class AttributeResponse {
 	}
 
 	public AttributeResponse(UUID id, String attributeName, Boolean active,
-			Set<AttributeValueResponse> attributeValueResponses, LocalDateTime createdAt, LocalDateTime updateAt,
+			 LocalDateTime createdAt, LocalDateTime updateAt,
 			UUID createdBy, UUID updatedBy) {
 		this.id = id;
 		this.attributeName = attributeName;
 		this.active = active;
-		this.attributeValueResponses = attributeValueResponses;
 		this.createdAt = createdAt;
 		this.updateAt = updateAt;
 		this.createdBy = createdBy;

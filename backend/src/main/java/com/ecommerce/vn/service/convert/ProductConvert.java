@@ -2,7 +2,6 @@ package com.ecommerce.vn.service.convert;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +9,13 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.dto.attribute.AttributeResponse;
 import com.ecommerce.vn.dto.category.CategoryResponse;
+import com.ecommerce.vn.dto.product.BrandResponse;
 import com.ecommerce.vn.dto.product.ProductCreateRequest;
 import com.ecommerce.vn.dto.product.ProductResponse;
 import com.ecommerce.vn.dto.product.ProductUpdateRequest;
 import com.ecommerce.vn.dto.ratting.RatingResponse;
 import com.ecommerce.vn.dto.tag.TagResponse;
+import com.ecommerce.vn.entity.product.Brand;
 import com.ecommerce.vn.entity.product.Category;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Tag;
@@ -45,6 +46,11 @@ public class ProductConvert {
     
     @Autowired
     private AttributeConvert attributeConvert;
+    
+    @Autowired
+    private BrandConvert brandConvert;
+    
+  
 
     public Product productCreateRequestConver(ProductCreateRequest productCreateRequest){
 
@@ -52,24 +58,32 @@ public class ProductConvert {
             return null;
         }
 
-//        Set<Category> categories = categoryRepository.findAllById(productCreateRequest.getCategoryIds())
-//        .stream().collect(Collectors.toSet());
-//        Set<Tag> tags = tagRepository.findAllById(productCreateRequest.getTagIds())
-//        .stream().collect(Collectors.toSet());
-//      
-        
-        List<Attribute> attributes = productCreateRequest.getAttributeCreateRequests()
-        		.stream()
-        		.map(attributeCreateRequest -> { 
-        			return attributeConvert.attributeCreateRequestConvert(attributeCreateRequest);
-        			})
-        		.toList();
+        List<Category> categories = categoryRepository.findAllById(productCreateRequest.getCategoryIds())
+        		.stream().toList();
+        List<Tag> tags = tagRepository.findAllById(productCreateRequest.getTagIds())
+        		.stream().toList();
+          
+        List<Attribute> attributes = attributeRepository.findAllById(productCreateRequest.getAttributeIds())
+                .stream().toList();
         
         Product product = new Product();
+        
+		String slug = String.join("-", productCreateRequest.getProductName().toLowerCase().split(" ") );
+
+		product.setSlug(slug);
         product.setProductName(productCreateRequest.getProductName());
         product.setDescription(productCreateRequest.getDescription());
         product.setShortDescription(productCreateRequest.getShortDescription());
         product.setAttributes(attributes);
+        product.setTags(tags);
+        product.setCategories(categories);
+        product.setActive(productCreateRequest.getActive());
+        
+        Brand brand = new Brand();
+        brand.setId(productCreateRequest.getBrandId());
+        
+        product.setBrand(brand);
+        product.setSoldQuantity(0);
             
         return product;
     }
@@ -88,6 +102,10 @@ public class ProductConvert {
         .stream().collect(Collectors.toList());
 
         Product product = new Product();
+        
+		String slug = String.join("-", productUpdateRequest.getProductName().toLowerCase().split(" ") );
+
+		product.setSlug(slug);
         product.setId(productUpdateRequest.getId());     
         product.setProductName(productUpdateRequest.getProductName());
         product.setDescription(productUpdateRequest.getDescription());
@@ -95,6 +113,12 @@ public class ProductConvert {
         product.setCategories(categories);
         product.setTags(tags);
         product.setAttributes(attributes);
+        product.setActive(productUpdateRequest.getActive());
+        
+        Brand brand = new Brand();
+        brand.setId(productUpdateRequest.getBrandId());
+        
+        product.setBrand(brand);
             
         return product;
     }
@@ -103,12 +127,12 @@ public class ProductConvert {
         if (product == null) {
             return null;
         }
-        Set<CategoryResponse> categoryResponses = product.getCategories().stream()
+        List<CategoryResponse> categoryResponses = product.getCategories().stream()
             .map(categoryConvert::categoryConvertToCategoryResponse) 
-            .collect(Collectors.toSet());
-        Set<TagResponse> tagResponses = product.getTags().stream()
+            .collect(Collectors.toList());
+        List<TagResponse> tagResponses = product.getTags().stream()
             .map(tagConvert::tagConvertToTagResponse) 
-            .collect(Collectors.toSet());
+            .collect(Collectors.toList());
         
         List<AttributeResponse> attributeResponses = product.getAttributes()
         		.stream()
@@ -139,6 +163,8 @@ public class ProductConvert {
         		.mapToInt(variant -> variant.getQuantity())
         		.sum();
         
+        BrandResponse brandResponse = brandConvert.brandConvertToBrandResponse(product.getBrand());
+        
         
         ProductResponse productResponse = new ProductResponse(
                 product.getId(), 
@@ -161,6 +187,8 @@ public class ProductConvert {
         
         productResponse.setStock(stock);
         productResponse.setMaxPrice(maxPrice);
+        productResponse.setBrandResponse(brandResponse);
+        productResponse.setSolded(product.getSoldQuantity());
 
         return productResponse;
     }
