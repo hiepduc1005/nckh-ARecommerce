@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import "../assets/styles/pages/AdminProducts.scss";
 import useAuth from "../hooks/UseAuth";
-import { createProduct, deleteProduct, getProductsPaginate } from "../api/productApi";
+import { createProduct, deleteProduct, getProductsPaginate, updateProduct } from "../api/productApi";
 import { toast } from "react-toastify";
 import AddVariantModal from "../components/AddVariantModal";
 import useLoading from "../hooks/UseLoading";
 import { useNavigate } from "react-router-dom";
-import { FiPlus, FiSearch, FiFilter, FiTrash2, FiEdit2} from 'react-icons/fi';
+import { FiPlus, FiSearch, FiFilter, FiTrash2, FiEdit2, FiEye} from 'react-icons/fi';
 import ProductFormModal from "../components/AdminProductFormModal";
 
 const sizeProduct = 5;
@@ -28,8 +28,12 @@ const AdminProduct = () => {
 
   const fetchProducts = async () => {
     const data = await getProductsPaginate(currentPage,sizeProduct);
-    setProducts(data.content);
-    setTotalPages(data.totalPages);
+
+    if(data){
+      setProducts(data.content);
+      setTotalPages(data.totalPages);
+    }
+      
   };
 
   useEffect(() => {
@@ -75,11 +79,11 @@ const AdminProduct = () => {
   const handleUpdateProduct = async (data) => {
     setLoading(true);
 
-    const updatedProduct = await createProduct(data,token);
+    const updatedProduct = await updateProduct(data,token);
 
     if(updatedProduct){
       fetchProducts();
-      toast.success("Thêm sản phẩm thành công!")
+      toast.success("Sửa sản phẩm thành công!")
     }else{
       toast.error("Có lỗi xảy ra!")
     }
@@ -220,16 +224,15 @@ const AdminProduct = () => {
                     <td>
                       <div className="product-image">
                         <img 
-                          src={"http://localhost:8080/uploads/22df2ba3-0757-4909-8611-e406706d7eb3_giaoducqp.jpg"} 
+                          src={`http://localhost:8080${product?.imagePath}`} 
                           alt={product.name}
-                          onError={(e) => {e.target.src = '/api/placeholder/60/60'; e.target.alt = 'No image'}}
                           width="60" 
                           height="60" 
                         />
                       </div>
                     </td>
                     <td>{product.productName}</td>
-                    <td>{product.brandResponse}</td>
+                    <td>{product?.brandResponse?.name}</td>
                     <td>{formatPrice(product.minPrice, product.maxPrice)}</td>
                     <td>{product.stock}</td>
                     <td>
@@ -239,6 +242,9 @@ const AdminProduct = () => {
                     </td>
                     <td className="actions">
                       <div style={{display: "flex", gap: "8px"}}>
+                        <button className="details-btn" onClick={() => handleViewDetails(product.id)}>
+                          <FiEye />
+                        </button>
                         <button className="edit-btn" onClick={() => handleOpenEditModal(product)}>
                           <FiEdit2 />
                         </button>

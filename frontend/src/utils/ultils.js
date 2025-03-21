@@ -39,5 +39,7 @@ export const isValidPhoneNum = (phone) => {
 }
 
 export const formatToVNDate = (date) => {
-    return format(new Date(date), "dd/MM/yyyy, h:mm:ss");
+    if(date){
+        return format(new Date(date), "dd/MM/yyyy, HH:mm:ss")
+    }
 }

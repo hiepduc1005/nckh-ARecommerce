@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiHome, FiBox, FiTag, FiLayers, FiBriefcase, FiMenu, FiX } from 'react-icons/fi';
+import { FiHome, FiBox, FiTag, FiLayers, FiBriefcase, FiMenu, FiX, FiList } from 'react-icons/fi';
 import '../assets/styles/components/AdminSidebar.scss';
 
 const AdminSidebar = () => {
@@ -13,6 +13,7 @@ const AdminSidebar = () => {
     { name: 'Brands', icon: <FiBriefcase />, path: '/admin/brands' },
     { name: 'Tags', icon: <FiTag />, path: '/admin/tags' },
     { name: 'Categories', icon: <FiLayers />, path: '/admin/categories' },
+    { name: 'Attributes', icon: <FiList />, path: '/admin/attributes' },
   ];
 
   const toggleSidebar = () => {
