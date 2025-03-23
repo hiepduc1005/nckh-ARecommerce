@@ -61,4 +61,6 @@ public interface ProductService {
 
     // Sản phẩm liên quan
      List<ProductWithScore> getRelatedProducts(UUID productId);
+     
+     Product getProductBySlug(String slug);
 }

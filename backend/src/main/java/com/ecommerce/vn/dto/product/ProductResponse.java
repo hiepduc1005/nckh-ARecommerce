@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.ecommerce.vn.dto.attribute.AttributeResponse;
+import com.ecommerce.vn.dto.attribute.AttributeProductResponse;
 import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.dto.ratting.RatingResponse;
 import com.ecommerce.vn.dto.tag.TagResponse;
@@ -31,11 +31,13 @@ public class ProductResponse {
 	
 	private BrandResponse brandResponse;
 	
+	private String slug;
+	
 	private List<CategoryResponse> categories = new ArrayList<CategoryResponse>();
 	
 	private List<TagResponse> tags = new ArrayList<TagResponse>();
 	
-	private List<AttributeResponse> attributeResponses = new ArrayList<AttributeResponse>();
+	private List<AttributeProductResponse> attributeResponses = new ArrayList<AttributeProductResponse>();
 	
 	private LocalDateTime createdAt;
 	
@@ -55,6 +57,16 @@ public class ProductResponse {
 	
 	
 	
+	public String getSlug() {
+		return slug;
+	}
+
+
+	public void setSlug(String slug) {
+		this.slug = slug;
+	}
+
+
 	public BrandResponse getBrandResponse() {
 		return brandResponse;
 	}
@@ -135,12 +147,12 @@ public class ProductResponse {
 	}
 	
 
-	public List<AttributeResponse> getAttributeResponses() {
+	public List<AttributeProductResponse> getAttributeResponses() {
 		return attributeResponses;
 	}
 
 
-	public void setAttributeResponses(List<AttributeResponse> attributeResponses) {
+	public void setAttributeResponses(List<AttributeProductResponse> attributeResponses) {
 		this.attributeResponses = attributeResponses;
 	}
 
@@ -247,8 +259,8 @@ public class ProductResponse {
 
 	public ProductResponse(UUID id, Boolean active, String productName, String description, String shortDescription,
 			String imagePath, List<CategoryResponse> categories, List<TagResponse> tags,
-			List<AttributeResponse> attributeResponses, LocalDateTime createdAt, LocalDateTime updatedAt,
-			UUID createdBy, UUID updatedBy, Double price , Double ratingValue, List<RatingResponse> ratingResponses) {
+			List<AttributeProductResponse> attributeResponses, LocalDateTime createdAt, LocalDateTime updatedAt,
+			UUID createdBy, UUID updatedBy, Double ratingValue, List<RatingResponse> ratingResponses) {
 		this.id = id;
 		this.active = active;
 		this.productName = productName;

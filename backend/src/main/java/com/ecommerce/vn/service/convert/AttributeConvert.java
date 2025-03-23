@@ -1,11 +1,15 @@
 package com.ecommerce.vn.service.convert;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.dto.attribute.AtributeUpdateRequest;
 import com.ecommerce.vn.dto.attribute.AttributeCreateRequest;
+import com.ecommerce.vn.dto.attribute.AttributeProductResponse;
 import com.ecommerce.vn.dto.attribute.AttributeResponse;
+import com.ecommerce.vn.dto.attribute.AttributeValueResponse;
 import com.ecommerce.vn.entity.attribute.Attribute;
 import com.ecommerce.vn.service.attribute.AttributeService;
 
@@ -14,6 +18,9 @@ public class AttributeConvert {
     
 	@Autowired
 	private AttributeService attributeService;
+	
+	@Autowired
+	private AttributeValueConvert attributeValueConvert;
 
     public Attribute attributeCreateRequestConvert(AttributeCreateRequest attributeCreateRequest){
         if (attributeCreateRequest == null) {
@@ -57,5 +64,27 @@ public class AttributeConvert {
             attribute.getCreatedBy(), 
             attribute.getUpdatedBy()
             );
+    }
+    
+    public AttributeProductResponse attributeProductConvertToAttributeProductResponse(Attribute attribute){
+        if (attribute == null) {
+            return null;
+        }
+        
+        AttributeProductResponse attributeProductResponse = new AttributeProductResponse();
+        attributeProductResponse.setId(attribute.getId());
+        attributeProductResponse.setActive(attribute.getActive());
+        attributeProductResponse.setAttributeName(attribute.getAttributeName());
+        attributeProductResponse.setCreatedAt(attributeProductResponse.getCreatedAt());
+        attributeProductResponse.setUpdateAt(attributeProductResponse.getUpdateAt());
+        attributeProductResponse.setCreatedBy(attributeProductResponse.getCreatedBy());
+        attributeProductResponse.setUpdatedBy(attributeProductResponse.getUpdatedBy());
+        
+        List<AttributeValueResponse> attributeValueResponses = attribute.getAttributeValues()
+        		.stream()
+        		.map(attributeValue -> attributeValueConvert.attributeConvertToAttributeValuesResponse(attributeValue)).toList();
+        attributeProductResponse.setAttributeValueResponses(attributeValueResponses);
+
+        return attributeProductResponse;
     }
 }

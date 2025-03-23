@@ -30,5 +30,7 @@ public interface UserService {
 	List<User> getUnactiveUser();
 	
 	List<User> getActiveUser();
+	
+	
 
 }

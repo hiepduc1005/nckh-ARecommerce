@@ -27,6 +27,9 @@ public interface VariantService {
 	
 	Page<Variant> findAllVariantsByProduct(UUID ProductId, Pageable pageable);
 	
+	Page<Variant> findAllVariantsByProductSlug(String slug, Pageable pageable);
+
+	
 	List<Variant> findVariantsByAttributeValues(Set<AttributeValue> attributeValues);
 	
 	Integer findVariantQuantity(UUID variantId);

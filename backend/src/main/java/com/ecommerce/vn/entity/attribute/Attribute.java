@@ -22,8 +22,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 @Entity
-@Table(name = "attributes")
+@Table(name = "attributes", uniqueConstraints = @UniqueConstraint(columnNames = "attribute_name"))
 @EntityListeners(AuditingEntityListener.class)
 public class Attribute {
 	
@@ -31,6 +32,7 @@ public class Attribute {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 	
+	@Column(name = "attribute_name", unique = true)
 	private String attributeName;
 	
 	private Boolean active;
@@ -49,7 +51,7 @@ public class Attribute {
 	@Column(name = "updated_by")
 	private UUID updatedBy;
 	
-	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "attributes")
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "attributes",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
 	private Set<Product> products = new HashSet<Product>();
 	
 	@OneToMany(mappedBy = "attribute", cascade = CascadeType.ALL, orphanRemoval = true)

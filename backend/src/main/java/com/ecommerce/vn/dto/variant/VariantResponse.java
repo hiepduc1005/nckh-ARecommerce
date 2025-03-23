@@ -16,7 +16,6 @@ public class VariantResponse {
 	private BigDecimal discountPrice;
 	private Integer quantity;
 	private String imagePath;
-	private List<AttributeResponse> attributeResponses;
 	private List<AttributeValueResponse> attributeValueResponses;
 	private LocalDateTime createdAt;
 	private LocalDateTime updateAt;
@@ -30,12 +29,7 @@ public class VariantResponse {
 	public void setImagePath(String imagePath) {
 		this.imagePath = imagePath;
 	}
-	public List<AttributeResponse> getAttributeResponses() {
-		return attributeResponses;
-	}
-	public void setAttributeResponses(List<AttributeResponse> attributeResponses) {
-		this.attributeResponses = attributeResponses;
-	}
+
 	public UUID getId() {
 		return id;
 	}

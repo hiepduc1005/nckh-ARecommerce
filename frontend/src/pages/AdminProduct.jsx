@@ -3,11 +3,10 @@ import "../assets/styles/pages/AdminProducts.scss";
 import useAuth from "../hooks/UseAuth";
 import { createProduct, deleteProduct, getProductsPaginate, updateProduct } from "../api/productApi";
 import { toast } from "react-toastify";
-import AddVariantModal from "../components/AddVariantModal";
 import useLoading from "../hooks/UseLoading";
 import { useNavigate } from "react-router-dom";
 import { FiPlus, FiSearch, FiFilter, FiTrash2, FiEdit2, FiEye} from 'react-icons/fi';
-import ProductFormModal from "../components/AdminProductFormModal";
+import ProductFormModal from "../components/modal/AdminProductFormModal";
 
 const sizeProduct = 5;
 
@@ -94,6 +93,11 @@ const AdminProduct = () => {
   const handleOpenEditModal = (product) => {
     setIsModalOpen(true);
     setProductUpdate(product)
+  }
+
+  const handleViewDetails = (slug) => {
+    handleCloseModal();
+    navigate(`${slug}`)
   }
 
   const handleCloseModal = () => {
@@ -242,7 +246,7 @@ const AdminProduct = () => {
                     </td>
                     <td className="actions">
                       <div style={{display: "flex", gap: "8px"}}>
-                        <button className="details-btn" onClick={() => handleViewDetails(product.id)}>
+                        <button className="details-btn" onClick={() => handleViewDetails(product?.slug)}>
                           <FiEye />
                         </button>
                         <button className="edit-btn" onClick={() => handleOpenEditModal(product)}>

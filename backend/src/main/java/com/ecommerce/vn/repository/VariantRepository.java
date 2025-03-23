@@ -37,6 +37,9 @@ public interface VariantRepository extends JpaRepository<Variant, UUID>{
 	@Query("SELECT v FROM Variant v WHERE v.product.id = :productId")
 	Page<Variant> findByProductId(@Param("productId") UUID productId ,  Pageable pageable);
 	
+	@Query("SELECT v FROM Variant v WHERE v.product.slug = :slug")
+	Page<Variant> findByProductSlug(@Param("slug") String slug ,  Pageable pageable);
+	
 	@Modifying
 	@Query("UPDATE Variant v SET v.quantity = v.quantity - :quantity WHERE v.id = :variantId AND v.quantity >= :quantity")
 	Integer decreaseStock(@Param("variantId") UUID variantId, @Param("quantity") int quantity);

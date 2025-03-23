@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { FiX, FiUpload, FiTrash2 } from 'react-icons/fi';
-import '../assets/styles/components/AdminProductFormModal.scss';
-import { getAllCategories } from '../api/categoryApi';
-import { getAllBrands } from '../api/brandApi';
+import '../../assets/styles/components/AdminProductFormModal.scss';
+import { getAllCategories } from '../../api/categoryApi';
+import { getAllBrands } from '../../api/brandApi';
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
-import { getAllAttributes } from '../api/attributeApi';
-import { getAllTags } from '../api/tagApi';
+import { getAllAttributes } from '../../api/attributeApi';
+import { getAllTags } from '../../api/tagApi';
 
 
 const ProductFormModal = ({ isOpen, onClose, product = null,handleAddProduct,handleUpdateProduct}) => {

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ecommerce.vn.dto.attribute.AttributeResponse;
+import com.ecommerce.vn.dto.attribute.AttributeProductResponse;
 import com.ecommerce.vn.dto.category.CategoryResponse;
 import com.ecommerce.vn.dto.product.BrandResponse;
 import com.ecommerce.vn.dto.product.ProductCreateRequest;
@@ -22,6 +22,7 @@ import com.ecommerce.vn.entity.product.Tag;
 import com.ecommerce.vn.repository.AttributeRepository;
 import com.ecommerce.vn.repository.CategoryRepository;
 import com.ecommerce.vn.repository.TagRepository;
+import com.ecommerce.vn.service.product.ProductService;
 import com.ecommerce.vn.entity.attribute.Attribute;
 
 @Service
@@ -50,7 +51,11 @@ public class ProductConvert {
     @Autowired
     private BrandConvert brandConvert;
     
+    @Autowired
+    private ProductService productService;
+    
   
+    private int count = 0;
 
     public Product productCreateRequestConver(ProductCreateRequest productCreateRequest){
 
@@ -68,7 +73,7 @@ public class ProductConvert {
         
         Product product = new Product();
         
-		String slug = String.join("-", productCreateRequest.getProductName().toLowerCase().split(" ") );
+		String slug = String.join("-", productCreateRequest.getProductName().toLowerCase().split(" ")) + "-" + count++;
 
 		product.setSlug(slug);
         product.setProductName(productCreateRequest.getProductName());
@@ -101,9 +106,9 @@ public class ProductConvert {
         List<Attribute> attributes = attributeRepository.findAllById(productUpdateRequest.getAttributeIds())
         .stream().collect(Collectors.toList());
 
-        Product product = new Product();
+        Product product = productService.getProductById(productUpdateRequest.getId());
         
-		String slug = String.join("-", productUpdateRequest.getProductName().toLowerCase().split(" ") );
+		String slug = String.join("-", productUpdateRequest.getProductName().toLowerCase().split(" ")) + "-" + count++;
 
 		product.setSlug(slug);
         product.setId(productUpdateRequest.getId());     
@@ -134,9 +139,9 @@ public class ProductConvert {
             .map(tagConvert::tagConvertToTagResponse) 
             .collect(Collectors.toList());
         
-        List<AttributeResponse> attributeResponses = product.getAttributes()
+        List<AttributeProductResponse> attributeResponses = product.getAttributes()
         		.stream()
-        		.map((attribute) -> attributeConvert.attributeConvertToAttributeResponse(attribute) )
+        		.map((attribute) -> attributeConvert.attributeProductConvertToAttributeProductResponse(attribute) )
         		.toList();
         
         List<RatingResponse> ratingResponses = product.getRatings().stream()
@@ -180,12 +185,13 @@ public class ProductConvert {
                 product.getUpdateAt(), 
                 product.getCreatedBy(), 
                 product.getUpdatedBy(),
-                minPrice,
                 rattingValue,
                 ratingResponses
                 ); 
         
         productResponse.setStock(stock);
+        productResponse.setSlug(product.getSlug());
+        productResponse.setMinPrice(minPrice);
         productResponse.setMaxPrice(maxPrice);
         productResponse.setBrandResponse(brandResponse);
         productResponse.setSolded(product.getSoldQuantity());

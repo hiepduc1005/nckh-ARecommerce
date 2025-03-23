@@ -44,7 +44,7 @@ const AppRoutes = () => {
 
         <Route path='/products' element={<ProductLayout/>} >
             <Route index element={<SearchPage/>}/>
-            <Route path=':productId' element={<ProductDetails/>}/>
+            <Route path=':slug' element={<ProductDetails/>}/>
         </Route>
 
         <Route element={<AuthLayout/>} >
@@ -61,7 +61,7 @@ const AppRoutes = () => {
           <Route path='brands' element={<AdminBrand/>} />
           <Route path='products' element={<AdminProduct/>} />
           <Route path='categories' element={<AdminCategory/>} />
-          <Route path="products/:productId" element={<AdminProductDetails />}/>
+          <Route path="products/:slug" element={<AdminProductDetails />}/>
           <Route path='variants' element={<AdminVariants />} />
         </Route>
 

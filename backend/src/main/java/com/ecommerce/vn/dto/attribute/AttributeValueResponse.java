@@ -4,6 +4,8 @@ import java.util.UUID;
 
 public class AttributeValueResponse {
 	private UUID id;
+	private UUID attributeId;
+	private String attributeName;
 	private String attributeValue;
 
 	public String getAttributeValue() {
@@ -12,6 +14,23 @@ public class AttributeValueResponse {
 
 	public UUID getId() {
 		return id;
+	}
+	
+
+	public UUID getAttributeId() {
+		return attributeId;
+	}
+
+	public void setAttributeId(UUID attributeId) {
+		this.attributeId = attributeId;
+	}
+
+	public String getAttributeName() {
+		return attributeName;
+	}
+
+	public void setAttributeName(String attributeName) {
+		this.attributeName = attributeName;
 	}
 
 	public void setId(UUID id) {

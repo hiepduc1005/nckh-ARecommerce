@@ -27,12 +27,14 @@ public class VariantServiceImpl implements VariantService{
 	private VariantRepository variantRepository;
 	
 	@Override
+	@Transactional
 	public Variant createVariant(Variant variant) {
 		// TODO Auto-generated method stub
 		return variantRepository.save(variant);
 	}
 
 	@Override
+	@Transactional
 	public Variant getVariantById(UUID id) {
 		Optional<Variant> variant = variantRepository.findById(id);
 		if(variant.isEmpty()) {
@@ -42,12 +44,14 @@ public class VariantServiceImpl implements VariantService{
 	}
 
 	@Override
+	@Transactional
 	public Variant updateVariant(Variant variant) {
 		// TODO Auto-generated method stub
 		return variantRepository.save(variant);
 	}
 
 	@Override
+	@Transactional
 	public void deleteVariant(UUID variantId) {
 		if(variantId != null) {
 			variantRepository.deleteById(variantId);
@@ -110,5 +114,11 @@ public class VariantServiceImpl implements VariantService{
 	public boolean isVariantOfProduct(UUID variantId, UUID productId) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public Page<Variant> findAllVariantsByProductSlug(String slug, Pageable pageable) {
+		// TODO Auto-generated method stub
+		return variantRepository.findByProductSlug(slug, pageable);
 	}
 }

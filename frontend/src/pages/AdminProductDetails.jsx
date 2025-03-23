@@ -2,78 +2,46 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import '../assets/styles/pages/AdminProductDetails.scss'
+import { getProductBySlug } from '../api/productApi';
+import useLoading from '../hooks/UseLoading';
+import AddVariantModal from '../components/modal/AddVariantModal';
+import useAuth from '../hooks/UseAuth';
+import { deleteVariant, getVariantsByProductSlug } from '../api/variantApi';
+import { toast } from 'react-toastify';
+
 const AdminProductDetails = () => {
-    const { productId } = useParams();
+    const { slug } = useParams();
     const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [activeTab, setActiveTab] = useState('details');
-    const [loading, setLoading] = useState(true);
+    const [showVariantModal,setShowVariantModal] = useState(false)
+    const [variants,setVariants] = useState([])
+    const [updateVariant,setUpdateVariant] = useState(null)
+    const {loading, setLoading} = useLoading();
   
-    // In a real application, you'd fetch product data from an API
+    const {token} = useAuth()
+
+    const fetchVariantsByProductSlug = async () => {
+      const data = await getVariantsByProductSlug(slug,token,1);
+      if(data){
+        setVariants(data.content);   
+      }
+    }
+  
     useEffect(() => {
-      // Simulating API fetch
-      const fetchProductData = () => {
-        // Mock data - in a real app, you would fetch from an API
-        const products = [
-          { 
-            id: "1", 
-            name: 'iPhone 15 Pro', 
-            category: 'Electronics', 
-            brand: 'Apple', 
-            price: '999 - 1299', 
-            stock: 120, 
-            status: 'Active',
-            description: 'The latest iPhone with A17 Pro chip, titanium design, and Action button.',
-            image: '/images/iphone15pro.jpg', 
-            variants: [
-              { id: "101", name: 'iPhone 15 Pro 128GB Black', price: 999, stock: 40, sku: 'IP15P-128-BLK', attributes: [{name: 'Storage', value: '128GB'}, {name: 'Color', value: 'Black'}] },
-              { id: "102", name: 'iPhone 15 Pro 256GB Black', price: 1099, stock: 35, sku: 'IP15P-256-BLK', attributes: [{name: 'Storage', value: '256GB'}, {name: 'Color', value: 'Black'}] },
-              { id: "103", name: 'iPhone 15 Pro 512GB Silver', price: 1299, stock: 25, sku: 'IP15P-512-SLV', attributes: [{name: 'Storage', value: '512GB'}, {name: 'Color', value: 'Silver'}] },
-              { id: "104", name: 'iPhone 15 Pro 128GB Silver', price: 999, stock: 20, sku: 'IP15P-128-SLV', attributes: [{name: 'Storage', value: '128GB'}, {name: 'Color', value: 'Silver'}] },
-            ]
-          },
-          { 
-            id: "2", 
-            name: 'Samsung Galaxy S23', 
-            category: 'Electronics', 
-            brand: 'Samsung', 
-            price: '899 - 1099', 
-            stock: 85, 
-            status: 'Active',
-            description: 'Samsung Galaxy S23 with Snapdragon 8 Gen 2 processor and advanced camera system.',
-            image: '/images/galaxys23.jpg', 
-            variants: [
-              { id: "201", name: 'Galaxy S23 128GB Black', price: 899, stock: 30, sku: 'SGS23-128-BLK', attributes: [{name: 'Storage', value: '128GB'}, {name: 'Color', value: 'Black'}] },
-              { id: "202", name: 'Galaxy S23 256GB Black', price: 999, stock: 25, sku: 'SGS23-256-BLK', attributes: [{name: 'Storage', value: '256GB'}, {name: 'Color', value: 'Black'}] },
-              { id: "203", name: 'Galaxy S23 256GB White', price: 999, stock: 15, sku: 'SGS23-256-WHT', attributes: [{name: 'Storage', value: '256GB'}, {name: 'Color', value: 'White'}] },
-              { id: "204", name: 'Galaxy S23 512GB White', price: 1099, stock: 15, sku: 'SGS23-512-WHT', attributes: [{name: 'Storage', value: '512GB'}, {name: 'Color', value: 'White'}] }
-            ]
-          },
-          { 
-            id: "3", 
-            name: 'MacBook Pro 16', 
-            category: 'Computers', 
-            brand: 'Apple', 
-            price: '2499 - 3499', 
-            stock: 45, 
-            status: 'Active',
-            description: 'Powerful MacBook Pro 16 with M2 chip, Liquid Retina XDR display, and up to 32GB unified memory.',
-            image: '/images/macbookpro16.jpg',
-            variants: [
-              { id: "301", name: 'MacBook Pro 16 M2 16GB 512GB', price: 2499, stock: 20, sku: 'MBP16-M2-16-512', attributes: [{name: 'Processor', value: 'M2'}, {name: 'RAM', value: '16GB'}, {name: 'Storage', value: '512GB'}] },
-              { id: "302", name: 'MacBook Pro 16 M2 32GB 1TB', price: 3299, stock: 15, sku: 'MBP16-M2-32-1TB', attributes: [{name: 'Processor', value: 'M2'}, {name: 'RAM', value: '32GB'}, {name: 'Storage', value: '1TB'}] },
-              { id: "303", name: 'MacBook Pro 16 M2 Pro 32GB 1TB', price: 3499, stock: 10, sku: 'MBP16-M2P-32-1TB', attributes: [{name: 'Processor', value: 'M2 Pro'}, {name: 'RAM', value: '32GB'}, {name: 'Storage', value: '1TB'}] }
-            ] 
-          },
-        ];
-  
-        const foundProduct = products.find(p => p.id === productId);
-        setProduct(foundProduct);
+      const fetchProductData = async () => {
+        setLoading(true);
+        const data = await getProductBySlug(slug);
+        
+        if(data){
+          setProduct(data);
+        }
         setLoading(false);
       };
   
       fetchProductData();
-    }, [productId]);
+      fetchVariantsByProductSlug()
+    }, [slug]);
   
     if (loading) {
       return <div className="loading">Loading product details...</div>;
@@ -89,19 +57,44 @@ const AdminProductDetails = () => {
     }
   
     const handleAddVariant = () => {
-      // Navigate to add variant page or show modal
-      navigate(`/admin/products/${productId}/variants/add`);
+      navigate(`/admin/products/${slug}/variants/add`);
     };
   
-    const handleEditVariant = (variantId) => {
-      navigate(`/admin/products/${productId}/variants/${variantId}/edit`);
-    };
+
   
-    const handleDeleteVariant = (variantId) => {
-      // In a real app, you would call an API to delete the variant
-      console.log(`Delete variant ${variantId}`);
-      // Then refresh product data
+    const handleDeleteVariant = async (variantId) => {
+      setLoading(true)
+
+      const data = await deleteVariant(token,variantId);
+      if(data){
+        fetchVariantsByProductSlug()
+        toast.success("Delete variant success!")
+      }else{
+        toast.success("Delete variant failed!")
+      }
+
+      setLoading(false)
+
     };
+
+    const handleAddAttribute = () => {
+      navigate(`/admin/products/${slug}/attributes/add`);
+    };
+
+    const handleCloseModal = () => {
+      fetchVariantsByProductSlug()
+      setShowVariantModal(false)
+      setUpdateVariant(null)
+    }
+
+    const handleOpenModal = () => {
+      setShowVariantModal(true)
+    }
+
+    const handleOpenModalUpdate = (variant) => {
+      setUpdateVariant(variant);
+      setShowVariantModal(true)
+    }
   
     return (
       <div className="product-detail-page">
@@ -127,7 +120,13 @@ const AdminProductDetails = () => {
               className={`tab-btn ${activeTab === 'variants' ? 'active' : ''}`}
               onClick={() => setActiveTab('variants')}
             >
-              Variants ({product.variants?.length || 0})
+              Variants ({variants?.length || 0})
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'attributes' ? 'active' : ''}`}
+              onClick={() => setActiveTab('attributes')}
+            >
+              Attributes ({product.attributeResponses?.length || 0})
             </button>
           </div>
   
@@ -137,8 +136,8 @@ const AdminProductDetails = () => {
                 <div className="product-detail-grid">
                   <div className="product-image-container">
                     <img 
-                      src={product.image || "/api/placeholder/300/300"} 
-                      alt={product.name} 
+                      src={`http://localhost:8080${product.imagePath}`} 
+                      alt={product.productName} 
                       className="product-image"
                     />
                   </div>
@@ -152,32 +151,70 @@ const AdminProductDetails = () => {
                       </div>
                       <div className="info-row">
                         <span className="info-label">Name:</span>
-                        <span className="info-value">{product.name}</span>
+                        <span className="info-value">{product.productName}</span>
                       </div>
                       <div className="info-row">
-                        <span className="info-label">Category:</span>
-                        <span className="info-value">{product.category}</span>
+                        <span className="info-label">Slug:</span>
+                        <span className="info-value">{product.slug}</span>
                       </div>
                       <div className="info-row">
                         <span className="info-label">Brand:</span>
-                        <span className="info-value">{product.brand}</span>
+                        <span className="info-value">{product.brandResponse?.name || 'N/A'}</span>
                       </div>
+                      <div className="info-row">
+                        <span className="info-label">Categories:</span>
+                        <span className="info-value">
+                          {product.categories?.length ? (
+                            product.categories.map((cat) => (
+                              <span key={cat.categoryName} className="badge badge-category">{cat.categoryName}</span>
+                            ))
+                          ) : (
+                            <span className="badge badge-empty">N/A</span>
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="info-row">
+                        <span className="info-label">Tags:</span>
+                        <span className="info-value">
+                          {product.tags?.length ? (
+                            product.tags.map((tag) => (
+                              <span key={tag.tagName} className="badge badge-tag">{tag.tagName}</span>
+                            ))
+                          ) : (
+                            <span className="badge badge-empty">N/A</span>
+                          )}
+                        </span>
+                      </div>
+
                     </div>
   
                     <div className="info-group">
                       <h3>Inventory</h3>
                       <div className="info-row">
                         <span className="info-label">Price Range:</span>
-                        <span className="info-value">${product.price}</span>
+                        <span className="info-value">
+                          {product.minPrice ? `$${product.minPrice} - $${product.maxPrice}` : `$${product.maxPrice}`}
+                        </span>
                       </div>
                       <div className="info-row">
-                        <span className="info-label">Total Stock:</span>
+                        <span className="info-label">Stock:</span>
                         <span className="info-value">{product.stock}</span>
                       </div>
                       <div className="info-row">
+                        <span className="info-label">Sold:</span>
+                        <span className="info-value">{product.solded}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Rating:</span>
+                        <span className="info-value">
+                          {product.ratingValue?.toFixed(1) || 'N/A'} ({product.ratingResponses?.length || 0} reviews)
+                        </span>
+                      </div>
+                      <div className="info-row">
                         <span className="info-label">Status:</span>
-                        <span className={`status-badge ${product.status === 'Active' ? 'active' : 'low-stock'}`}>
-                          {product.status}
+                        <span className={`status-badge ${product.active ? 'active' : 'inactive'}`}>
+                          {product.active ? 'Active' : 'Inactive'}
                         </span>
                       </div>
                     </div>
@@ -187,6 +224,20 @@ const AdminProductDetails = () => {
                 <div className="product-description">
                   <h3>Description</h3>
                   <p>{product.description}</p>
+                  
+                  <h3>Short Description</h3>
+                  <p>{product.shortDescription}</p>
+                </div>
+  
+                <div className="product-creation-info">
+                  <div className="info-row">
+                    <span className="info-label">Created At:</span>
+                    <span className="info-value">{new Date(product.createdAt).toLocaleString()}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Updated At:</span>
+                    <span className="info-value">{new Date(product.updatedAt).toLocaleString()}</span>
+                  </div>
                 </div>
   
                 <div className="product-actions">
@@ -200,79 +251,162 @@ const AdminProductDetails = () => {
                   </button>
                 </div>
               </div>
-            ) : (
+            ) : activeTab === 'variants' ? (
               <div className="product-variants">
                 <div className="variants-header">
                   <h3>Product Variants</h3>
-                  <button className="add-variant-btn" onClick={handleAddVariant}>
+                  <button className="add-variant-btn" onClick={handleOpenModal}>
                     <FiPlus />
                     <span>Add Variant</span>
                   </button>
                 </div>
   
                 <div className="variants-table-container">
-                  <table className="variants-table">
-                    <thead>
-                      <tr>
-                        <th>Variant Name</th>
-                        <th>SKU</th>
-                        <th>Attributes</th>
-                        <th>Price</th>
-                        <th>Stock</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {product.variants.map(variant => {
-                        const status = variant.stock > 10 ? 'Active' : 'Low Stock';
-                        
-                        return (
-                          <tr key={variant.id}>
-                            <td>{variant.name}</td>
-                            <td>{variant.sku}</td>
+                  {variants && variants.length > 0 ? (
+                    <table className="variants-table">
+                     <thead>
+                       <tr>
+                         <th>Variant ID</th>
+                         <th>Image</th>
+                         <th>Attributes</th>
+                         <th>Price</th>
+                         <th>Discount Price</th>
+                         <th>Quantity</th>
+                         <th>Actions</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {variants?.map(variant => {
+                         return (
+                           <tr key={variant.id}>
+                             <td>{variant.id}</td>
+                             <td>
+                               {variant.imagePath && (
+                                 <img 
+                                   src={`http://localhost:8080${variant.imagePath}`} 
+                                   alt="Variant" 
+                                   style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                                 />
+                               )}
+                             </td>
+                             <td>
+                               {variant.attributeValueResponses && variant.attributeValueResponses.length > 0 ? (
+                                 <div className="attribute-list">
+                                   {variant.attributeValueResponses.map((attr, index) => (
+                                     <div key={attr.id} className="attribute-item">
+                                       <span className="attribute-name">{attr.attributeName}:</span> 
+                                       <span className="attribute-value">{attr.attributeValue}</span>
+                                       {index < variant.attributeValueResponses.length - 1 && ', '}
+                                     </div>
+                                   ))}
+                                 </div>
+                               ) : (
+                                 <span className="no-attributes">No attributes</span>
+                               )}
+                             </td>
+                             <td>${variant.price?.toFixed(2)}</td>
+                             <td>${variant.discountPrice?.toFixed(2)}</td>
+                             <td>{variant.quantity}</td>
+                             <td className="actions">
+                               <button 
+                                 className="edit-btn" 
+                                 title="Edit"
+                                 onClick={() => handleOpenModalUpdate(variant)}
+                               >
+                                 <FiEdit2 />
+                               </button>
+                               <button 
+                                 className="delete-btn" 
+                                 title="Delete"
+                                 onClick={() => handleDeleteVariant(variant.id)}
+                               >
+                                 <FiTrash2 />
+                               </button>
+                             </td>
+                           </tr>
+                         );
+                       })}
+                     </tbody>
+                   </table>
+                  ) : (
+                    <div className="no-data-message">
+                      <p>No variants available for this product.</p>
+                      <button className="add-btn" onClick={handleOpenModal}>
+                        <FiPlus />
+                        <span>Add First Variant</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="product-attributes">
+                <div className="attributes-header">
+                  <h3>Product Attributes</h3>
+                  <button className="add-attribute-btn" onClick={handleAddAttribute}>
+                    <FiPlus />
+                    <span>Add Attribute</span>
+                  </button>
+                </div>
+  
+                <div className="attributes-table-container">
+                  {product.attributeResponses && product.attributeResponses.length > 0 ? (
+                    <table className="attributes-table">
+                      <thead>
+                        <tr>
+                          <th>Attribute ID</th>
+                          <th>Attribute Name</th>
+                          <th>Created At</th>
+                          <th>Updated At</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {product.attributeResponses.map(attribute => (
+                          <tr key={attribute.id}>
+                            <td>{attribute.id}</td>
+                            <td>{attribute.attributeName}</td>
+                            <td>{new Date(attribute.createdAt).toLocaleString()}</td>
+                            <td>{new Date(attribute.updateAt).toLocaleString()}</td>
                             <td>
-                              {variant.attributes.map((attr, index) => (
-                                <span key={index} className="attribute-badge">
-                                  {attr.name}: {attr.value}
-                                </span>
-                              ))}
-                            </td>
-                            <td>${variant.price}</td>
-                            <td>{variant.stock}</td>
-                            <td>
-                              <span className={`status-badge ${status === 'Active' ? 'active' : 'low-stock'}`}>
-                                {status}
+                              <span className={`status-badge ${attribute.active ? 'active' : 'inactive'}`}>
+                                {attribute.active ? 'Active' : 'Inactive'}
                               </span>
                             </td>
-                            <td className="actions">
-                              <button 
-                                className="edit-btn" 
-                                title="Edit"
-                                onClick={() => handleEditVariant(variant.id)}
-                              >
-                                <FiEdit2 />
-                              </button>
-                              <button 
-                                className="delete-btn" 
-                                title="Delete"
-                                onClick={() => handleDeleteVariant(variant.id)}
-                              >
-                                <FiTrash2 />
-                              </button>
-                            </td>
+                            
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div className="no-data-message">
+                      <p>No attributes available for this product.</p>
+                      <button className="add-btn" onClick={handleAddAttribute}>
+                        <FiPlus />
+                        <span>Add First Attribute</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </div>
         </div>
+        {showVariantModal 
+        
+          ? 
+          <AddVariantModal 
+            show={showVariantModal}
+            product={product}
+            token={token}
+            handleClose={handleCloseModal}
+            variant={updateVariant}
+          />
+
+          : ""
+        }
       </div>
     );
   };
   
-export default AdminProductDetails
+export default AdminProductDetails;

@@ -90,7 +90,7 @@ public class Product {
 	)
 	private List<Tag> tags = new ArrayList<Tag>();
 	
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.MERGE)
 	@JoinTable(
 			name = "products_attributes",
 			joinColumns = @JoinColumn(name = "product_id"),

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.vn.entity.attribute.Attribute;
+import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.repository.AttributeRepository;
 import com.ecommerce.vn.service.attribute.AttributeService;
@@ -36,13 +37,21 @@ public class AttributeServiceImpl implements AttributeService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteAttribute(UUID id) {
-		if(id != null) {
-			attributeRepository.deleteById(id);
-			return;
-		}
-		
-		throw new RuntimeException("ID must not null !");
+	 Attribute attribute = attributeRepository.findById(id)
+		        .orElseThrow(() -> new RuntimeException("Attribute not found"));
+
+		    // Xóa quan hệ giữa Attribute và Product trước
+		    for (Product product : attribute.getProducts()) {
+		        product.getAttributes().remove(attribute);
+		    }
+
+		    attribute.getProducts().clear();
+		    attributeRepository.save(attribute); 
+		    
+		    
+		    attributeRepository.delete(attribute);
 	}
 
 	@Override

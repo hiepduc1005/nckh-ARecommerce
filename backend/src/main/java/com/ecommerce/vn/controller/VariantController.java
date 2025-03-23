@@ -23,6 +23,7 @@ import com.ecommerce.vn.dto.variant.VariantResponse;
 import com.ecommerce.vn.entity.product.Variant;
 import com.ecommerce.vn.service.FileUploadService;
 import com.ecommerce.vn.service.convert.VariantConvert;
+import com.ecommerce.vn.service.product.ProductService;
 import com.ecommerce.vn.service.variant.VariantService;
 
 @RestController
@@ -37,6 +38,9 @@ public class VariantController {
 	
 	@Autowired
 	public FileUploadService fileUploadService;
+	
+	@Autowired
+	public ProductService productService;
 	
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<?> createVariant(
@@ -83,6 +87,19 @@ public class VariantController {
      
 		Pageable pageable = PageRequest.of(page, size);
         Page<Variant> variants = variantService.findAllVariantsByProduct(productId, pageable);
+        Page<VariantResponse> variantResponse = variants.map((variant ) -> variantConvert.variantConvertToVariantResponse(variant));
+       
+        return ResponseEntity.ok(variantResponse);
+    }
+	
+	@GetMapping("/products/slug/{slug}")
+    public ResponseEntity<Page<VariantResponse>> getVariantsByProduct(
+            @PathVariable("slug") String slug,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+     
+		Pageable pageable = PageRequest.of(page, size);
+        Page<Variant> variants = variantService.findAllVariantsByProductSlug(slug, pageable);
         Page<VariantResponse> variantResponse = variants.map((variant ) -> variantConvert.variantConvertToVariantResponse(variant));
        
         return ResponseEntity.ok(variantResponse);

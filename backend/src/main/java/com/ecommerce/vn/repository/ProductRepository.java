@@ -2,6 +2,7 @@ package com.ecommerce.vn.repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -87,5 +88,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID>{
 
     @Query("SELECT p FROM Product p JOIN p.categories t WHERE t.categoryName = :categoryName")
     List<Product> findByCategoryName(@Param("categoryName") String categoryName);
+    
+    @Query("SELECT p FROM Product p WHERE p.slug = :slug")
+    Optional<Product> getProductBySlug(@Param("slug") String slug);
 
 }

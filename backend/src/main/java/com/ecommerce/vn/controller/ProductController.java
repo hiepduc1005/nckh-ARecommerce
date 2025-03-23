@@ -79,11 +79,22 @@ public class ProductController {
         ProductResponse productResponse = productConvert.productConvertToProductResponse(product);
         return ResponseEntity.ok(productResponse);
     }
+    
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<ProductResponse> findProductById(@PathVariable("slug") String slug){
+        Product product = productService.getProductBySlug(slug);
+        if (product == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); 
+        }
+
+        ProductResponse productResponse = productConvert.productConvertToProductResponse(product);
+        return ResponseEntity.ok(productResponse);
+    }
 
     //Update sản phẩm
     @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateProduct(
-            @RequestPart("image") MultipartFile image, 
+            @RequestPart(name = "image", required = false) MultipartFile image, 
             @RequestPart("product")  ProductUpdateRequest productUpdateRequest) {
     	
     	Product productToUpdate = productConvert.productUpdateRequestConver(productUpdateRequest);
