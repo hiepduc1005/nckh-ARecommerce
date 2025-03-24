@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.vn.dto.user.UserCreateRequest;
 import com.ecommerce.vn.dto.user.UserResponse;
 import com.ecommerce.vn.dto.user.UserUpdateRequest;
+import com.ecommerce.vn.entity.cart.Cart;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.service.convert.UserConvert;
 import com.ecommerce.vn.service.user.UserService;
@@ -57,6 +58,13 @@ public class UserController {
 	public ResponseEntity<UserResponse> getUserAuthenticated() {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 		User user = userService.findUserByEmail(email);
+		if(user.getCart() == null) {
+    		Cart cart = new Cart();
+			cart.setUser(user);
+			user.setCart(cart);
+			
+			userService.updateUser(user);
+    	}
 		UserResponse response = userConvert.userConvertToUserResponse(user); 
 		return ResponseEntity.ok(response); 
 	}

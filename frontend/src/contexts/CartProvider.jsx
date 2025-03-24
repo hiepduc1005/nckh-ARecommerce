@@ -13,22 +13,22 @@ const CartProvider = ({children}) => {
 
     const {setLoading} = useLoading();
 
-    useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                setLoading(true);
-                if (token) {
-                    const data = await getCartByToken(token);
-                    if (data) {
-                        setCart(data);
-                    }
+    const fetchCart = async () => {
+        try {
+            setLoading(true);
+            if (token) {
+                const data = await getCartByToken(token);
+                if (data) {
+                    setCart(data);
                 }
-            } catch (error) {
-                console.error("Lỗi khi lấy giỏ hàng:", error);
-            } finally {
-                setLoading(false);
             }
-        };
+        } catch (error) {
+            console.error("Lỗi khi lấy giỏ hàng:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
     
         fetchCart();
     }, [token, setLoading]);
@@ -42,7 +42,7 @@ const CartProvider = ({children}) => {
             const cartResponse = await removeVariantFromCart(data, cart?.id, token);
     
             if (cartResponse) {
-                setCart(cartResponse);
+                fetchCart()
                 toast.success("Xóa sản phẩm khỏi giỏ hàng thành công!");
             } else {
                 toast.error("Xóa sản phẩm khỏi giỏ hàng thất bại!");
@@ -68,7 +68,7 @@ const CartProvider = ({children}) => {
             const cartResponse = await addVariantToCart(data,cart?.id,token);
 
             if(cartResponse){
-                setCart(cartResponse);
+                fetchCart()
                 setLoading(false)
                 toast.success("Thêm sản phẩm vào giỏ hàng thành công!")
                 return;

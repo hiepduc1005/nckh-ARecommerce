@@ -1,0 +1,231 @@
+.product-rating-container{
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+  
+    // Rating Summary Styles
+    .rating-summary {
+      margin-bottom: 30px;
+  
+      .average-rating {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+  
+        .stars-container {
+          display: flex;
+          margin-right: 10px;
+        }
+  
+        .rating-value {
+          font-size: 1.2rem;
+          font-weight: 600;
+        }
+  
+        .review-count {
+          margin-left: 8px;
+          color: #666;
+        }
+      }
+    }
+  
+    // Star Styles
+    .star {
+      &.filled {
+        color: #ffc107;
+        fill: #ffc107;
+      }
+  
+      &.half-filled {
+        color: #ffc107;
+        fill: #ffc107;
+      }
+  
+      &.empty {
+        color: #ccc;
+        fill: none;
+      }
+    }
+  
+    // Rating Form Styles
+    .rating-form-container {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+  
+      .form-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+      }
+  
+      .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+      }
+  
+      .error-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+      }
+  
+      .rating-form {
+        .form-group {
+          margin-bottom: 20px;
+  
+          .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+          }
+  
+          .interactive-stars {
+            display: flex;
+            align-items: center;
+            
+            .interactive-star-container {
+              position: relative;
+              display: flex;
+              width: 24px;
+              height: 24px;
+              margin-right: 5px;
+              
+              .star-half {
+                position: absolute;
+                width: 50%;
+                height: 100%;
+                overflow: hidden;
+                cursor: pointer;
+                
+                &.left-half {
+                  left: 0;
+                  
+                  svg {
+                    position: absolute;
+                    left: 0;
+                  }
+                }
+                
+                &.right-half {
+                  right: 0;
+                  
+                  svg {
+                    position: absolute;
+                    right: 0;
+                  }
+                }
+              }
+            }
+          }
+  
+          .comment-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+          }
+        }
+  
+        .submit-button {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+          transition: background-color 0.2s;
+  
+          &:hover {
+            background-color: #0069d9;
+          }
+  
+          &:disabled,
+          &.submitting {
+            background-color: #6c757d;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  
+    // Reviews List Styles
+    .reviews-container {
+      .no-reviews {
+        color: #6c757d;
+      }
+  
+      .reviews-list {
+        .review-item {
+          border-bottom: 1px solid #dee2e6;
+          padding-bottom: 20px;
+          margin-bottom: 20px;
+  
+          &:last-child {
+            border-bottom: none;
+          }
+  
+          .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+  
+            .reviewer-info {
+              display: flex;
+              align-items: center;
+  
+              .stars-container {
+                display: flex;
+                margin-right: 10px;
+              }
+              
+              .reviewer-rating {
+                font-weight: 600;
+                margin-right: 10px;
+              }
+  
+              .reviewer-name {
+                font-weight: 500;
+                margin-right: 10px;
+              }
+  
+              .verified-badge {
+                background-color: #d4edda;
+                color: #155724;
+                font-size: 0.75rem;
+                padding: 2px 8px;
+                border-radius: 4px;
+              }
+            }
+  
+            .review-date {
+              font-size: 0.875rem;
+              color: #6c757d;
+            }
+          }
+  
+          .review-comment {
+            color: #212529;
+            line-height: 1.5;
+          }
+        }
+      }
+    }
+  }

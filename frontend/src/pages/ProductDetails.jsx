@@ -15,6 +15,8 @@ import ProductDetailsTapList from '../components/ProductDetailsTapList';
 import { getProductById, getProductBySlug } from '../api/productApi';
 import { toast } from 'react-toastify';
 import useLoading from '../hooks/UseLoading';
+import { getVariantsByProductSlug } from '../api/variantApi';
+import useCart from '../hooks/UseCart';
 
 const products = [
   { id: 1, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 4.5, reviews: 120, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
@@ -30,40 +32,84 @@ const colors = ["red", "blue", "black", "green", "yellow"];
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariants, setSelectedVariants] = useState({});
+  const [selectedVariants, setSelectedVariants] = useState(null);
+  const [selectedVariantStock,setSelectVariantStock] = useState(null)
+  const [variants,setVariants] = useState([])
+
+  const [images,setImages] = useState([])
+
   const { slug } = useParams();
   const { setLoading } = useLoading();
+  const {addItem} = useCart()
+
+  // useEffect(() => {
+  //   const fetchProductById = async () => {
+  //     try {
+  //       const data = await getProductBySlug(slug);
+  //       if (data) {
+  //         setProduct(data);
+  //       } else {
+  //         toast.error("Có lỗi xảy ra khi tải dữ liệu sản phẩm!");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching product:", error);
+  //       toast.error("Có lỗi xảy ra!");
+  //     } 
+  //   };
+
+  //   const fetchVariantsByProductSlug = async () => {
+  //     const data = await getVariantsByProductSlug(slug,"",1,10);
+  //     if(data){
+  //       setVariants(data.content);   
+  //       console.log(data)
+  //     }
+  //   }
+  //   setLoading(true);
+  //   fetchVariantsByProductSlug()
+  //   fetchProductById();
+
+  //   if(product && variants){
+  //     const listImage = [product.imagePath,...variants.map(variant => variant.imagePath)]
+  //     setImages(listImage)
+  //   }
+  //   setLoading(false);
+
+  // }, [slug, setLoading]);
 
   useEffect(() => {
-    const fetchProductById = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const data = await getProductBySlug(slug);
-        if (data) {
-          setProduct(data);
+        // Fetch product data
+        const productData = await getProductBySlug(slug);
+        if (productData) {
+          setProduct(productData);
           
-          // Initialize selected variants with first value of each attribute
-          const initialVariants = {};
-          if (data.attributeResponses) {
-            data.attributeResponses.forEach(attr => {
-              if (attr.attributeValueResponses && attr.attributeValueResponses.length > 0) {
-                initialVariants[attr.attributeName] = attr.attributeValueResponses[0].attributeValue;
-              }
-            });
+          // Fetch variants
+          const variantsData = await getVariantsByProductSlug(slug, "", 1, 10);
+          if (variantsData) {
+            setVariants(variantsData.content);
+            
+            // Create images array once we have both product and variants
+            const listImage = [
+              productData.imagePath,
+              ...variantsData.content.map(variant => variant.imagePath)
+            ].filter(Boolean); // Filter out any null or undefined values
+            
+            setImages(listImage);
           }
-          setSelectedVariants(initialVariants);
         } else {
           toast.error("Có lỗi xảy ra khi tải dữ liệu sản phẩm!");
         }
       } catch (error) {
-        console.error("Error fetching product:", error);
+        console.error("Error fetching data:", error);
         toast.error("Có lỗi xảy ra!");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProductById();
+  
+    fetchData();
   }, [slug, setLoading]);
 
   const handleQuantityChange = (amount) => {
@@ -73,12 +119,27 @@ const ProductDetails = () => {
     }
   };
 
-  const handleVariantSelect = (attributeName, value) => {
-    setSelectedVariants({
-      ...selectedVariants,
-      [attributeName]: value
-    });
+  const handleVariantSelect = (variant) => {
+    setSelectedVariants(variant.id);
+    setSelectVariantStock(variant.quantity)
+    setQuantity(1)
   };
+
+  const handleAddProductToCart = async () => {
+    if(!selectedVariants){
+      toast.warning("Bạn chưa chọn biến thể!");
+      return;
+    }
+    
+    await addItem(selectedVariants,quantity);
+  }
+
+  const handleClickOrder = () => {
+    if(!selectedVariants){
+      toast.warning("Bạn chưa chọn biến thể!");
+      return;
+    }
+  }
 
   const settings = {
     dots: true,
@@ -90,7 +151,7 @@ const ProductDetails = () => {
     pauseOnHover: true,
     slidesToScroll: 1,
     customPaging: (i) => (
-      <img src={products[i % products.length].image} alt={`thumb-${i}`} className="dot-thumbnail" />
+      <img src={`http://localhost:8080${images[i % images.length]}`} alt={`thumb-${i}`} className="dot-thumbnail" />
     ),
     dotsClass: "custom-dots",
   };
@@ -102,9 +163,9 @@ const ProductDetails = () => {
       <div className="left">
         <div className="carousel">
           <Slider {...settings}>
-            {products?.map((product, index) => (
-              <div key={product?.id} className='item'>
-                <img src={product?.image} alt={`slide-${index}`} className="slide-image" />
+            {images?.map((image, index) => (
+              <div key={index} className='item'>
+                <img src={`http://localhost:8080${image}`} alt={`slide-${index}`} className="slide-image" />
               </div>
             ))}
           </Slider>
@@ -167,19 +228,27 @@ const ProductDetails = () => {
         </div>
         <div className="product-options">
           {/* Attribute Selection Based on Product Data */}
-          {product.attributeResponses && product.attributeResponses.map((attribute) => (
-            <div key={attribute.id} className="variant-selection">
-              <h3>{attribute.attributeName}:</h3>
-              <div className="variant-options">
-                {attribute.attributeValueResponses && attribute.attributeValueResponses.map((value) => (
+          <h3>Biến thể:</h3>
+          {variants && variants.map((variant) => (
+            <div key={variant.id} className="variant-selection">
+              <div className="variant-options">              
                   <button
-                    key={value.id}
-                    className={`variant-option ${selectedVariants[attribute.attributeName] === value.attributeValue ? 'selected' : ''}`}
-                    onClick={() => handleVariantSelect(attribute.attributeName, value.attributeValue)}
+                    className={`variant-option ${selectedVariants === variant.id ? 'selected' : ''}`}
+                    onClick={() => handleVariantSelect(variant)}
                   >
-                    {value.attributeValue}
-                  </button>
-                ))}
+                    <div className="variant-image">
+                      <img src={`http://localhost:8080${variant.imagePath}`} alt={`Variant ${variant.id}`} />
+                    </div>
+                    <div className="variant-details">
+                      {variant?.attributeValueResponses?.map((attrValue, index) => (
+                        <React.Fragment key={attrValue.id}>
+                          <span className='attr-name'>{attrValue.attributeName}: </span>
+                          <span className='attr-value'>{attrValue.attributeValue}</span>
+                          {index < variant.attributeValueResponses.length - 1 && <span>, </span>}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </button>              
               </div>
             </div>
           ))}
@@ -202,24 +271,24 @@ const ProductDetails = () => {
             <button 
               className="quantity-btn" 
               onClick={() => handleQuantityChange(1)}
-              disabled={quantity >= (product.stock || 100)}
+              disabled={quantity >= (selectedVariantStock || product.stock || 100)}
             >
               <FontAwesomeIcon icon={faPlus} />
             </button>
           </div>
           <div className="stock-info">
             {product.stock > 0 ? (
-              <span className="in-stock">{product.stock} sản phẩm có sẵn</span>
+              <span className="in-stock">{selectedVariantStock || product.stock} sản phẩm có sẵn</span>
             ) : (
               <span className="out-of-stock">Hết hàng</span>
             )}
           </div>
           <div className="purchase-buttons">
-            <button className="add-to-cart">
+            <button className="add-to-cart" onClick={() => handleAddProductToCart()}>
               <FontAwesomeIcon className='icon' icon={faCartPlus}/>
               <span>Thêm Vào Giỏ Hàng</span>
             </button>
-            <button className="buy-now">Mua Ngay</button>
+            <button className="buy-now" onClick={() => handleClickOrder()}>Mua Ngay</button>
           </div>
         </div>
       </div>

@@ -1,29 +1,35 @@
 import React from 'react'
 import "../assets/styles/components/CartPopper.scss"
+import { Link, useNavigate } from 'react-router-dom'
 const CartPopper = ({isCartOpen,cart}) => {
 
-    return (
+  const navigate = useNavigate();
+  const handleNavigate = (url) => {
+    setTimeout(() => navigate(`${url}`), 100);
+  };
+
+  return (
     <div className={`cart-popper ${!isCartOpen ? "hidden" : ""}`}>
       <div className="cart-header">Sản Phẩm Mới Thêm</div>
       <div className="cart-content">
-        {cart?.variantResponse?.length > 0 ? (
-          cart?.variantResponse?.map((item, index) => (
-            <div key={item?.id} className="cart-item">
-              <img src={item.image} alt={item.name} className="cart-image" />
+        {cart?.cartItemResponses?.length > 0 ? (
+          cart?.cartItemResponses?.map((item, index) => (
+            <Link key={item?.id} className="cart-item" to={`/products/${item.variantResponse.productResponse.slug}`}>
+              <img src={`http://localhost:8080${item.variantResponse.imagePath}`} alt={item.variantResponse.productResponse.productName} className="cart-image" />
               <div className="cart-details">
                 <div style={{display: "flex" , flexDirection: "column"}}>
-                    <span className="cart-name">{item.name}</span>
-                    <span className="cart-price">₫{item.price.toLocaleString()}</span>
+                    <span className="cart-name">{item.variantResponse.productResponse.productName}</span>
+                    <span className="cart-price">₫{item.variantResponse.discountPrice?.toLocaleString()}</span>
                 </div>
-                <span className='cart-quantity'>x3</span>
+                <span className='cart-quantity'>x{item.quantity}</span>
               </div>
-            </div>
+            </Link>
           ))
         ) : (
           <p className="empty-cart-message" >Không có sản phẩm trong giỏ</p>
         )}
       </div>
-      <button className="cart-button">Xem Giỏ Hàng</button>
+      <button onClick={() => handleNavigate("/cart")} className="cart-button">Xem Giỏ Hàng</button>
     </div>
   )
 }

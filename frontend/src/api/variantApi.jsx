@@ -31,13 +31,9 @@ export const getVariantsByProductId = async (productId , token , page) => {
     }
 }
 
-export const getVariantsByProductSlug = async (slug , token , page) => {
+export const getVariantsByProductSlug = async (slug , token , page,size = 5) => {
     try {
-        const res = await axiosInstance.get(`api/v1/variants/products/slug/${slug}?page=${page-1}&size=5`,{
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            }
-        })
+        const res = await axiosInstance.get(`api/v1/variants/products/slug/${slug}?page=${page-1}&size=${size}`)
 
         return res.data;
     } catch (error) {

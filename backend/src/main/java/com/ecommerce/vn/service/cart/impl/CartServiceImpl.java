@@ -1,6 +1,7 @@
 package com.ecommerce.vn.service.cart.impl;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,18 +35,41 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public Cart getCartByUserId(UUID userId) {
         return cartRepository.findByUserId(userId);
     }
 
     @Override
+    @Transactional
     public Cart addItemToCart(UUID cartId, CartItem cartItem) {
+    	if(cartItem.getQuantity() > cartItem.getVariant().getQuantity()) {
+    		throw new RuntimeException("Số sản phẩm có sẵn không đủ!");
+    	}
         Cart cart = getCartById(cartId);
-        cart.getCartItems().add(cartItem);
+        cartItem.setCart(cart);
+        
+        Optional<CartItem> existCartItem = cart.getCartItems()
+        		.stream()
+        		.filter(item -> item.getVariant().getId().equals(cartItem.getVariant().getId())).findFirst();
+        if(existCartItem.isPresent()) {
+        	CartItem item = existCartItem.get();
+        	int quantity = item.getQuantity() + cartItem.getQuantity();
+        	
+        	if(quantity > cartItem.getVariant().getQuantity()) {
+        		throw new RuntimeException("Số sản phẩm có sẵn không đủ!");
+        	}
+        	item.setQuantity(quantity);
+
+        }else {
+
+        	cart.getCartItems().add(cartItem);        	
+        }
         return cartRepository.save(cart);
     }
 
     @Override
+    @Transactional
     public Cart removeItemFromCart(UUID cartId, UUID cartItemId) {
         Cart cart = getCartById(cartId);
         cartItemService.deleteCartItem(cartItemId);

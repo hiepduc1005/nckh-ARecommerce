@@ -1,5 +1,6 @@
 package com.ecommerce.vn;
 
+import org.springframework.beans.factory.annotation.Autowired;
 //import java.util.Arrays;
 //
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //import com.ecommerce.vn.entity.user.User;
 //import com.ecommerce.vn.service.role.RoleService;
 //import com.ecommerce.vn.service.user.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.ecommerce.vn.entity.cart.Cart;
+import com.ecommerce.vn.entity.user.User;
+import com.ecommerce.vn.service.user.UserService;
 
 @SpringBootApplication
 public class Chatapp1Application implements CommandLineRunner {  // ✅ Implement CommandLineRunner để chạy sau khi ứng dụng khởi động
 
-//    @Autowired
-//    private UserService userService;
+    @Autowired
+    private UserService userService;
 //
 //    @Autowired
 //    private PasswordEncoder passwordEncoder;
@@ -47,5 +53,9 @@ public class Chatapp1Application implements CommandLineRunner {  // ✅ Implemen
 //        user.setRoles(Arrays.asList(roleAdmin));
 //
 //        userService.createUser(user);
+    	
+    	
+//    	
+    	
     }
 }

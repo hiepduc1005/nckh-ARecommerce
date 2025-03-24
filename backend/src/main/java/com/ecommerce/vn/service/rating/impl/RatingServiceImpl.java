@@ -5,6 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,6 +106,12 @@ public class RatingServiceImpl implements RatingService {
 	public boolean hasCustomerRatedProduct(Product product, User user) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public Page<Rating> getProductsWithPaginationAndSorting(int page, int size, String sortBy) {
+		Pageable pageable = PageRequest.of(page, size);
+		return ratingRepository.findAll(pageable);
 	}
 
 

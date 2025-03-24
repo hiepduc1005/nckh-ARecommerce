@@ -3,6 +3,8 @@ package com.ecommerce.vn.service.rating;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.rating.Rating;
 import com.ecommerce.vn.entity.user.User;
@@ -28,5 +30,7 @@ public interface RatingService {
     Long getTotalRatingsByProduct(UUID productId);
 
     // Kiểm tra xem khách hàng đã xếp hạng sản phẩm chưa
-    boolean hasCustomerRatedProduct(Product product, User user);  
+    boolean hasCustomerRatedProduct(Product product, User user);
+
+	Page<Rating> getProductsWithPaginationAndSorting(int page, int size, String sortBy);  
 }

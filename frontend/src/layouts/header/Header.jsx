@@ -88,13 +88,13 @@ const Header = () => {
 
               <Link 
                 className="cart-icon" 
-                to="/"
+                to="/cart"
                 onMouseEnter={() => setIsCartOpen(true)}
                 onMouseLeave={() => setIsCartOpen(false)}
               >
                 <FontAwesomeIcon style={{color: "white"}} icon={faCartShopping} size="lg" color="#207355" />
                 {cart?.cartItemResponses.length > 0 && (
-                    <span className="cart-badge">{cart?.cartItemResponses}</span>
+                    <span className="cart-badge">{cart?.cartItemResponses.length}</span>
                 )}
                 <CartPopper isCartOpen={isCartOpen} cart = {cart}/>
               </Link>

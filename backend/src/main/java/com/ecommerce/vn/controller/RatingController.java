@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.vn.dto.ratting.RatingCreateRequest;
@@ -61,6 +64,18 @@ public class RatingController {
 		return ResponseEntity.ok(ratingResponses);
 	
 	}
+	
+	 @GetMapping("/product/{productId}/pagination")
+	    public ResponseEntity<Page<RatingResponse>> getProductRatingsWithPaginationAndSorting(
+	            @RequestParam("page") int page,
+	            @RequestParam("size") int size,
+	            @RequestParam(value ="sortBy" , required = false) String sortBy) {
+	    	
+	    	Page<Rating> ratings = ratingService.getProductsWithPaginationAndSorting(page, size, sortBy);
+	        
+	    	Page<RatingResponse> ratingsResponse = ratings.map(rating -> ratingConvert.ratingConvertToRatingResponse(rating));
+	    	return new ResponseEntity<>(ratingsResponse, HttpStatus.OK);
+	    }
 	
 	@GetMapping("/users/{userId}")
 	public ResponseEntity<List<RatingResponse>> getRatingByUser(@PathVariable("userId") UUID userId){
