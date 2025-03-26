@@ -17,6 +17,7 @@ public class OrderResponse {
 	private CouponResponse couponResponse;
 	private OrderStatus orderStatus;
 	private PaymentMethod paymentMethod;
+	private String code;
 	private LocalDateTime createdAt;
 	private LocalDateTime orderApprovedAt;
     private String notes;
@@ -96,6 +97,12 @@ public class OrderResponse {
 	}
 	public void setShippingFee(BigDecimal shippingFee) {
 		this.shippingFee = shippingFee;
+	}
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
 	}
     
     

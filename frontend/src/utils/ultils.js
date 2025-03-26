@@ -1,5 +1,7 @@
 import { format } from "date-fns";
+import CryptoJS from "crypto-js";
 
+const SECRET_KEY = "1005";
 const isLeapYear = (year) => {
     if(+year % 400 === 0 || (+year % 4 === 0 && +year % 100 !== 0)){
         return true;
@@ -43,3 +45,18 @@ export const formatToVNDate = (date) => {
         return format(new Date(date), "dd/MM/yyyy, HH:mm:ss")
     }
 }
+
+export const encryptData = (data) => {
+    if (data) {
+        return CryptoJS.Rabbit.encrypt(JSON.stringify(data), SECRET_KEY).toString();
+    }
+    return null;
+};
+
+export const decryptData = (data) => {
+    if (data) {
+        const bytes = CryptoJS.Rabbit.decrypt(data, SECRET_KEY);
+        return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    }
+    return null;
+};

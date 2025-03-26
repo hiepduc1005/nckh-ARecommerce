@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ecommerce.vn.config.Utils;
 import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
@@ -38,6 +39,15 @@ public class OrderServiceImpl implements OrderService {
 		if(isOrderEmpty(order)) {
 			throw new RuntimeException("Order is empty!");
 		}
+		
+		String code = "";
+		do {
+		    code = Utils.generateSecureRandomString();
+		} while (orderRepository.isCodeExists(code)); 
+		
+		order.setCode(code);
+		order.setOrderStatus(OrderStatus.PENDING);
+		
 		Coupon coupon = order.getCoupon();
 		if(coupon != null) {
 			BigDecimal discountPrice = calculateTotalPriceWithCoupon(order,coupon);
@@ -183,7 +193,7 @@ public class OrderServiceImpl implements OrderService {
 	public Order cancelOrder(UUID orderId) {
 		Order order = getOrderById(orderId);
 		
-		order.setOrderStatus(OrderStatus.CANCELED);
+		order.setOrderStatus(OrderStatus.CANCELLED);
 		
 		return updateOrder(order);
 	}

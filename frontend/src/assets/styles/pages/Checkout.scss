@@ -1,0 +1,231 @@
+// Colors
+$primary-color: #207355;
+$secondary-color: #3498db;
+$background-color: #f4f6f7;
+$text-color: #333;
+$border-color: #e0e0e0;
+$success-color: #27ae60;
+$error-color: #e74c3c;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin box-shadow {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// Global Styles
+.checkout-container {
+  background-color: $background-color;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.checkout-content {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  @include box-shadow;
+}
+
+.checkout-left, .checkout-right {
+  padding: 2rem;
+}
+
+.checkout-left {
+  flex: 2;
+  background-color: white;
+}
+
+.checkout-right {
+  flex: 1;
+  background-color: #f9f9f9;
+  border-left: 1px solid $border-color;
+
+  .payment-options{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.checkout-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    color: $primary-color;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .checkout-steps {
+    @include flex-center;
+    gap: 0.5rem;
+    color: #666;
+
+    span {
+      &.active {
+        color: $primary-color;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Sections
+.contact-section, 
+.shipping-section {
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+  h2 {
+    font-size: 1.2rem;
+    color: $primary-color;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid $primary-color;
+    padding-bottom: 0.5rem;
+  }
+}
+
+// Inputs
+input, select {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+}
+
+.name-inputs, .location-inputs {
+  display: flex;
+  gap: 1rem;
+
+  input, select {
+    flex: 1;
+  }
+}
+
+// Buttons
+.continue-button, 
+.apply-code, 
+.payment-method {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  @include flex-center;
+  gap: 0.5rem;
+}
+
+.continue-button {
+  background-color: $primary-color;
+  color: white;
+  margin-top: 1rem;
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}
+
+.payment-method {
+  background-color: white;
+  border: 1px solid $border-color;
+  color: $text-color;
+  margin-bottom: 0.5rem;
+
+  &.active, &:hover {
+    background-color: $primary-color;
+    color: white;
+  }
+}
+
+.apply-code {
+  background-color: $primary-color;
+  color: white;
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}
+
+// Cart Summary
+.cart-summary {
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  .cart-item, 
+  .cart-totals > div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  .total {
+    font-weight: 600;
+    border-top: 1px solid $border-color;
+    padding-top: 0.5rem;
+  }
+}
+
+// Payment Options
+.payment-options {
+  .payment-method-details {
+    background-color: white;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 1rem;
+
+    .stripe-details{
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        .card-details {
+          display: flex;
+          gap: 1rem;
+    
+          input {
+            flex: 1;
+          }
+        }
+    }
+
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .checkout-content {
+    flex-direction: column;
+  }
+
+  .checkout-right {
+    border-left: none;
+    border-top: 1px solid $border-color;
+  }
+}

@@ -1,5 +1,5 @@
 package com.ecommerce.vn.entity.order;
 
 public enum PaymentMethod {
-	ONLINE,OFLINE
+	COD,VNPAY,MOMO,ZALOPAY,CREDIT_CARD,PAYPAL,STRIPE
 }

@@ -10,13 +10,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faShareAlt, faMinus, faPlus, faCartPlus } from '@fortawesome/free-solid-svg-icons';
 
 import ProductRecommend from '../components/ProductRecommend';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import ProductDetailsTapList from '../components/ProductDetailsTapList';
 import { getProductById, getProductBySlug } from '../api/productApi';
 import { toast } from 'react-toastify';
 import useLoading from '../hooks/UseLoading';
 import { getVariantsByProductSlug } from '../api/variantApi';
 import useCart from '../hooks/UseCart';
+import { encryptData } from '../utils/ultils';
 
 const products = [
   { id: 1, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 4.5, reviews: 120, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
@@ -25,9 +26,6 @@ const products = [
   { id: 4, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 5, reviews: 3, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
   { id: 5, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 5, reviews: 3, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
 ];
-
-// Sample colors for development
-const colors = ["red", "blue", "black", "green", "yellow"];
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
@@ -41,41 +39,9 @@ const ProductDetails = () => {
   const { slug } = useParams();
   const { setLoading } = useLoading();
   const {addItem} = useCart()
+  const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const fetchProductById = async () => {
-  //     try {
-  //       const data = await getProductBySlug(slug);
-  //       if (data) {
-  //         setProduct(data);
-  //       } else {
-  //         toast.error("Có lỗi xảy ra khi tải dữ liệu sản phẩm!");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching product:", error);
-  //       toast.error("Có lỗi xảy ra!");
-  //     } 
-  //   };
-
-  //   const fetchVariantsByProductSlug = async () => {
-  //     const data = await getVariantsByProductSlug(slug,"",1,10);
-  //     if(data){
-  //       setVariants(data.content);   
-  //       console.log(data)
-  //     }
-  //   }
-  //   setLoading(true);
-  //   fetchVariantsByProductSlug()
-  //   fetchProductById();
-
-  //   if(product && variants){
-  //     const listImage = [product.imagePath,...variants.map(variant => variant.imagePath)]
-  //     setImages(listImage)
-  //   }
-  //   setLoading(false);
-
-  // }, [slug, setLoading]);
-
+  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -139,6 +105,18 @@ const ProductDetails = () => {
       toast.warning("Bạn chưa chọn biến thể!");
       return;
     }
+
+    const data = [
+      {
+        quantity,
+        variant: selectedVariants 
+      }
+    ]
+
+    const encryptedData = encryptData(data);
+    const encodedData = encodeURIComponent(encryptedData);
+
+    navigate(`/checkout?encrd=${encodedData}`)
   }
 
   const settings = {

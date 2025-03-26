@@ -69,6 +69,7 @@ public class OrderConvert {
 			orderResponse.setCouponResponse(couponConvert.couponConvertToCouponResponse(coupon));
 		}
 		
+		orderResponse.setCode(order.getCode());
 		orderResponse.setId(order.getId());
 		orderResponse.setCreatedAt(order.getCreatedAt());
 		orderResponse.setOrderApprovedAt(order.getOrderApprovedAt());

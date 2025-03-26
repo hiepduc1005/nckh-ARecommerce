@@ -1,6 +1,8 @@
 package com.ecommerce.vn.controller;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -77,6 +79,15 @@ public class VariantController {
 		
 		return ResponseEntity.ok(variantResponse);
 
+	}
+	
+	@GetMapping("/ids")
+	public ResponseEntity<List<VariantResponse>> getVariants(@RequestParam List<UUID> ids) {
+	    List<VariantResponse> variantResponses = ids.stream()
+	        .map(id -> variantConvert.variantConvertToVariantResponse(variantService.getVariantById(id)))
+	        .collect(Collectors.toList());
+
+	    return ResponseEntity.ok(variantResponses);
 	}
 	
 	@GetMapping("/products/{productId}")

@@ -21,6 +21,7 @@
     "@types/three": "^0.173.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
+    "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "gsap": "^3.12.7",
     "lucide-react": "^0.482.0",

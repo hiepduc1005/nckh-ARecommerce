@@ -25,12 +25,15 @@ import AdminCategory from '../pages/AdminCategory'
 import AdminBrand from '../pages/AdminBrand'
 import AdminTag from '../pages/AdminTag'
 import AdminAttribute from '../pages/AdminAttribute'
+import Checkout from '../pages/Checkout'
 
 const AppRoutes = () => {
   return (
     <Routes>
         <Route path='/' element={<DefaultLayout/>} >
             <Route index element={<Home/>}/>
+            <Route path='checkout' element={<Checkout/>}/>
+
         </Route>
 
         <Route path='/cart' element={<CartLayout />}></Route>

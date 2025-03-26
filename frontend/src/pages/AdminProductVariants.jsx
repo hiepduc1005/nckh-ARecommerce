@@ -22,7 +22,7 @@ const AdminProductVariants = () => {
 
       const fetchVariantsByProductId = async () => {
           try {
-              const data = await getVariantsByProductId(productId , token,currentPage);
+              const data = await getVariantsByProductId(productId ,currentPage);
 
               if(data){
                   setVariants(data.content)

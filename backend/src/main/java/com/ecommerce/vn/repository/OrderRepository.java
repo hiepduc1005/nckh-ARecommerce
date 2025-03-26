@@ -29,4 +29,8 @@ public interface OrderRepository extends JpaRepository<Order,UUID>{
 			@Param("startDate") LocalDateTime startDate,
 			@Param("endDate") LocalDateTime endDate);
 
+	@Query(value =  "SELECT EXISTS ( "
+			+ "SELECT 1 FROM orders WHERE code = :code "
+			+ ")", nativeQuery = true)
+	Boolean isCodeExists(@Param("code") String code);
 }

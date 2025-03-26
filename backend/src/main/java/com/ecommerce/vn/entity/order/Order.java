@@ -47,6 +47,8 @@ public class Order {
 	@Column(name = "order_status",nullable = false)
 	private OrderStatus orderStatus;
 	
+	private String code;
+	
 	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY)
 	private List<OrderItem> orderItems = new ArrayList<OrderItem>();
 	
@@ -76,6 +78,16 @@ public class Order {
 	
 	@Column(name = "dícount_price")
     private BigDecimal discountPrice;
+	
+	
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 
 	public User getUser() {
 		return user;
