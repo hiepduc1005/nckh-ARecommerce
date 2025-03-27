@@ -1,34 +1,29 @@
 # Compiled class file
 *.class
-
-backend/.metadata/
-
-backend/.mvn/
-
+# Ignore specific directories
 backend/bin/
-
-
-backend/.settings/
 backend/target/
-/backend/src/main/resources
-.metadata
+backend/src/main/resources/
+backend/.settings/
+backend/.mvn/
+backend/.metadata/
+backend/.idea/
 
-/backend/.settings/**
-backend/mvnw/
-backend/mvnw.cmd
-/backend/target/**
+# Ignore files in root directory
 .metadata/
-**/resources/
+.settings/
+target/
+bin/
+
+# Wildcard pattern matching
+**/.settings/
 **/target/
-/backend/.idea/**
-/backend/bin/**
+**/bin/
+**/resources/
 
-/backend/src/main/resources/**
-
-
-/backend/.claspath
-
-/backend/.project
+# Specific file types or paths (if needed)
+backend/mvnw
+backend/mvnw.cmd
 
 # Log file
 *.log
