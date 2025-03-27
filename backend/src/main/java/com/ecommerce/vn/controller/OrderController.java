@@ -58,6 +58,14 @@ public class OrderController {
 		return ResponseEntity.ok(orderResponse);
 	}
 	
+	@GetMapping("/code/{orderCode}")
+	public ResponseEntity<OrderResponse> getOrderByCode(@PathVariable(name = "orderCode") String orderCode){
+		Order order = orderService.getOrderByCode(orderCode).orElseThrow(() -> new RuntimeException("Cant not found order with code : " + orderCode));
+		OrderResponse orderResponse = orderConvert.orderConvertToOrderResponse(order);
+	
+		return ResponseEntity.ok(orderResponse);
+	}
+	
 	@GetMapping
 	public ResponseEntity<List<OrderResponse>> getAllOrders(){
 		List<Order> orders = orderService.getAllOrders();

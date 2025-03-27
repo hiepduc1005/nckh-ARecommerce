@@ -26,6 +26,7 @@ import AdminBrand from '../pages/AdminBrand'
 import AdminTag from '../pages/AdminTag'
 import AdminAttribute from '../pages/AdminAttribute'
 import Checkout from '../pages/Checkout'
+import OrderConfirmation from '../pages/OrderConfirmation'
 
 const AppRoutes = () => {
   return (
@@ -33,6 +34,7 @@ const AppRoutes = () => {
         <Route path='/' element={<DefaultLayout/>} >
             <Route index element={<Home/>}/>
             <Route path='checkout' element={<Checkout/>}/>
+            <Route path='payment-check' element={<OrderConfirmation/>}/>
 
         </Route>
 

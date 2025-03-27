@@ -10,14 +10,16 @@ backend/bin/
 
 backend/.settings/
 backend/target/
-
+backend/src/main/resources
 .metadata
 
 backend/.settings/
 backend/mvnw/
 backend/mvnw.cmd
-backend/target/
+/backend/target/
 .metadata/
+**/resources/
+**/target/
 
 
 
