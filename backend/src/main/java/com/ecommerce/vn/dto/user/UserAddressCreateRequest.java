@@ -13,7 +13,7 @@ public class UserAddressCreateRequest {
 	
 	private String address;
 	
-	private String district;
+	private String specificAddress;
 	
 	@JsonProperty("isDefault")
 	private Boolean isDefault;
@@ -23,7 +23,7 @@ public class UserAddressCreateRequest {
 	@Override
 	public String toString() {
 		return "UserAddressCreateRequest [userId=" + userId + ", name=" + name + ", phone=" + phone + ", address="
-				+ address + ", district=" + district + ", isDefault=" + isDefault + "]";
+				+ address + ", district=" + specificAddress + ", isDefault=" + isDefault + "]";
 	}
 
 	public UUID getUserId() {
@@ -58,12 +58,22 @@ public class UserAddressCreateRequest {
 		this.address = address;
 	}
 
-	public String getDistrict() {
-		return district;
+	
+
+	public String getSpecificAddress() {
+		return specificAddress;
 	}
 
-	public void setDistrict(String district) {
-		this.district = district;
+	public void setSpecificAddress(String specificAddress) {
+		this.specificAddress = specificAddress;
+	}
+
+	public Boolean getIsDefault() {
+		return isDefault;
+	}
+
+	public void setIsDefault(Boolean isDefault) {
+		this.isDefault = isDefault;
 	}
 
 	public Boolean isDefault() {

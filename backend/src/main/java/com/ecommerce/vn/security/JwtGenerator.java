@@ -1,6 +1,8 @@
 package com.ecommerce.vn.security;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,8 @@ public class JwtGenerator {
 	
 	@Value("${jwt.auth.expiration}")
 	private Long exprirationTime;
+	
+    private final Set<String> blackList = new HashSet<>();
 	
 	public String gennerateToken(String email) {
 		Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -45,6 +49,10 @@ public class JwtGenerator {
 		
 		try {
 		    DecodedJWT decodedJWT = verifier.verify(token);
+		    
+		    if (blackList.contains(decodedJWT.getId())) {
+                throw new RuntimeException("Token has been revoked");
+            }
 		    return decodedJWT;
 		} catch (Exception e) {
 			throw new RuntimeException("Invalid token", e);
@@ -55,5 +63,20 @@ public class JwtGenerator {
 		DecodedJWT decodedJWT = verifyToken(token);
 	    String email = decodedJWT.getSubject();
 	    return email;
+	}
+	
+	public void revokeToken(String token) {
+		Algorithm algorithm = Algorithm.HMAC256(secret);
+		
+		JWTVerifier verifier = JWT
+				.require(algorithm)
+				.withIssuer(APP_NAME)
+				.build();
+		try {
+		    DecodedJWT decodedJWT = verifier.verify(token);
+		    blackList.add(decodedJWT.getId());
+		} catch (Exception e) {
+			throw new RuntimeException("Invalid token", e);
+		}
 	}
 }

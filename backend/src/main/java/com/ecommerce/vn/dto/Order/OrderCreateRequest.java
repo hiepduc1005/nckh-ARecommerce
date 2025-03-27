@@ -1,21 +1,44 @@
 package com.ecommerce.vn.dto.order;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.ecommerce.vn.entity.order.PaymentMethod;
 
 public class OrderCreateRequest {
-	private UUID userId;
+	private String email;
 	private String couponCode;
+	private String address;
+	private String phone;
+	private String specificAddress;
     private List<OrderItemCreateRequest> orderItemCreateRequests;
 	private PaymentMethod paymentMethod;
     private String notes;
-	public UUID getUserId() {
-		return userId;
+
+    
+    
+	public String getPhone() {
+		return phone;
 	}
-	public void setUserId(UUID userId) {
-		this.userId = userId;
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getSpecificAddress() {
+		return specificAddress;
+	}
+	public void setSpecificAddress(String specificAddress) {
+		this.specificAddress = specificAddress;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	public String getCouponCode() {
 		return couponCode;

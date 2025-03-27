@@ -11,7 +11,7 @@ public class UserAddressUpdateRequest {
 	
 	private String address;
 	
-	private String district;
+	private String specificAddress;
 	
 	private boolean isDefault;
 
@@ -49,12 +49,13 @@ public class UserAddressUpdateRequest {
 		this.address = address;
 	}
 
-	public String getDistrict() {
-		return district;
+	
+	public String getSpecificAddress() {
+		return specificAddress;
 	}
 
-	public void setDistrict(String district) {
-		this.district = district;
+	public void setSpecificAddress(String specificAddress) {
+		this.specificAddress = specificAddress;
 	}
 
 	public boolean isDefault() {

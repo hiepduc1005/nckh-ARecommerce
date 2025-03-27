@@ -18,11 +18,10 @@ public class UserAdressConvert {
     
     public UserAddress userAddressCreateRequestConvert(UserAddressCreateRequest userAddressCreateRequest){
 
-    	System.out.println(userAddressCreateRequest);
         UserAddress userAdress = new UserAddress();
         userAdress.setAddress(userAddressCreateRequest.getAddress());
         userAdress.setDefault(userAddressCreateRequest.isDefault());
-        userAdress.setDistrict(userAddressCreateRequest.getDistrict());
+        userAdress.setSpecificAddress(userAddressCreateRequest.getSpecificAddress());
         userAdress.setName(userAddressCreateRequest.getName());
         userAdress.setPhone(userAddressCreateRequest.getPhone());
         
@@ -36,7 +35,7 @@ public class UserAdressConvert {
         UserAddress userAdress = userAddressService.getUserAddressById(addressUpdateRequest.getId());
         userAdress.setAddress(addressUpdateRequest.getAddress());
         userAdress.setDefault(addressUpdateRequest.isDefault());
-        userAdress.setDistrict(addressUpdateRequest.getDistrict());
+        userAdress.setSpecificAddress(addressUpdateRequest.getSpecificAddress());
         userAdress.setName(addressUpdateRequest.getName());
         userAdress.setPhone(addressUpdateRequest.getPhone());
         userAdress.setId(addressUpdateRequest.getId());
@@ -52,7 +51,7 @@ public class UserAdressConvert {
         UserAddressResponse userAddressResponse = new UserAddressResponse();
         userAddressResponse.setAddress(userAddress.getAddress());
         userAddressResponse.setDefault(userAddress.isDefault());
-        userAddressResponse.setDistrict(userAddress.getDistrict());
+        userAddressResponse.setSpecificAddress(userAddress.getSpecificAddress());
         userAddressResponse.setName(userAddress.getName());
         userAddressResponse.setPhone(userAddress.getPhone());
         userAddressResponse.setId(userAddress.getId());

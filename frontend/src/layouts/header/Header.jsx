@@ -59,9 +59,9 @@ const Header = () => {
       />
       <header className='header-container'>
           <div className="header-left">
-            <div className='webicon-container'>
+            <Link to={"/"} className='webicon-container'>
               <img src={webicon}></img>
-            </div>
+            </Link>
             <Link className='navbar-link'>Kính Mắt</Link>
             <Link className='navbar-link'>Giày</Link>
             <Link className='navbar-link'>Thương Hiệu</Link>

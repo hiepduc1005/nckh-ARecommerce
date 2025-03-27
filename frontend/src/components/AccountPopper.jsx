@@ -11,7 +11,7 @@ const AccountPopper = ({isOpen , logout}) => {
         <li onClick={(e) => e.stopPropagation() }>
           <Link to="/orders">Đơn mua</Link>
         </li>
-        <li  className="logout" onClick={(e) => {e.stopPropagation; logout()}}>
+        <li  className="logout" onClick={(e) => {e.stopPropagation(); logout()}}>
           Đăng xuất
         </li>
       </ul>

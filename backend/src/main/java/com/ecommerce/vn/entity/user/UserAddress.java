@@ -31,8 +31,8 @@ public class UserAddress {
     @Column(name = "address", nullable = false)
     private String address;
     
-    @Column(name = "district", nullable = false)
-    private String district;
+    @Column(name = "specific_address", nullable = false)
+    private String specificAddress;
     
     @Column(name = "is_default")
     private Boolean isDefault;
@@ -43,13 +43,13 @@ public class UserAddress {
     
     // Constructor đầy đủ
     public UserAddress(UUID id, User user, String name, String phone, String address, 
-                      String district, Boolean isDefault) {
+                      String specificAddress, Boolean isDefault) {
         this.id = id;
         this.user = user;
         this.name = name;
         this.phone = phone;
         this.address = address;
-        this.district = district;
+        this.specificAddress = specificAddress;
         this.isDefault = isDefault;
     }
     
@@ -94,15 +94,16 @@ public class UserAddress {
         this.address = address;
     }
     
-    public String getDistrict() {
-        return district;
-    }
-    
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-    
-    public Boolean isDefault() {
+   
+    public String getSpecificAddress() {
+		return specificAddress;
+	}
+
+	public void setSpecificAddress(String specificAddress) {
+		this.specificAddress = specificAddress;
+	}
+
+	public Boolean isDefault() {
         return isDefault;
     }
     

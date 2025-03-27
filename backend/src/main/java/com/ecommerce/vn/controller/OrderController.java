@@ -1,9 +1,11 @@
 package com.ecommerce.vn.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +33,16 @@ public class OrderController {
 	private OrderConvert orderConvert;
 	
 	@PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderCreateRequest orderCreateRequest) {
+    public ResponseEntity<?> createOrder(@RequestBody OrderCreateRequest orderCreateRequest) {
+		 Optional<Order> existingOrder = orderService.findPendingOrderByUser(orderCreateRequest.getEmail());
+
+	    if (existingOrder.isPresent()) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("Bạn đã có đơn hàng đang chờ thanh toán!");
+	    }
+		
 		Order order = orderConvert.orderCreateConvertToOrder(orderCreateRequest);
+		
 		order = orderService.createOrder(order);
 		
 		OrderResponse orderResponse = orderConvert.orderConvertToOrderResponse(order);

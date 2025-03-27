@@ -37,6 +37,22 @@ export const loginUser = async (email,password) => {
     }
 }
 
+export const logoutUser = async (token) => {
+    try {
+        const res = await axiosInstance.post("api/v1/auth/logout",null,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        )
+        
+    } catch (error) {
+        console.error(error)
+        throw error;
+    }
+}
+
 export const registerUser = async (email, firstname, lastname, password) => {
     try {
         const res = await axiosInstance.post("api/v1/auth/register", {

@@ -18,6 +18,8 @@ import com.ecommerce.vn.dto.user.UserLoginRequest;
 import com.ecommerce.vn.security.JwtGenerator;
 import com.ecommerce.vn.service.user.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("api/v1/auth")
 public class AuthController {
@@ -64,6 +66,25 @@ public class AuthController {
 			ex.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi! Không thể đăng ký");
 	    }
+	}
+	
+	@PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String token = getTokenByRequest(request);
+        if (token == null) {
+            return ResponseEntity.badRequest().body("Token is missing");
+        }
+        jwtGenerator.revokeToken(token);
+        return ResponseEntity.ok("Logged out successfully");
+    }
+	 
+	private String getTokenByRequest(HttpServletRequest request) {
+		String authHeader = request.getHeader("Authorization");
+		if(authHeader != null && !authHeader.trim().isEmpty()) {
+			return authHeader.substring(7);
+		}
+		
+		return null;
 	}
 	
 	

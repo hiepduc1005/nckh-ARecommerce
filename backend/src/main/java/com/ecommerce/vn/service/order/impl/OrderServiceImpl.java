@@ -3,6 +3,7 @@ package com.ecommerce.vn.service.order.impl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import com.ecommerce.vn.config.Utils;
 import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
+import com.ecommerce.vn.entity.order.PaymentMethod;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.repository.OrderRepository;
 import com.ecommerce.vn.service.coupon.CouponService;
@@ -40,14 +42,26 @@ public class OrderServiceImpl implements OrderService {
 			throw new RuntimeException("Order is empty!");
 		}
 		
-		String code = "";
-		do {
-		    code = Utils.generateSecureRandomString();
-		} while (orderRepository.isCodeExists(code)); 
+		String code;
+	    int attempts = 0;
+	    do {
+	        code = Utils.generateSecureRandomString();
+	        attempts++;
+	        if (attempts > 10) { // Tránh vòng lặp vô tận
+	            throw new RuntimeException("Failed to generate a unique order code after multiple attempts.");
+	        }
+	    } while (orderRepository.existsByCode(code));
+	
+		if(order.getPaymentMethod().equals(PaymentMethod.COD)) {
+			order.setOrderStatus(OrderStatus.PROCESSING);
+		}else {
+			order.setOrderStatus(OrderStatus.PENDING);
+		}
 		
-		order.setCode(code);
-		order.setOrderStatus(OrderStatus.PENDING);
-		
+		order.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+		order.setCode(code);	
+		order.setShippingFee(BigDecimal.ONE);
+		order.setShippingMethod("");
 		Coupon coupon = order.getCoupon();
 		if(coupon != null) {
 			BigDecimal discountPrice = calculateTotalPriceWithCoupon(order,coupon);
@@ -229,6 +243,18 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Boolean isOrderEmpty(Order order) {
 		return order.getOrderItems().isEmpty();
+	}
+
+	@Override
+	public Optional<Order> findPendingOrderByUser(String email) {
+		
+		return orderRepository.findPendingOrderByUser(email);
+	}
+
+	@Override
+	public Optional<Order> getOrderByCode(String code) {
+		// TODO Auto-generated method stub
+		return orderRepository.findByCode(code);
 	}
 
 

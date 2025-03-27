@@ -3,6 +3,7 @@ package com.ecommerce.vn.service.order;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.ecommerce.vn.entity.coupon.Coupon;
@@ -49,5 +50,9 @@ public interface OrderService {
     Boolean isOrderEmpty(Order order);
     
     Order applyCouponToOrder(String couponCode,Order order);
+
+	Optional<Order> findPendingOrderByUser(String email);
+	
+	Optional<Order> getOrderByCode(String code);
 
 }

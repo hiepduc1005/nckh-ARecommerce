@@ -3,6 +3,7 @@ import "../assets/styles/pages/UserAddress.scss";
 import useAuth from '../hooks/UseAuth';
 import { createUserAddress, deleteUserAddress, getUserAddressByUserId } from '../api/userAddressApi';
 import useLoading from '../hooks/UseLoading';
+import SelectPlace from '../components/SelectPlace';
 
 const UserAddress = () => {
   const [addresses, setAddresses] = useState([]);
@@ -12,7 +13,7 @@ const UserAddress = () => {
     name: "",
     phone: "",
     address: "",
-    district: "",
+    specificAddress: "",
     isDefault: false
   });
   const {user,token} = useAuth();
@@ -55,6 +56,15 @@ const UserAddress = () => {
     });
   };
 
+  const handleAddressChange = (address) => {
+    console.log(address)
+    setNewAddress({
+      ...newAddress,
+      specificAddress: address,
+      address: address,
+    });
+  }
+
   const handleCheckboxChange = (e) => {
     setNewAddress({
       ...newAddress,
@@ -69,7 +79,7 @@ const UserAddress = () => {
       userId: user.id,
       phone: newAddress.phone,
       address: newAddress.address,
-      district: newAddress.district,
+      specificAddress: newAddress.specificAddress,
       isDefault: newAddress.isDefault,
       name: newAddress.name,
     }
@@ -84,7 +94,7 @@ const UserAddress = () => {
       name: "",
       phone: "",
       address: "",
-      district: "",
+      specificAddress: "",
       isDefault: false
     });
     
@@ -136,27 +146,7 @@ const UserAddress = () => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="address">Địa chỉ</label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                value={newAddress.address}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="district">Quận/Huyện, Tỉnh/Thành phố</label>
-              <input
-                type="text"
-                id="district"
-                name="district"
-                value={newAddress.district}
-                onChange={handleInputChange}
-                required
-              />
+             <SelectPlace onChange={handleAddressChange}/> 
             </div>
             
             <div className="form-group checkbox">
@@ -195,8 +185,7 @@ const UserAddress = () => {
                 <span className="phone">{address.phone}</span>
               </div>
               <div className="address-details">
-                <p>{address.address}</p>
-                <p>{address.district}</p>
+                <p>{address.specificAddress}</p>
               </div>
               {address.isDefault && (
                 <div className="default-tag">

@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import CryptoJS from "crypto-js";
 
 const SECRET_KEY = "1005";
+export const LOCATIONIQ = "pk.faf3d66fd55714f726b3656386e724e2" 
 const isLeapYear = (year) => {
     if(+year % 400 === 0 || (+year % 4 === 0 && +year % 100 !== 0)){
         return true;
@@ -38,6 +39,11 @@ export const isValidDate = (day , month, year) => {
 export const isValidPhoneNum = (phone) => {
     const regexPhoneNumber = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g;
     return phone.match(regexPhoneNumber) ? true : false;
+}
+
+export const  isValidEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
 }
 
 export const formatToVNDate = (date) => {

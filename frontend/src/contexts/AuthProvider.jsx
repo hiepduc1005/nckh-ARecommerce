@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { getAuthUser, loginUser, registerUser } from "../api/userApi";
+import { getAuthUser, loginUser, logoutUser, registerUser } from "../api/userApi";
 import {toast, ToastContainer} from "react-toastify"
 import { useLocation, useNavigate } from "react-router-dom";
 import useLoading from "../hooks/UseLoading";
@@ -66,9 +66,10 @@ export const AuthProvider = ({children}) => {
         }
     }
 
-    const logout = () => {
+    const logout = async () => {
         setLoading(true);
 
+        await logoutUser(token)
         localStorage.removeItem("token");
         setToken(null); 
         setIsAuthenticated(false);

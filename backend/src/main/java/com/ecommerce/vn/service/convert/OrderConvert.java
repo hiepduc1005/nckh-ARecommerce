@@ -1,6 +1,8 @@
 package com.ecommerce.vn.service.convert;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,16 +44,18 @@ public class OrderConvert {
 			order.setCoupon(coupon);
 		}
 		
-		User user = userService.findUserByUuId(orderCreateRequest.getUserId());
+		User user = userService.findUserByEmail(orderCreateRequest.getEmail());
 		order.setUser(user);
-		
+		order.setAddress(orderCreateRequest.getAddress());
+		order.setSpecificAddress(orderCreateRequest.getSpecificAddress());
 		order.setNotes(orderCreateRequest.getNotes());
 		order.setPaymentMethod(orderCreateRequest.getPaymentMethod());
+		order.setPhone(orderCreateRequest.getPhone());
 		
 		List<OrderItem> orderItems = orderCreateRequest.getOrderItemCreateRequests()
-				.stream()
-				.map((orderItem) -> orderItemConvert.orderItemCreateConvertToOrderItem(orderItem))
-				.toList();
+		        .stream()
+		        .map(orderItem -> orderItemConvert.orderItemCreateConvertToOrderItem(orderItem))
+		        .collect(Collectors.toCollection(ArrayList::new));
 		
 		order.setOrderItems(orderItems);
 		
@@ -78,7 +82,10 @@ public class OrderConvert {
 		orderResponse.setNotes(order.getNotes());
 		orderResponse.setPaymentMethod(order.getPaymentMethod());
 		orderResponse.setShippingFee(order.getShippingFee());
-		orderResponse.setUserId(order.getUser().getId());
+		orderResponse.setEmail(order.getEmail());
+		orderResponse.setAddress(order.getAddress());
+		orderResponse.setSpecificAddress(order.getSpecificAddress());
+		orderResponse.setPhone(order.getPhone());
 		
 		List<OrderItemResponse> orderItemResponses = order.getOrderItems()
 				.stream()
@@ -87,6 +94,7 @@ public class OrderConvert {
 		
 		orderResponse.setOrderItems(orderItemResponses);
 		orderResponse.setOrderStatus(order.getOrderStatus());
+		orderResponse.setOrderExpireAt(order.getExpiresAt());
 		
 		return orderResponse;
 	}

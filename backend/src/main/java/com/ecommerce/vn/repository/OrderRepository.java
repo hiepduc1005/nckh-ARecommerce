@@ -2,6 +2,7 @@ package com.ecommerce.vn.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,4 +34,16 @@ public interface OrderRepository extends JpaRepository<Order,UUID>{
 			+ "SELECT 1 FROM orders WHERE code = :code "
 			+ ")", nativeQuery = true)
 	Boolean isCodeExists(@Param("code") String code);
+
+	  @Query("SELECT o FROM Order o WHERE o.orderStatus = 'PENDING' AND o.expiresAt <= :now")
+	    List<Order> findExpiredOrders(@Param("now") LocalDateTime now);
+
+	@Query("SELECT o FROM Order o WHERE o.user.email = :email AND o.orderStatus = 'PENDING' ")
+	Optional<Order> findPendingOrderByUser(String email);
+
+	Boolean existsByCode(String code);
+
+	@Query("SELECT o FROM Order o WHERE o.code = :code ")
+	Optional<Order> findByCode(String code);
+
 }

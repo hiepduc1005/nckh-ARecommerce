@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.user.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -38,6 +39,18 @@ public class Order {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
+	
+	private String email;
+	
+	private String address;
+	
+	private String phone;
+	
+	@Column(name = "payment_url", columnDefinition = "TEXT")
+	private String paymentUrl;
+	
+	@Column(name="specific_address")
+	private String specificAddress;
 
 	@ManyToOne
 	@JoinColumn(name = "order_coupon_id")
@@ -49,12 +62,15 @@ public class Order {
 	
 	private String code;
 	
-	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems = new ArrayList<OrderItem>();
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
+	
+	@Column(name = "expires_at", nullable = false)
+	private LocalDateTime expiresAt;
 	
 	@Column(name = "order_approved_at")
 	private LocalDateTime orderApprovedAt;
@@ -76,10 +92,58 @@ public class Order {
 	@Column(name = "total_price")
     private BigDecimal totalPrice;
 	
-	@Column(name = "dícount_price")
+	@Column(name = "discount_price")
     private BigDecimal discountPrice;
 	
 	
+
+	public String getPaymentUrl() {
+		return paymentUrl;
+	}
+
+	public void setPaymentUrl(String paymentUrl) {
+		this.paymentUrl = paymentUrl;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getSpecificAddress() {
+		return specificAddress;
+	}
+
+	public void setSpecificAddress(String specificAddress) {
+		this.specificAddress = specificAddress;
+	}
+
+	public LocalDateTime getExpiresAt() {
+		return expiresAt;
+	}
+
+	public void setExpiresAt(LocalDateTime expiresAt) {
+		this.expiresAt = expiresAt;
+	}
 
 	public String getCode() {
 		return code;
