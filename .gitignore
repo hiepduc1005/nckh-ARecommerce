@@ -1,22 +1,23 @@
 # Compiled class file
 *.class
 # Ignore specific directories
-backend/bin/
-backend/target/
-backend/src/main/resources/
-backend/.settings/
-backend/.mvn/
-backend/.metadata/
-backend/.idea/
-
+backend/bin/*
+backend/target/classes*
+backend/src/main/resources/*
+backend/.settings/*
+backend/.mvn/*
+backend/.metadata
+backend/.idea/*
+backend/.classpath
+backend/.project
 # Ignore files in root directory
-.metadata/
-.settings/
-target/
-bin/
+.metadata/*
+.settings/*
+target/*
+bin/*
 
 # Wildcard pattern matching
-**/.settings/
+.settings
 **/target/
 **/bin/
 **/resources/
