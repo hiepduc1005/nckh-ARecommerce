@@ -10,22 +10,25 @@ backend/bin/
 
 backend/.settings/
 backend/target/
-backend/src/main/resources
+/backend/src/main/resources
 .metadata
 
-backend/.settings/
+/backend/.settings/**
 backend/mvnw/
 backend/mvnw.cmd
-/backend/target/
+/backend/target/**
 .metadata/
 **/resources/
 **/target/
+/backend/.idea/**
+/backend/bin/**
+
+/backend/src/main/resources/**
 
 
+/backend/.claspath
 
-backend/.claspath
-
-backend/.project
+/backend/.project
 
 # Log file
 *.log
