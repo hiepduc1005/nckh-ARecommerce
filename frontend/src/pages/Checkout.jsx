@@ -14,6 +14,7 @@ import useAuth from '../hooks/UseAuth';
 import SelectPlace from '../components/SelectPlace';
 import { toast } from 'react-toastify';
 import { createPayment } from '../api/paymentApi';
+import useCart from '../hooks/UseCart';
 
 const Checkout = () => {
     const [email, setEmail] = useState('');
@@ -30,6 +31,7 @@ const Checkout = () => {
     const subtotal = cartItems.reduce((sum, item) => sum + (item.variant.discountPrice * item.quantity), 0);
     const total = subtotal + 4.99; // Adding shipping
     const {user} = useAuth();
+    const {removeItem} = useCart()
     const query = useQuery();
     const encrd = query.get("encrd")
 
@@ -40,9 +42,9 @@ const Checkout = () => {
         const listIds = decryptedData.map(dataItem => (dataItem.variant))
         const data = await getVariantsByIds(listIds);
         if(data){
-          const newCartItems = decryptedData.map(({ quantity, variant }) => {
+          const newCartItems = decryptedData.map(({ quantity, variant,cartItemId }) => {
             const variantResponse = data.find(v => v.id === variant); // Tìm variantResponse theo id
-            return { quantity, variant : variantResponse };
+            return { quantity, variant : variantResponse,cartItemId};
           })
           setCartItems(newCartItems);
         }
@@ -80,6 +82,7 @@ const Checkout = () => {
           variantId: cartItem.variant.id
         }
       ))
+
       const orderData = {
         email,
         couponCode: "",
@@ -96,7 +99,7 @@ const Checkout = () => {
         window.location.href = paymentURL;
       }
 
-      console.log(orderData)
+      // await Promise.all(cartItems.map(cartItem => removeItem(cartItem.cartItemId)));
     }
   
     const paymentMethods = [

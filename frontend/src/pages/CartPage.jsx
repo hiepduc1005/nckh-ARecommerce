@@ -53,6 +53,7 @@ const CartPage = () => {
       {
         quantity: cartItem.quantity,
         variant: cartItem.variantResponse.id,
+        cartItemId: cartItem.id,
       }
     ))
 
