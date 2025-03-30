@@ -35,9 +35,7 @@ public class UserAddressController {
 	public ResponseEntity<UserAddressResponse> createUserAddress(@RequestBody UserAddressCreateRequest userAddressCreateRequest){
 		UserAddress userAddress = userAdressConvert.userAddressCreateRequestConvert(userAddressCreateRequest);
 		
-		System.out.println(userAddress.isDefault());
 		userAddress = userAddressService.createUserAddress(userAddress);
-		System.out.println(userAddress.isDefault());
 
 		UserAddressResponse userAddressResponse = userAdressConvert.userAddressConvertToUsserAddressReponse(userAddress);
 		

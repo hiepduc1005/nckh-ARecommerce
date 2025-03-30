@@ -27,14 +27,17 @@ import AdminTag from '../pages/AdminTag'
 import AdminAttribute from '../pages/AdminAttribute'
 import Checkout from '../pages/Checkout'
 import OrderConfirmation from '../pages/OrderConfirmation'
+import Test from '../pages/Test'
 
 const AppRoutes = () => {
   return (
     <Routes>
         <Route path='/' element={<DefaultLayout/>} >
+
             <Route index element={<Home/>}/>
             <Route path='checkout' element={<Checkout/>}/>
             <Route path='payment-check' element={<OrderConfirmation/>}/>
+            <Route path='test' element={<Test/>}/>
 
         </Route>
 

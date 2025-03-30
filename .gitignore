@@ -16,6 +16,8 @@ backend/.project
 target/*
 bin/*
 
+frontend/package-lock.json
+
 # Wildcard pattern matching
 .settings
 **/target/

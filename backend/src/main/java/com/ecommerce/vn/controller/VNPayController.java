@@ -2,6 +2,7 @@ package com.ecommerce.vn.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ import com.ecommerce.vn.dto.order.OrderCreateRequest;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
 import com.ecommerce.vn.entity.order.PaymentMethod;
+import com.ecommerce.vn.service.EmailService;
 import com.ecommerce.vn.service.VNPayService;
 import com.ecommerce.vn.service.convert.OrderConvert;
 import com.ecommerce.vn.service.order.OrderService;
@@ -38,6 +40,9 @@ public class VNPayController {
 	
 	@Autowired
 	private VNPayService vnPayService;
+	
+	@Autowired
+	private EmailService emailService;
 	
 	private static final String FRONTEND_PAYMENT = "http://localhost:5173/payment-check";
 	
@@ -92,6 +97,13 @@ public class VNPayController {
             order.setOrderApprovedAt(LocalDateTime.now());
             orderService.updateOrder(order);
             redirectUrl = FRONTEND_PAYMENT + "?orderCode=" + orderCode;
+            
+            Map<String, String> data = new HashMap<>();
+            data.put("orderCode", orderCode);
+            data.put("orderDate", LocalDateTime.now().toString());
+            data.put("totalAmount", order.getTotalPrice().toString());
+
+            emailService.sendOrderConfirmationEmail(order.getEmail(), data);
         } else {
             order.setOrderStatus(OrderStatus.CANCELLED);
             orderService.updateOrder(order);

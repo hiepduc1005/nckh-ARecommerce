@@ -51,6 +51,8 @@ public class OrderConvert {
 		order.setNotes(orderCreateRequest.getNotes());
 		order.setPaymentMethod(orderCreateRequest.getPaymentMethod());
 		order.setPhone(orderCreateRequest.getPhone());
+		order.setEmail(orderCreateRequest.getEmail());
+		order.setNotes(orderCreateRequest.getNotes());
 		
 		List<OrderItem> orderItems = orderCreateRequest.getOrderItemCreateRequests()
 		        .stream()

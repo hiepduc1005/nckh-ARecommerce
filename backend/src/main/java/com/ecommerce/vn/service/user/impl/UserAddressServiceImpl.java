@@ -20,7 +20,9 @@ public class UserAddressServiceImpl implements UserAddressService{
 	@Override
 	@Transactional
 	public UserAddress createUserAddress(UserAddress userAddress) {
-		
+		if(userAddress.isDefault()) {
+			userAddressRepository.unsetDefaultAddresses(userAddress.getUser().getId());
+		}
 		return userAddressRepository.save(userAddress);
 	}
 
@@ -29,6 +31,10 @@ public class UserAddressServiceImpl implements UserAddressService{
 	public UserAddress updateUserAddress(UserAddress userAddress) {
 		if(userAddress.getId() == null) {
 			throw new RuntimeException("UserAddress id missing");
+		}
+		
+		if(userAddress.isDefault()) {
+			userAddressRepository.unsetDefaultAddresses(userAddress.getUser().getId());
 		}
 		return userAddressRepository.save(userAddress);
 	}
