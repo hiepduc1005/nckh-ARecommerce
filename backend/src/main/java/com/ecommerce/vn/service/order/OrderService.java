@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+
 import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
@@ -54,5 +56,7 @@ public interface OrderService {
 	Optional<Order> findPendingOrderByUser(String email);
 	
 	Optional<Order> getOrderByCode(String code);
+
+	Page<Order> getOrdersWithPaginationAndSorting(int page, int size, String sortBy);
 
 }

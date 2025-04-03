@@ -7,7 +7,7 @@ import ReactStars from 'react-stars'
 import successIcon from "../assets/icons/success_icon.png"
 import voucher from "../assets/icons/voucher.png"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faShareAlt, faMinus, faPlus, faCartPlus } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faShareAlt, faMinus, faPlus, faCartPlus, faVideo } from '@fortawesome/free-solid-svg-icons';
 
 import ProductRecommend from '../components/ProductRecommend';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -147,6 +147,11 @@ const ProductDetails = () => {
               </div>
             ))}
           </Slider>
+          <div className="button-try">
+              <FontAwesomeIcon className='icon' icon={faVideo}/>
+              <button>Thử trực tiếp</button>
+          </div>
+
         </div>
         <div className="button-group">
           <div className="wishlist">

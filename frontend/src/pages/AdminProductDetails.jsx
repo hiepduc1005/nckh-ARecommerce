@@ -296,7 +296,6 @@ const AdminProductDetails = () => {
                                      <div key={attr.id} className="attribute-item">
                                        <span className="attribute-name">{attr.attributeName}:</span> 
                                        <span className="attribute-value">{attr.attributeValue}</span>
-                                       {index < variant.attributeValueResponses.length - 1 && ', '}
                                      </div>
                                    ))}
                                  </div>

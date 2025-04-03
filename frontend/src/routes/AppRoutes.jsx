@@ -28,6 +28,8 @@ import AdminAttribute from '../pages/AdminAttribute'
 import Checkout from '../pages/Checkout'
 import OrderConfirmation from '../pages/OrderConfirmation'
 import Test from '../pages/Test'
+import AdminOrder from '../pages/AdminOrder'
+import AdminOrderDetails from '../pages/AdminOrderDetails'
 
 const AppRoutes = () => {
   return (
@@ -71,6 +73,9 @@ const AppRoutes = () => {
           <Route path='categories' element={<AdminCategory/>} />
           <Route path="products/:slug" element={<AdminProductDetails />}/>
           <Route path='variants' element={<AdminVariants />} />
+          <Route path='orders' element={<AdminOrder />} />
+          <Route path='orders/:orderId' element={<AdminOrderDetails />} />
+
         </Route>
 
         <Route path="*" element={<NotFound />} />

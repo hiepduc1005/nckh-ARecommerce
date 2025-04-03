@@ -13,7 +13,7 @@ public class OrderCreateRequest {
     private List<OrderItemCreateRequest> orderItemCreateRequests;
 	private PaymentMethod paymentMethod;
     private String notes;
-
+  
     
     
 	public String getPhone() {

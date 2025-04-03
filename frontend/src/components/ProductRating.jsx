@@ -14,7 +14,7 @@ const ProductRating = ({ productId, existingRatings = []}) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const {token,user} = useAuth()
+  const {token,user,isAuthenticated} = useAuth()
   const {setLoading} = useLoading()
 
   

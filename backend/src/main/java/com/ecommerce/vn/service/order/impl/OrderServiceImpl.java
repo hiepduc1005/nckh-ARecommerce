@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +44,13 @@ public class OrderServiceImpl implements OrderService {
 		if(isOrderEmpty(order)) {
 			throw new RuntimeException("Order is empty!");
 		}
+		
+		order.getOrderItems().stream().forEach(orderItem -> {
+			if(orderItem.getQuantity() > orderItem.getVariant().getQuantity()) {
+				throw new RuntimeException("Số sản phẩm có sẵn không đủ!");
+			}
+			orderItem.getVariant().setQuantity(orderItem.getVariant().getQuantity() -  orderItem.getQuantity() );
+		});
 		
 		String code;
 	    int attempts = 0;
@@ -255,6 +265,12 @@ public class OrderServiceImpl implements OrderService {
 	public Optional<Order> getOrderByCode(String code) {
 		// TODO Auto-generated method stub
 		return orderRepository.findByCode(code);
+	}
+
+	@Override
+	public Page<Order> getOrdersWithPaginationAndSorting(int page, int size, String sortBy) {
+		Pageable pageable = PageRequest.of(page, size);
+		return orderRepository.findAll(pageable);
 	}
 
 

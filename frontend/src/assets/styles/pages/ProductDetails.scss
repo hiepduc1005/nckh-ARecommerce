@@ -15,6 +15,46 @@ $primaryColor: #207355;
       width: 100%;
       max-width: 900px;
       overflow: hidden;
+      position: relative;
+
+      .button-try{
+        position: absolute;
+        z-index: 10000;
+        color: #333;
+        right: 50%;
+        left: 50%;
+        background-color: #00ACEB;
+        color: whitesmoke;
+        border-radius: 4px;
+        white-space: nowrap;
+        bottom: 20%;
+        transform: translate(-50%, -50%);
+        min-width: 140px;
+        padding: 4px;
+
+        display: inline-flex; /* Căn icon và text trên cùng một hàng */
+        align-items: center;
+        justify-content: center;
+        gap: 6px; /* Khoảng cách giữa icon và text */
+
+        button{
+          border: none;
+          background: transparent; // Xóa nền trắng
+          font-size: 14px;
+          padding: 0;
+          color: inherit;
+        }
+
+        .icon{
+          display: inline-block;
+          width: 16px; // Điều chỉnh kích thước icon
+          height: 16px;
+        }
+
+        &:hover{
+          background-color: #0993c5;
+        }
+      }
 
       .slick-slider {
         max-width: 100%;

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.dto.order.OrderItemCreateRequest;
 import com.ecommerce.vn.dto.order.OrderItemResponse;
+import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderItem;
 import com.ecommerce.vn.entity.product.Variant;
 import com.ecommerce.vn.service.variant.VariantService;
@@ -18,12 +19,12 @@ public class OrderItemConvert {
 	@Autowired
 	private VariantConvert variantConvert;
 	
-	public OrderItem orderItemCreateConvertToOrderItem(OrderItemCreateRequest orderCreateRequest) {
+	public OrderItem orderItemCreateConvertToOrderItem(OrderItemCreateRequest orderCreateRequest, Order order) {
 		Variant variant = variantService.getVariantById(orderCreateRequest.getVariantId());
 		OrderItem orderItem = new OrderItem();
 		orderItem.setVariant(variant);
 		orderItem.setQuantity(orderCreateRequest.getQuantity());
-		
+		orderItem.setOrder(order);
 		return orderItem;
 	}
 	

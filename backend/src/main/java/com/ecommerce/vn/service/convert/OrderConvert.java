@@ -56,7 +56,7 @@ public class OrderConvert {
 		
 		List<OrderItem> orderItems = orderCreateRequest.getOrderItemCreateRequests()
 		        .stream()
-		        .map(orderItem -> orderItemConvert.orderItemCreateConvertToOrderItem(orderItem))
+		        .map(orderItem -> orderItemConvert.orderItemCreateConvertToOrderItem(orderItem,order))
 		        .collect(Collectors.toCollection(ArrayList::new));
 		
 		order.setOrderItems(orderItems);
@@ -88,6 +88,7 @@ public class OrderConvert {
 		orderResponse.setAddress(order.getAddress());
 		orderResponse.setSpecificAddress(order.getSpecificAddress());
 		orderResponse.setPhone(order.getPhone());
+		orderResponse.setPaymentUrl(order.getPaymentUrl());
 		
 		List<OrderItemResponse> orderItemResponses = order.getOrderItems()
 				.stream()

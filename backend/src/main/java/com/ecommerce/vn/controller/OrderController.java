@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,12 +15,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.vn.dto.order.OrderCreateRequest;
 import com.ecommerce.vn.dto.order.OrderResponse;
+import com.ecommerce.vn.dto.product.ProductResponse;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
+import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.service.convert.OrderConvert;
 import com.ecommerce.vn.service.order.OrderService;
 
@@ -49,6 +53,19 @@ public class OrderController {
 		
 		return ResponseEntity.ok(orderResponse);
 	}
+	
+	 @GetMapping("/pagination")
+	    public ResponseEntity<Page<OrderResponse>> getOrdersWithPaginationAndSorting(
+	            @RequestParam("page") int page,
+	            @RequestParam("size") int size,
+	            @RequestParam(value ="sortBy" , required = false) String sortBy) {
+	    	
+	    	Page<Order> orders = orderService.getOrdersWithPaginationAndSorting(page, size, sortBy);
+	        
+	    	Page<OrderResponse> orderResponse = orders.map(order -> orderConvert.orderConvertToOrderResponse(order));
+	    	return new ResponseEntity<>(orderResponse, HttpStatus.OK);
+	    }
+
 	
 	@GetMapping("/{orderId}")
 	public ResponseEntity<OrderResponse> getOrderById(@PathVariable(name = "orderId") UUID orderId){
