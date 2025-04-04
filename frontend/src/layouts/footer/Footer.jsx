@@ -41,6 +41,7 @@ const Footer = () => {
         <div className="item">
           <div className="title">Về HHQTV Store</div>
           <div className="links">
+            <Link to={"/privacy-policy"}>Chính sách bảo mật</Link>
             <Link>Chính sách thanh toán</Link>
             <Link to={"/return-policy"}>Chính sách đổi trả</Link>
             <Link>Chính sách bảo hành</Link>
