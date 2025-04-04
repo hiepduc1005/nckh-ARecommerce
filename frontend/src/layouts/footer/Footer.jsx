@@ -42,7 +42,7 @@ const Footer = () => {
           <div className="title">Về HHQTV Store</div>
           <div className="links">
             <Link>Chính sách thanh toán</Link>
-            <Link>Chính sách đổi trả</Link>
+            <Link to={"/return-policy"}>Chính sách đổi trả</Link>
             <Link>Chính sách bảo hành</Link>
             <Link>Giới thiệu</Link>
           </div>

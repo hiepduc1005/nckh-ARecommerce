@@ -32,6 +32,8 @@ import AdminOrder from '../pages/AdminOrder'
 import AdminOrderDetails from '../pages/AdminOrderDetails'
 import Purchase from '../pages/Purchase'
 import PurchaseProgress from '../pages/PurchaseProgress'
+import AboutUs from '../pages/AboutUs'
+import ReturnPolicy from '../pages/ReturnPolicy'
 
 const AppRoutes = () => {
   return (
@@ -42,6 +44,8 @@ const AppRoutes = () => {
             <Route path='checkout' element={<Checkout/>}/>
             <Route path='payment-check' element={<OrderConfirmation/>}/>
             <Route path='test' element={<Test/>}/>
+            <Route path='about-us' element={<AboutUs/>}/>
+            <Route path='return-policy' element={<ReturnPolicy/>}/>
 
         </Route>
 

@@ -18,24 +18,6 @@ const Header = () => {
   const [isWishListOpen,setIsWishListOpen] = useState(false)
   
   const {cart} = useCart();
-
-  const cartItemCount = 2; 
-
-  // const cart = [
-  //   {
-  //     id: 1,
-  //     name: "Khăn giấy gấu trúc Top Gia Sắc Hạ",
-  //     price: 179000,
-  //     image: "http://localhost:8080/uploads/8d2bbbec-d731-4855-a270-e94c4f554eef_giaoducqp.jpg"
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Bánh quy Oreo Chocolate 288g",
-  //     price: 45000,
-  //     image: "http://localhost:8080/uploads/8d2bbbec-d731-4855-a270-e94c4f554eef_giaoducqp.jpg", // Thay bằng ảnh thực tế
-  //   },
-  // ];
-
   const wishList = [
     {
       id: 1,
@@ -65,6 +47,8 @@ const Header = () => {
             <Link className='navbar-link'>Kính Mắt</Link>
             <Link className='navbar-link'>Giày</Link>
             <Link className='navbar-link'>Thương Hiệu</Link>
+            <Link to={'/about-us'} className='navbar-link'>Về chúng tôi</Link>
+
           </div>
           <div className="header-right">
               <div className="header-search">
