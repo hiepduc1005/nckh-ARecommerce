@@ -71,8 +71,9 @@ public class VNPayController {
 	        String paymentUrl = vnPayService.createPaymentURL(order, request);
 	        order.setPaymentUrl(paymentUrl);
             orderService.updateOrder(order);
-	        return ResponseEntity.ok(paymentUrl); // Trả về 200 OK để tránh lỗi
+	        return ResponseEntity.ok(paymentUrl);
 	    }
+	 
 
 	    return ResponseEntity.ok("Đơn hàng được tạo thành công!");
 	}

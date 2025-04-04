@@ -30,6 +30,8 @@ import OrderConfirmation from '../pages/OrderConfirmation'
 import Test from '../pages/Test'
 import AdminOrder from '../pages/AdminOrder'
 import AdminOrderDetails from '../pages/AdminOrderDetails'
+import Purchase from '../pages/Purchase'
+import PurchaseProgress from '../pages/PurchaseProgress'
 
 const AppRoutes = () => {
   return (
@@ -49,6 +51,8 @@ const AppRoutes = () => {
           <Route index element={<Navigate to="profile" replace />} />
           <Route path='profile' element={<Profile/>}/>
           <Route path='address' element={<UserAddress/>}/>
+          <Route path='purchase' element={<Purchase/>}/>
+          <Route path='purchase/progress/:orderCode' element={<PurchaseProgress/>}/>
 
         </Route>
 

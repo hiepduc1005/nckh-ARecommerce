@@ -19,7 +19,8 @@ public interface OrderRepository extends JpaRepository<Order,UUID>{
 	@Query("SELECT o FROM Order o WHERE o.user.id = :userId")
 	List<Order> findByUserId(@Param("userId") UUID userId);
 	
-	List<Order> findByOrderStatus(OrderStatus status);
+	@Query("SELECT o FROM Order o WHERE o.orderStatus = :status ORDER BY o.createdAt DESC")
+	List<Order> findByOrderStatus(@Param("status") OrderStatus status);
 	
 	@Query("SELECT o FROM Order o WHERE o.createdAt BETWEEN :startDate AND :endDate")
 	List<Order> findOrdersByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);

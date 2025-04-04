@@ -9,6 +9,6 @@ public enum OrderStatus {
     DELIVERED,      // Đơn hàng đã giao thành công đến người mua.
     REFUNDED,       // Đơn hàng đã được hoàn tiền.
     
-    
+    ALL, //Tat ca trang thai
    
 }

@@ -273,5 +273,11 @@ public class OrderServiceImpl implements OrderService {
 		return orderRepository.findAll(pageable);
 	}
 
+	@Override
+	public List<Order> getOrdersByUserEmail(String email) {
+		User user = userService.findUserByEmail(email);
+		return user != null ? user.getOrders() : List.of();
+	}
+
 
 }

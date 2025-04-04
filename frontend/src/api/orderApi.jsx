@@ -36,3 +36,19 @@ export const getOrdersPaginate = async (token,page) => {
         return null;
     }
 } 
+
+
+export const getOrdersByStatus = async (token,status) => {
+    try {
+        const res = await axiosInstance.get(`api/v1/orders/status/${status}`,{
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        return res.data;
+    } catch (error) {
+        console.error(error)
+        return null;
+    }
+} 

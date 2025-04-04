@@ -6,10 +6,10 @@ const AccountPopper = ({isOpen , logout}) => {
     <div className={`account-popper ${isOpen ? "" : "hidden"}`}>
       <ul>
         <li onClick={(e) => e.stopPropagation() }>
-          <Link to="/profile">Tài khoản của tôi</Link>
+          <Link to="/user/profile">Tài khoản của tôi</Link>
         </li>
         <li onClick={(e) => e.stopPropagation() }>
-          <Link to="/orders">Đơn mua</Link>
+          <Link to="/user/purchase">Đơn mua</Link>
         </li>
         <li  className="logout" onClick={(e) => {e.stopPropagation(); logout()}}>
           Đăng xuất

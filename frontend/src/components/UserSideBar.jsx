@@ -64,7 +64,7 @@ const UserSideBar = () => {
         </div>
         
         <div className="menu-item">
-          <Link to="/user/orders">
+          <Link to="/user/purchase">
             <FontAwesomeIcon icon={faReceipt} className="icon" />
             <span className="text">Đơn Mua</span>
           </Link>

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,10 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.vn.dto.order.OrderCreateRequest;
 import com.ecommerce.vn.dto.order.OrderResponse;
-import com.ecommerce.vn.dto.product.ProductResponse;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
-import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.service.convert.OrderConvert;
 import com.ecommerce.vn.service.order.OrderService;
 
@@ -90,6 +89,20 @@ public class OrderController {
 	
 		return ResponseEntity.ok(orderResponses);
 	}
+	
+	@GetMapping("/status/{orderStatus}")
+	public ResponseEntity<List<OrderResponse>> getOrdersByStatus(@PathVariable(name = "orderStatus", required = false) OrderStatus orderStatus){
+		
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		List<OrderResponse> orders = orderService.getOrdersByUserEmail(email)
+				.stream()
+				.filter((order) -> orderStatus.equals(OrderStatus.ALL) ? true : order.getOrderStatus().equals(orderStatus))
+				.map((order) -> orderConvert.orderConvertToOrderResponse(order))
+				.toList();
+		
+		return ResponseEntity.ok(orders);
+	}
+	
 	
 	@PutMapping("/status/{orderId}")
     public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable(name = "orderId") UUID orderId, @RequestBody OrderStatus orderStatus) {

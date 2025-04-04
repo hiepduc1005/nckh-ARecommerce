@@ -32,6 +32,9 @@ public interface OrderService {
     Order addNotes(UUID orderId, String notes);
     
     List<Order> getOrdersByUserId(UUID userId);
+    
+    List<Order> getOrdersByUserEmail(String email);
+
 
     List<Order> getOrdersByStatus(OrderStatus status);
 
