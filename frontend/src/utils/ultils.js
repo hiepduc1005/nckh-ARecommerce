@@ -70,3 +70,25 @@ export const decryptData = (data) => {
     }
     return null;
 };
+
+export const generateCodeVerifier = () => {
+    const array = new Uint32Array(56);  // Create an array of 56 random numbers
+    window.crypto.getRandomValues(array); // Populate the array with random values
+    return Array.from(array, dec => dec.toString(36)).join(''); // Convert numbers to base-36 and join them into a string
+}
+  
+export const generateCodeChallenge = (codeVerifier) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(codeVerifier);
+
+    // Create a SHA-256 hash of the codeVerifier
+    return window.crypto.subtle.digest('SHA-256', data).then(hashBuffer => {
+        // Convert the hash to base64-url encoding (as per PKCE spec)
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const base64 = btoa(String.fromCharCode.apply(null, hashArray))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');  // Remove padding
+        return base64;
+    });
+}

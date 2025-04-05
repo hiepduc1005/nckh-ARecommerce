@@ -16,6 +16,7 @@ import com.ecommerce.vn.dto.user.UserAuthenticateSuccess;
 import com.ecommerce.vn.dto.user.UserCreateRequest;
 import com.ecommerce.vn.dto.user.UserLoginRequest;
 import com.ecommerce.vn.security.JwtGenerator;
+import com.ecommerce.vn.service.EmailService;
 import com.ecommerce.vn.service.user.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,8 @@ public class AuthController {
 	@Autowired
 	private JwtGenerator jwtGenerator;
 	
+	@Autowired
+	private EmailService emailService;
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@RequestBody UserLoginRequest userLoginRequest){
@@ -60,7 +63,13 @@ public class AuthController {
 				return ResponseEntity.badRequest().body("Email này đã được đăng ký!");
 			}
 			userService.registerUser(userCreateRequest.getEmail(),userCreateRequest.getPassword(), userCreateRequest.getFirstname(), userCreateRequest.getLastname());
-			
+			String name = userCreateRequest.getFirstname() + userCreateRequest.getLastname();
+			if(name == null || name.isEmpty()) {
+				emailService.sendWelcomeEmail(userCreateRequest.getEmail(), userCreateRequest.getEmail());
+			}else {
+				emailService.sendWelcomeEmail(userCreateRequest.getEmail(), name);
+
+			}
 			return ResponseEntity.status(HttpStatus.CREATED).body("Đăng ký thành công!");
 		}catch (Exception ex) {
 			ex.printStackTrace();

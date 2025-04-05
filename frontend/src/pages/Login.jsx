@@ -4,13 +4,17 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import useAuth from '../hooks/UseAuth'
 import useLoading from '../hooks/UseLoading'
 import { useNavigate } from 'react-router-dom'
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
+import { googleLoginUser } from '../api/oauthApi'
+import { generateCodeChallenge, generateCodeVerifier } from '../utils/ultils'
+import { toast } from 'react-toastify'
 const Login = () => {
   const [showPassword,setShowPassword] = useState(false)
   const [email,setEmail] = useState("");
   const [password,setPassword] = useState("")
 
   const navigate = useNavigate();
-  const {isAuthenticated,login} = useAuth();
+  const {isAuthenticated,login,loginGoogle} = useAuth();
   const {setLoading} = useLoading();
 
   useEffect(() => {
@@ -27,6 +31,14 @@ const Login = () => {
     login(email,password);
 
   }
+
+  const handleGoogleLogin = async (credentialResponse) => {
+    const credential = credentialResponse.credential;
+
+    await loginGoogle(credential);
+
+  }
+
 
   return (
     <div className="login-container">
@@ -63,6 +75,16 @@ const Login = () => {
           </div>
           <button type="submit" className="login-btn">ĐĂNG NHẬP</button>
         </form>
+        
+        <GoogleLogin 
+          onSuccess={(credentialResponse) => {
+            handleGoogleLogin(credentialResponse);
+          }}
+          onError={() => {
+            console.log("lỗi")
+            toast.error("Đăng nhập bằng Google thất bại")
+          }}
+        />
         <div className="login-options">
           <a href="/forgot-password">Bạn đã quên mật khẩu?</a>
           <span>Bạn chưa có tài khoản? <a href="/register">Tạo tài khoản ngay</a></span>

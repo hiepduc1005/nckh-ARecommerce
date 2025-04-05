@@ -94,6 +94,34 @@ public class EmailService {
         }
     }
     
+    public void sendWelcomeEmail(String recipientEmail, String username) throws IOException {
+        Email from = new Email(senderEmail);
+        Email to = new Email(recipientEmail);
+        String subject = "Chào mừng! Bạn đã sẵn sàng cho trải nghiệm mua sắm tương lai?";
+
+        // Gọi hàm tạo HTML cho email
+        String htmlContent = readHtmlTemplate("templates/welcome.html");
+
+        htmlContent = htmlContent.replace("{USERNAME}", username);
+
+        Content content = new Content("text/html", htmlContent);
+        Mail mail = new Mail(from, subject, to, content);
+
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            System.out.println("Response Code: " + response.getStatusCode());
+            System.out.println("Response Body: " + response.getBody());
+        } catch (IOException ex) {
+            throw new RuntimeException("Gửi email thất bại", ex);
+        }
+    }
+    
     private String readHtmlTemplate(String filePath) throws IOException {
         ClassPathResource resource = new ClassPathResource(filePath);
         StringBuilder content = new StringBuilder();

@@ -58,6 +58,9 @@ public class User {
     
     private String gender;
     
+    @Column(name = "auth_provider")
+    private String authProvider;
+    
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
@@ -106,7 +109,15 @@ public class User {
 
 	
 	
-    public LocalDate getDateOfBirth() {
+    public String getAuthProvider() {
+		return authProvider;
+	}
+
+	public void setAuthProvider(String authProvider) {
+		this.authProvider = authProvider;
+	}
+
+	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
 

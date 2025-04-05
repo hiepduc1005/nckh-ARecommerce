@@ -3,6 +3,7 @@ import { getAuthUser, loginUser, logoutUser, registerUser } from "../api/userApi
 import {toast, ToastContainer} from "react-toastify"
 import { useLocation, useNavigate } from "react-router-dom";
 import useLoading from "../hooks/UseLoading";
+import { googleLoginUser } from "../api/oauthApi";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
@@ -66,6 +67,26 @@ export const AuthProvider = ({children}) => {
         }
     }
 
+    const loginGoogle = async (credential) => {
+        try {
+            setLoading(true);
+            const data = await googleLoginUser(credential);
+            if(data){
+                localStorage.setItem("token" , data.accessToken);
+                setToken(data.accessToken)
+                setIsAuthenticated(true);
+                
+                
+                toast.success('Đăng nhập thành công!');
+                navigate("/");
+            }
+        } catch (error) {
+            toast.error(error.response?.data || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');
+        }finally{
+            setLoading(false)
+        }
+    }
+
     const logout = async () => {
         setLoading(true);
 
@@ -98,7 +119,7 @@ export const AuthProvider = ({children}) => {
     } 
 
     return (
-        <AuthContext.Provider value={{user,isAuthenticated,token,login,logout,register}}>
+        <AuthContext.Provider value={{user,isAuthenticated,token,login,logout,register,loginGoogle}}>
             {children}
         </AuthContext.Provider>
     )

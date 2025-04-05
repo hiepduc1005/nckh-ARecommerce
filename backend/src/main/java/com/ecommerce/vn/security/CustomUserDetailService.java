@@ -30,7 +30,7 @@ public class CustomUserDetailService implements UserDetailsService{
 		User user = userService.findUserByEmail(username); 
 		return new org.springframework.security.core.userdetails.User(
 				username,
-				user.getPassword(),
+				user.getPassword() != null ? user.getPassword() : "",
 				mapPrivilegesToAuthorities(user.getRoles())
 				);
 	}
