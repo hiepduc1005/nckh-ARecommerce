@@ -166,7 +166,6 @@ const Purchase = () => {
                       <>
                         <button className="buy-again-btn">Mua Lại</button>
                         <button className="details-btn">Xem Chi Tiết Hủy Đơn</button>
-                        <button className="contact-seller-btn">Liên Hệ Người Bán</button>
                       </>
                     )}
                     {order.orderStatus === 'DELIVERED' && (
@@ -178,7 +177,6 @@ const Purchase = () => {
                     {order.orderStatus === 'PAID' && (
                       <>
                         <button className="track-btn" onClick={() => handleNavigatePurchaseProgress(order.code)}>Theo Dõi Đơn Hàng</button>
-                        <button className="contact-seller-btn">Liên Hệ Người Bán</button>
                       </>
                     )}
                     {order.orderStatus === 'PENDING' && (
@@ -190,7 +188,6 @@ const Purchase = () => {
                     {order.orderStatus === 'PROCESSING' && (
                       <>
                         <button className="track-btn" onClick={() => handleNavigatePurchaseProgress(order.code)}>Theo Dõi Đơn Hàng</button>
-                        <button className="contact-seller-btn">Liên Hệ Người Bán</button>
                       </>
                     )}
                     {order.orderStatus === 'SHIPPED' && (

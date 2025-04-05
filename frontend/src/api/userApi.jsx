@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import axiosInstance from "../utils/axiosInstance";
 
 export const getAuthUser = async (token) => {
@@ -91,7 +92,39 @@ export const updateUser = async (data,token) => {
         return res.data;
         
     } catch (error) {
-        console.error("Login failed",error)
         throw error;
+    }
+}
+
+export const requestForgotPassword = async (data) => {
+    try {
+        const res = await axiosInstance.post("api/v1/users/forgot-password/request", data)
+        return res;
+    } catch (error) {
+        toast.error("Không thể gửi mã OTP");
+    }
+}
+
+export const verifyForgotPassword = async (data) => {
+    try {
+        const res = await axiosInstance.post("api/v1/users/forgot-password/verify", data)
+        if(res.status !== 202){
+            toast.error("Mã OTP không hợp lệ");
+            return null;
+        }
+
+        return res.data;
+    } catch (error) {
+        toast.error(error);
+    }
+}
+
+export const verifyResetPassword = async (data) => {
+    try {
+        const res = await axiosInstance.post("api/v1/users/reset-password/verify", data)
+        
+        return res.data;
+    } catch (error) {
+        toast.error(error);
     }
 }

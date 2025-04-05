@@ -1,6 +1,9 @@
 package com.ecommerce.vn.service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -60,5 +63,46 @@ public class EmailService {
         } catch (IOException ex) {
             return "Error sending email: " + ex.getMessage();
         }
+    }
+    
+    public void sendOtpEmail(String recipientEmail, String username, String otpCode) throws IOException {
+        Email from = new Email(senderEmail);
+        Email to = new Email(recipientEmail);
+        String subject = "Xác nhận mã OTP của bạn";
+
+        // Gọi hàm tạo HTML cho email
+        String htmlContent = readHtmlTemplate("templates/forgot-password-otp-email.html");
+
+        htmlContent = htmlContent.replace("{USERNAME}", username)
+                                 .replace("{OTP_CODE}", otpCode);
+
+        Content content = new Content("text/html", htmlContent);
+        Mail mail = new Mail(from, subject, to, content);
+
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            System.out.println("Response Code: " + response.getStatusCode());
+            System.out.println("Response Body: " + response.getBody());
+        } catch (IOException ex) {
+            throw new RuntimeException("Gửi email thất bại", ex);
+        }
+    }
+    
+    private String readHtmlTemplate(String filePath) throws IOException {
+        ClassPathResource resource = new ClassPathResource(filePath);
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        }
+        return content.toString();
     }
 }

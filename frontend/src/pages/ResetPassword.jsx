@@ -1,34 +1,54 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../assets/styles/pages/ResetPassword.scss";
+import { toast } from "react-toastify";
+import { verifyResetPassword } from "../api/userApi";
+import useQuery from "../hooks/useQuery";
 
 const ResetPassword = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const identifier = location.state?.identifier || "";
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const token = useQuery().get("t")
     
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [message, setMessage] = useState("");
   
     useEffect(() => {
-      if (!identifier) {
+      if (!identifier || !token) {
         navigate("/login");
       }
-    }, [identifier, navigate]);
+    }, [identifier, navigate,token]);
   
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       e.preventDefault();
-      if (password !== confirmPassword) {
-        setMessage("Mật khẩu xác nhận không khớp. Vui lòng thử lại.");
+      setIsSubmitting(true);
+
+      if(!password){
+        toast.error("Mật khẩu không được để trống!")
         return;
       }
-  
-      // Giả lập gọi API đặt lại mật khẩu
-      setTimeout(() => {
-        setMessage("Mật khẩu của bạn đã được đặt lại thành công!");
-        setTimeout(() => navigate("/login"), 1500);
-      }, 1500);
+      
+      if (password !== confirmPassword) {
+        toast.error("Mật khẩu xác nhận không khớp. Vui lòng thử lại.");
+        return;
+      }
+      
+      const dataVerify = {
+        token,
+        newPassword: password,
+      }
+
+      const data = await verifyResetPassword(dataVerify)
+      if(data){
+        toast.success(data?.message)
+        setTimeout(() => navigate("/login"), 1000);
+      }else{
+        toast.error("Đổi mật khẩu thất bại")
+      }
+      setIsSubmitting(false);
     };
   
     return (
@@ -52,10 +72,9 @@ const ResetPassword = () => {
               required
             />
             <div className="button-group">
-              <button type="submit">Xác nhận</button>
+              <button type="submit"disabled={isSubmitting} >{isSubmitting ? "Đang xử lý..." : "Xác nhận"}</button>
             </div>
           </form>
-          {message && <p className="message">{message}</p>}
         </div>
       </div>
     );

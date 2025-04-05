@@ -1,5 +1,7 @@
 package com.ecommerce.vn.security;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +39,25 @@ public class JwtGenerator {
 			.withJWTId(UUID.randomUUID().toString())
 			.sign(algorithm);		
 			
+	}
+	
+	public String generateOTPToken(String email) {
+	    Algorithm algorithm = Algorithm.HMAC256(secret);
+
+	    LocalDateTime now = LocalDateTime.now();
+
+	    LocalDateTime expiresAt = now.plusMinutes(15);
+
+	    Date issuedAtDate = Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+	    Date expiresAtDate = Date.from(expiresAt.atZone(ZoneId.systemDefault()).toInstant());
+
+	    return JWT.create()
+	        .withIssuer(APP_NAME)
+	        .withSubject(email)
+	        .withIssuedAt(issuedAtDate)
+	        .withExpiresAt(expiresAtDate)
+	        .withJWTId(UUID.randomUUID().toString())
+	        .sign(algorithm);
 	}
 	
 	public DecodedJWT verifyToken(String token) {

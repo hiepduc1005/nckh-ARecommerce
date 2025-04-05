@@ -232,7 +232,9 @@ public class OrderServiceImpl implements OrderService {
 	public BigDecimal calculateTotalPrice(Order order) {
 		return order.getOrderItems().stream()
 		        .map(orderItem -> {
-		            BigDecimal price = orderItem.getVariant() != null ? orderItem.getVariant().getPrice() : BigDecimal.ZERO;
+		            BigDecimal price = 
+		            		orderItem.getVariant() != null ? 
+		            		((orderItem.getVariant().getDiscountPrice() != null && orderItem.getVariant().getDiscountPrice().doubleValue() > 0) ? orderItem.getVariant().getDiscountPrice() : orderItem.getVariant().getPrice() )  : BigDecimal.ZERO;
 		            return price.multiply(BigDecimal.valueOf(orderItem.getQuantity()));
 		        })
 		        .reduce(BigDecimal.ZERO, BigDecimal::add);

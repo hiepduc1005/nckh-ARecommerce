@@ -16,4 +16,17 @@ public class Utils {
 		
 		return sb.toString();
 	}
+	
+	public static String gennerateOTP() {
+		SecureRandom secureRandom = new SecureRandom();
+		
+		StringBuilder randomNumbers = new StringBuilder();
+		for(int i=0 ; i < 6 ; i++) {
+			int randomDigit = secureRandom.nextInt(0, 9);
+			randomNumbers.append(randomDigit);
+		}
+		
+		return randomNumbers.toString();
+		
+	}
 }
