@@ -58,9 +58,6 @@ public class User {
     
     private String gender;
     
-    @Column(name = "auth_provider")
-    private String authProvider;
-    
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
@@ -106,17 +103,6 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Notification> notifications  = new ArrayList<Notification>();
 	
-
-	
-	
-    public String getAuthProvider() {
-		return authProvider;
-	}
-
-	public void setAuthProvider(String authProvider) {
-		this.authProvider = authProvider;
-	}
-
 	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}

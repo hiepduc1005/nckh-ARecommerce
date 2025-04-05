@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.ecommerce.vn.entity.cart.Cart;
 import com.ecommerce.vn.entity.role.Role;
@@ -22,6 +23,7 @@ import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.security.JwtGenerator;
 import com.ecommerce.vn.service.EmailService;
 import com.ecommerce.vn.service.role.RoleService;
+import com.ecommerce.vn.service.user.UserAuthProviderService;
 import com.ecommerce.vn.service.user.UserService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
@@ -45,6 +47,9 @@ public class OAuth2Controller {
 	
 	@Autowired
 	private RoleService roleService;
+	
+	@Autowired
+	private UserAuthProviderService userAuthProviderService;
 
     private final ClientRegistrationRepository clientRegistrationRepository;
 
@@ -71,18 +76,26 @@ public class OAuth2Controller {
 
                 String email = payload.getEmail();
                 String name = (String) payload.get("name");
+                String providerUserId = payload.getSubject();
 
+                User user;
                 try {
-                    User user = userService.findUserByEmail(email);
-                    user.setAuthProvider("google");
+                    user = userService.findUserByEmail(email);
+                    user.setUserName(name);
                     userService.updateUser(user);
+                    
+                    try {
+                        String username = user.getUserName() != null ? user.getUserName() : "";
+        				emailService.sendLinkAccountEmail(user.getEmail(),username, "google");
+        			} catch (IOException e) {
+        						
+        			}
                 } catch (Exception e) {
                 	Role userRole = roleService.getRoleByName("USER");
-                    User user = new User();
+                    user = new User();
                     user.setActive(true);
                     user.setEmail(email);
                     user.setUserName(name);
-                    user.setAuthProvider("google");
                     user.setLoyaltyPoint(0);
                     user.setRoles(Arrays.asList(userRole));
                     
@@ -94,6 +107,8 @@ public class OAuth2Controller {
                     
                     emailService.sendWelcomeEmail(email,name);
                 }
+                
+                userAuthProviderService.linkProviderToUser(user,"google", providerUserId);
 
                 String token = jwtGenerator.gennerateToken(email);
 
@@ -109,6 +124,71 @@ public class OAuth2Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Token verification failed");
         }
     }
+    
+    
+    @PostMapping("/facebook/token")
+    public ResponseEntity<?> authenticateWithFacebookToken(@RequestBody Map<String, String> request) {
+        String accessToken = request.get("accessToken");
+
+        String facebookApiUrl = "https://graph.facebook.com/me?fields=id,name,email&access_token=" + accessToken;
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Map> response = restTemplate.getForEntity(facebookApiUrl, Map.class);
+            Map<String, Object> userData = response.getBody();
+
+            String email = (String) userData.get("email");
+            String name = (String) userData.get("name");
+            String userProviderId = (String) userData.get("id");
+
+            User user;
+            try {
+                user = userService.findUserByEmail(email);
+                user.setUserName(name);
+                userService.updateUser(user);
+                
+                try {
+                    String username = user.getUserName() != null ? user.getUserName() : "";
+    				emailService.sendLinkAccountEmail(user.getEmail(),username, "facebook");
+    			} catch (IOException e) {
+    						
+    			}
+                
+            } catch (Exception e) {
+            	Role userRole = roleService.getRoleByName("USER");
+                user = new User();
+                user.setEmail(email);
+                user.setUserName(name);
+                user.setActive(true);
+                user.setLoyaltyPoint(0);
+                
+                user.setRoles(Arrays.asList(userRole));
+                
+                Cart cart = new Cart();
+    			cart.setUser(user);
+    			user.setCart(cart);
+                
+                userService.createUser(user);
+                
+                emailService.sendWelcomeEmail(email,name);
+                
+            }
+
+            userAuthProviderService.linkProviderToUser(user,"facebook", userProviderId);
+           
+            String jwt = jwtGenerator.gennerateToken(email);
+
+            return ResponseEntity.ok(Map.of(
+                "accessToken", jwt,
+                "tokenType", "Bearer",
+                "email", email
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Facebook access token");
+        }
+    }
+
     
     
 }

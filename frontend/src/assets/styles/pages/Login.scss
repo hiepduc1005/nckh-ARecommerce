@@ -93,6 +93,34 @@ $borderRadius: 8px;
       }
     }
 
+    .separator {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+      
+      &:before,
+      &:after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #eaeaea;
+      }
+      
+      span {
+        padding: 0 10px;
+        color: #777;
+        font-size: 14px;
+      }
+    }
+    
+    .social-login {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-direction: column;
+      gap: 20px;
+    }
+
     .login-options {
       margin-top: 15px;
       font-size: 14px;

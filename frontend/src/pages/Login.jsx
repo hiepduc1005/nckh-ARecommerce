@@ -1,44 +1,48 @@
-import React, { useEffect, useState } from 'react'
-import "../assets/styles/pages/Login.scss"
-import { FaEye, FaEyeSlash } from 'react-icons/fa'
-import useAuth from '../hooks/UseAuth'
-import useLoading from '../hooks/UseLoading'
-import { useNavigate } from 'react-router-dom'
-import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
-import { googleLoginUser } from '../api/oauthApi'
-import { generateCodeChallenge, generateCodeVerifier } from '../utils/ultils'
-import { toast } from 'react-toastify'
+import React, { useEffect, useState } from "react";
+import "../assets/styles/pages/Login.scss";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import useAuth from "../hooks/UseAuth";
+import useLoading from "../hooks/UseLoading";
+import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import FacebookLogin from "@greatsumini/react-facebook-login";
+
+import { toast } from "react-toastify";
+import FacebookLoginButton from "../components/FacebookLoginButton";
+
 const Login = () => {
-  const [showPassword,setShowPassword] = useState(false)
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
-  const {isAuthenticated,login,loginGoogle} = useAuth();
-  const {setLoading} = useLoading();
+  const { isAuthenticated, login, loginGoogle, loginFacebook } = useAuth();
+  const { setLoading } = useLoading();
 
   useEffect(() => {
-    if(isAuthenticated){
+    if (isAuthenticated) {
       setLoading(true);
-      navigate("/")
-     
+      navigate("/");
     }
-  },[isAuthenticated, navigate, setLoading])
+  }, [isAuthenticated, navigate, setLoading]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    login(email,password);
-
-  }
+    login(email, password);
+  };
 
   const handleGoogleLogin = async (credentialResponse) => {
     const credential = credentialResponse.credential;
 
     await loginGoogle(credential);
+  };
 
-  }
+  const handleFacebookLogin = async (data) => {
+    const accessToken = data.accessToken;
 
+    await loginFacebook(accessToken);
+  };
 
   return (
     <div className="login-container">
@@ -46,13 +50,15 @@ const Login = () => {
         <h2>ĐĂNG NHẬP TÀI KHOẢN</h2>
         <form onSubmit={(e) => handleSubmit(e)}>
           <div className="input-group">
-            <label htmlFor="username">Email / Số điện thoại / Tên đăng nhập</label>
+            <label htmlFor="username">
+              Email / Số điện thoại / Tên đăng nhập
+            </label>
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="text"
               id="username"
-              placeholder="Nhập Email/SĐT/tên đăng nhập" 
+              placeholder="Nhập Email/SĐT/tên đăng nhập"
             />
           </div>
           <div className="input-group password-group">
@@ -61,37 +67,67 @@ const Login = () => {
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                type={showPassword ? "text" : "password"} 
-                id="password" 
-                placeholder="Nhập mật khẩu" 
+                type={showPassword ? "text" : "password"}
+                id="password"
+                placeholder="Nhập mật khẩu"
+                autoComplete
               />
-              <span 
-                className="toggle-password" 
+              <span
+                className="toggle-password"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <FaEye /> : <FaEyeSlash />}
               </span>
             </div>
           </div>
-          <button type="submit" className="login-btn">ĐĂNG NHẬP</button>
+          <button type="submit" className="login-btn">
+            ĐĂNG NHẬP
+          </button>
         </form>
-        
-        <GoogleLogin 
-          onSuccess={(credentialResponse) => {
-            handleGoogleLogin(credentialResponse);
-          }}
-          onError={() => {
-            console.log("lỗi")
-            toast.error("Đăng nhập bằng Google thất bại")
-          }}
-        />
+
+        <div className="separator">
+          <span>hoặc</span>
+        </div>
+
+        <div className="social-login">
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              handleGoogleLogin(credentialResponse);
+            }}
+            onError={() => {
+              console.log("lỗi");
+              toast.error("Đăng nhập bằng Google thất bại");
+            }}
+            onClose={() => {
+              console.log("Cửa sổ đăng nhập đã bị đóng");
+              toast.info("Đăng nhập đã bị hủy");
+            }}
+            logo_alignment="center"
+          />
+          <FacebookLogin
+            appId="667943549262562"
+            onSuccess={(response) => {
+              handleFacebookLogin(response);
+            }}
+            onFail={(error) => {
+              console.log("Login Failed!", error);
+              toast.error("Đăng nhập bằng Facebook thất bại");
+            }}
+            useRedirect={false}
+            scope="public_profile,email"
+            render={({ onClick }) => <FacebookLoginButton onClick={onClick} />}
+          />
+        </div>
+
         <div className="login-options">
           <a href="/forgot-password">Bạn đã quên mật khẩu?</a>
-          <span>Bạn chưa có tài khoản? <a href="/register">Tạo tài khoản ngay</a></span>
+          <span>
+            Bạn chưa có tài khoản? <a href="/register">Tạo tài khoản ngay</a>
+          </span>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
