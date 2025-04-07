@@ -1,47 +1,101 @@
-import React, { useEffect, useState } from 'react';
-import Slider from 'react-slick';
-import "slick-carousel/slick/slick.css"; 
+import React, { useEffect, useState } from "react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "../assets/styles/pages/ProductDetails.scss";
-import ReactStars from 'react-stars'
-import successIcon from "../assets/icons/success_icon.png"
-import voucher from "../assets/icons/voucher.png"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faShareAlt, faMinus, faPlus, faCartPlus, faVideo } from '@fortawesome/free-solid-svg-icons';
+import ReactStars from "react-stars";
+import successIcon from "../assets/icons/success_icon.png";
+import voucher from "../assets/icons/voucher.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHeart,
+  faShareAlt,
+  faMinus,
+  faPlus,
+  faCartPlus,
+  faVideo,
+} from "@fortawesome/free-solid-svg-icons";
 
-import ProductRecommend from '../components/ProductRecommend';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import ProductDetailsTapList from '../components/ProductDetailsTapList';
-import { getProductById, getProductBySlug } from '../api/productApi';
-import { toast } from 'react-toastify';
-import useLoading from '../hooks/UseLoading';
-import { getVariantsByProductSlug } from '../api/variantApi';
-import useCart from '../hooks/UseCart';
-import { encryptData } from '../utils/ultils';
+import ProductRecommend from "../components/ProductRecommend";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import ProductDetailsTapList from "../components/ProductDetailsTapList";
+import { getProductById, getProductBySlug } from "../api/productApi";
+import { toast } from "react-toastify";
+import useLoading from "../hooks/UseLoading";
+import { getVariantsByProductSlug } from "../api/variantApi";
+import useCart from "../hooks/UseCart";
+import { encryptData } from "../utils/ultils";
+import VTOGlassModal from "../components/ar/VTOGlassModal";
 
 const products = [
-  { id: 1, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 4.5, reviews: 120, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 2, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 4.1, reviews: 32, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 3, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 5, reviews: 3, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 4, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 5, reviews: 3, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 5, name: "TÊN SẢN PHẨM", originalPrice: "XXX.XXX đ", discountedPrice: "XXX.XXX đ", rating: 5, reviews: 3, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
+  {
+    id: 1,
+    name: "TÊN SẢN PHẨM",
+    originalPrice: "XXX.XXX đ",
+    discountedPrice: "XXX.XXX đ",
+    rating: 4.5,
+    reviews: 120,
+    image:
+      "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600",
+  },
+  {
+    id: 2,
+    name: "TÊN SẢN PHẨM",
+    originalPrice: "XXX.XXX đ",
+    discountedPrice: "XXX.XXX đ",
+    rating: 4.1,
+    reviews: 32,
+    image:
+      "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600",
+  },
+  {
+    id: 3,
+    name: "TÊN SẢN PHẨM",
+    originalPrice: "XXX.XXX đ",
+    discountedPrice: "XXX.XXX đ",
+    rating: 5,
+    reviews: 3,
+    image:
+      "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600",
+  },
+  {
+    id: 4,
+    name: "TÊN SẢN PHẨM",
+    originalPrice: "XXX.XXX đ",
+    discountedPrice: "XXX.XXX đ",
+    rating: 5,
+    reviews: 3,
+    image:
+      "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600",
+  },
+  {
+    id: 5,
+    name: "TÊN SẢN PHẨM",
+    originalPrice: "XXX.XXX đ",
+    discountedPrice: "XXX.XXX đ",
+    rating: 5,
+    reviews: 3,
+    image:
+      "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600",
+  },
 ];
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState(null);
-  const [selectedVariantStock,setSelectVariantStock] = useState(null)
-  const [variants,setVariants] = useState([])
+  const [selectedVariantStock, setSelectVariantStock] = useState(null);
+  const [variants, setVariants] = useState([]);
 
-  const [images,setImages] = useState([])
+  const [showModalVTO, setShowModalVTO] = useState(false);
+
+  const [images, setImages] = useState([]);
 
   const { slug } = useParams();
   const { setLoading } = useLoading();
-  const {addItem} = useCart()
+  const { addItem } = useCart();
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -50,18 +104,18 @@ const ProductDetails = () => {
         const productData = await getProductBySlug(slug);
         if (productData) {
           setProduct(productData);
-          
+
           // Fetch variants
           const variantsData = await getVariantsByProductSlug(slug, "", 1, 10);
           if (variantsData) {
             setVariants(variantsData.content);
-            
+
             // Create images array once we have both product and variants
             const listImage = [
               productData.imagePath,
-              ...variantsData.content.map(variant => variant.imagePath)
+              ...variantsData.content.map((variant) => variant.imagePath),
             ].filter(Boolean); // Filter out any null or undefined values
-            
+
             setImages(listImage);
           }
         } else {
@@ -74,7 +128,7 @@ const ProductDetails = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [slug, setLoading]);
 
@@ -87,21 +141,21 @@ const ProductDetails = () => {
 
   const handleVariantSelect = (variant) => {
     setSelectedVariants(variant.id);
-    setSelectVariantStock(variant.quantity)
-    setQuantity(1)
+    setSelectVariantStock(variant.quantity);
+    setQuantity(1);
   };
 
   const handleAddProductToCart = async () => {
-    if(!selectedVariants){
+    if (!selectedVariants) {
       toast.warning("Bạn chưa chọn biến thể!");
       return;
     }
-    
-    await addItem(selectedVariants,quantity);
-  }
+
+    await addItem(selectedVariants, quantity);
+  };
 
   const handleClickOrder = () => {
-    if(!selectedVariants){
+    if (!selectedVariants) {
       toast.warning("Bạn chưa chọn biến thể!");
       return;
     }
@@ -109,15 +163,15 @@ const ProductDetails = () => {
     const data = [
       {
         quantity,
-        variant: selectedVariants 
-      }
-    ]
+        variant: selectedVariants,
+      },
+    ];
 
     const encryptedData = encryptData(data);
     const encodedData = encodeURIComponent(encryptedData);
 
-    navigate(`/checkout?encrd=${encodedData}`)
-  }
+    navigate(`/checkout?encrd=${encodedData}`);
+  };
 
   const settings = {
     dots: true,
@@ -129,12 +183,19 @@ const ProductDetails = () => {
     pauseOnHover: true,
     slidesToScroll: 1,
     customPaging: (i) => (
-      <img src={`http://localhost:8080${images[i % images.length]}`} alt={`thumb-${i}`} className="dot-thumbnail" />
+      <img
+        src={`http://localhost:8080${images[i % images.length]}`}
+        alt={`thumb-${i}`}
+        className="dot-thumbnail"
+      />
     ),
     dotsClass: "custom-dots",
   };
 
-  if (!product) return <div className="loading-placeholder">Đang tải thông tin sản phẩm...</div>;
+  if (!product)
+    return (
+      <div className="loading-placeholder">Đang tải thông tin sản phẩm...</div>
+    );
 
   return (
     <div className="product-details-container">
@@ -142,57 +203,61 @@ const ProductDetails = () => {
         <div className="carousel">
           <Slider {...settings}>
             {images?.map((image, index) => (
-              <div key={index} className='item'>
-                <img src={`http://localhost:8080${image}`} alt={`slide-${index}`} className="slide-image" />
+              <div key={index} className="item">
+                <img
+                  src={`http://localhost:8080${image}`}
+                  alt={`slide-${index}`}
+                  className="slide-image"
+                />
               </div>
             ))}
           </Slider>
-          <div className="button-try">
-              <FontAwesomeIcon className='icon' icon={faVideo}/>
-              <button>Thử trực tiếp</button>
+          <div className="button-try" onClick={() => setShowModalVTO(true)}>
+            <FontAwesomeIcon className="icon" icon={faVideo} />
+            <button>Thử trực tiếp</button>
           </div>
-
         </div>
         <div className="button-group">
           <div className="wishlist">
-            <FontAwesomeIcon icon={faHeart} color='#207355' size="lg" />
+            <FontAwesomeIcon icon={faHeart} color="#207355" size="lg" />
             <span>Thêm vào yêu thích</span>
           </div>
           <div className="share">
-            <FontAwesomeIcon icon={faShareAlt} color='#207355' size="lg" />
+            <FontAwesomeIcon icon={faShareAlt} color="#207355" size="lg" />
             <span>Chia sẻ</span>
           </div>
         </div>
-        <ProductDetailsTapList product={product}/>
+        <ProductDetailsTapList product={product} />
         <div className="products-recommend">
           <div className="title">Đề xuất cho bạn</div>
-          <ProductRecommend products={products}/>
-          <Link 
-            to={"/"}
-            content='Xem thêm'
-            title='Xem thêm'
-            className='more'
-          >Xem thêm</Link>
+          <ProductRecommend products={products} />
+          <Link to={"/"} content="Xem thêm" title="Xem thêm" className="more">
+            Xem thêm
+          </Link>
         </div>
       </div>
       <div className="right">
         <div className="product-name">{product.productName}</div>
         <div className="rating">
-          <ReactStars 
+          <ReactStars
             count={5}
             value={product.ratingValue || 0}
             size={24}
-            color2={"#f8b400"} 
+            color2={"#f8b400"}
             edit={false}
             half={true}
-            style={{ display: 'flex', alignItems: 'center' }}
+            style={{ display: "flex", alignItems: "center" }}
           />
           <div className="score">{product.ratingValue?.toFixed(1) || 0}</div>
-          <div className="reviews">({product.ratingResponses?.length || 0} đánh giá)</div>
+          <div className="reviews">
+            ({product.ratingResponses?.length || 0} đánh giá)
+          </div>
         </div>
         <div className="prices">
           <div className="original">{product.maxPrice?.toLocaleString()} đ</div>
-          <div className="discounted">{product.minPrice?.toLocaleString()} đ</div>
+          <div className="discounted">
+            {product.minPrice?.toLocaleString()} đ
+          </div>
         </div>
         <div className="benefits">
           <h3>Quyền lợi</h3>
@@ -212,71 +277,103 @@ const ProductDetails = () => {
         <div className="product-options">
           {/* Attribute Selection Based on Product Data */}
           <h3>Biến thể:</h3>
-          {variants && variants.map((variant) => (
-            <div key={variant.id} className="variant-selection">
-              <div className="variant-options">              
+          {variants &&
+            variants.map((variant) => (
+              <div key={variant.id} className="variant-selection">
+                <div className="variant-options">
                   <button
-                    className={`variant-option ${selectedVariants === variant.id ? 'selected' : ''}`}
+                    className={`variant-option ${
+                      selectedVariants === variant.id ? "selected" : ""
+                    }`}
                     onClick={() => handleVariantSelect(variant)}
                   >
                     <div className="variant-image">
-                      <img src={`http://localhost:8080${variant.imagePath}`} alt={`Variant ${variant.id}`} />
+                      <img
+                        src={`http://localhost:8080${variant.imagePath}`}
+                        alt={`Variant ${variant.id}`}
+                      />
                     </div>
                     <div className="variant-details">
-                      {variant?.attributeValueResponses?.map((attrValue, index) => (
-                        <React.Fragment key={attrValue.id}>
-                          <span className='attr-name'>{attrValue.attributeName}: </span>
-                          <span className='attr-value'>{attrValue.attributeValue}</span>
-                          {index < variant.attributeValueResponses.length - 1 && <span>, </span>}
-                        </React.Fragment>
-                      ))}
+                      {variant?.attributeValueResponses?.map(
+                        (attrValue, index) => (
+                          <React.Fragment key={attrValue.id}>
+                            <span className="attr-name">
+                              {attrValue.attributeName}:{" "}
+                            </span>
+                            <span className="attr-value">
+                              {attrValue.attributeValue}
+                            </span>
+                            {index <
+                              variant.attributeValueResponses.length - 1 && (
+                              <span>, </span>
+                            )}
+                          </React.Fragment>
+                        )
+                      )}
                     </div>
-                  </button>              
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
 
           <h3>Số lượng:</h3>
           <div className="quantity-control">
-            <button 
-              className="quantity-btn" 
+            <button
+              className="quantity-btn"
               onClick={() => handleQuantityChange(-1)}
               disabled={quantity <= 1}
             >
               <FontAwesomeIcon icon={faMinus} />
             </button>
-            <input 
-              type="text" 
-              className="quantity-input" 
-              value={quantity} 
-              readOnly 
+            <input
+              type="text"
+              className="quantity-input"
+              value={quantity}
+              readOnly
             />
-            <button 
-              className="quantity-btn" 
+            <button
+              className="quantity-btn"
               onClick={() => handleQuantityChange(1)}
-              disabled={quantity >= (selectedVariantStock || product.stock || 100)}
+              disabled={
+                quantity >= (selectedVariantStock || product.stock || 100)
+              }
             >
               <FontAwesomeIcon icon={faPlus} />
             </button>
           </div>
           <div className="stock-info">
             {product.stock > 0 ? (
-              <span className="in-stock">{selectedVariantStock || product.stock} sản phẩm có sẵn</span>
+              <span className="in-stock">
+                {selectedVariantStock || product.stock} sản phẩm có sẵn
+              </span>
             ) : (
               <span className="out-of-stock">Hết hàng</span>
             )}
           </div>
           <div className="purchase-buttons">
-            <button className="add-to-cart" onClick={() => handleAddProductToCart()}>
-              <FontAwesomeIcon className='icon' icon={faCartPlus}/>
+            <button
+              className="add-to-cart"
+              onClick={() => handleAddProductToCart()}
+            >
+              <FontAwesomeIcon className="icon" icon={faCartPlus} />
               <span>Thêm Vào Giỏ Hàng</span>
             </button>
-            <button className="buy-now" onClick={() => handleClickOrder()}>Mua Ngay</button>
+            <button className="buy-now" onClick={() => handleClickOrder()}>
+              Mua Ngay
+            </button>
           </div>
         </div>
       </div>
+      {showModalVTO ? (
+        <VTOGlassModal
+          isOpen={showModalVTO}
+          onClose={() => setShowModalVTO(false)}
+        />
+      ) : (
+        ""
+      )}
     </div>
   );
-}
+};
 
 export default ProductDetails;

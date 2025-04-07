@@ -1,371 +1,386 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, OrbitControls, Environment, Lightformer } from '@react-three/drei';
-import * as THREE from 'three';
+import React, { useRef, useState, useEffect, Suspense } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import {
+  useGLTF,
+  OrbitControls,
+  Environment,
+  Stage,
+  useHelper,
+  useProgress,
+  Stats,
+} from "@react-three/drei";
+import * as THREE from "three";
+import { EffectComposer, Outline } from "@react-three/postprocessing";
+import LoadingScreen from "../components/ar/LoadingScreen";
+import ModelCustomize from "../components/ar/ModelCustomize";
+import { saveAs } from "file-saver";
+import ColorControls from "../components/ar/ColorControls";
 
-// Component to load and display 3D glasses model
-function GlassesModel({ positions }) {
-  // Load the 3D glasses model - replace with your .glb URL
-  const { scene,materials } = useGLTF('/models/trang_sua_c2ceb8.glb');
-  const glassesRef = useRef();
+function ScreenshotHelper({ cameraRef }) {
+  const { gl, scene } = useThree();
 
-  useEffect(() => {
-    if (materials && materials['glasses_mirror.001']) {
-      const lensMaterial = materials['glasses_mirror.001'];
-      lensMaterial.color = new THREE.Color('#FFD700'); // Màu vàng
-      lensMaterial.metalness = 1.0;
-      lensMaterial.roughness = 0;
-      lensMaterial.envMapIntensity = 2.0
-      lensMaterial.transparent = true;
-      lensMaterial.opacity = 0.6;
+  const captureScreenshot = async () => {
+    const angles = [
+      { name: "front", pos: [0, 0, 0.2] },
+      { name: "left", pos: [-0.2, 0, 0] },
+      { name: "right", pos: [0.2, 0, 0] },
+    ];
+
+    for (const angle of angles) {
+      cameraRef.current.position.set(...angle.pos);
+      cameraRef.current.lookAt(0, 0, 0);
+      cameraRef.current.updateProjectionMatrix();
+
+      // Force render
+      gl.render(scene, cameraRef.current);
+
+      const dataUrl = gl.domElement.toDataURL("image/png");
+      // saveAs(dataUrl, `shoe-${angle.name}.png`);
+
+      await new Promise((res) => setTimeout(res, 200)); // Optional delay
     }
-  }, [materials]);
-  
-  useFrame(() => {
-    if (!glassesRef.current) return;
-    
-    // Calculate position between eyes for glasses center
-    const centerX = (positions.leftEye.x + positions.rightEye.x) / 0.8 ;
-    const centerY = (positions.leftEye.y + positions.rightEye.y) / 1.1;
-    const centerZ = (positions.leftEye.z + positions.rightEye.z) / 1 ;
-    
-     // Calculate scale based on eye distance
-    const eyeDistance = new THREE.Vector3().subVectors(
-        new THREE.Vector3(positions.leftEye.x, positions.leftEye.y, positions.leftEye.z),
-        new THREE.Vector3(positions.rightEye.x, positions.rightEye.y, positions.rightEye.z)
-    ).length();
+  };
 
-    const offsetY = eyeDistance * 1.3;  // Điều chỉnh hệ số nếu cần
-    const adjustedY = centerY + offsetY;
+  // Gắn hàm vào window để có thể gọi từ bên ngoài (hoặc props tùy bạn)
+  useEffect(() => {
+    window.captureScreenshot = captureScreenshot;
+  }, []);
 
-    // Update glasses position
-    glassesRef.current.position.set(centerX, adjustedY, centerZ);
+  return null;
+}
+// Enhanced controls component with orbit controls manager
+function SceneControls({ isDragging }) {
+  const { camera, gl } = useThree();
+  const controlsRef = useRef();
 
-    if (positions.glassesRotation) {
-        // Tạo quaternion từ các góc Euler, nhưng chỉ định thứ tự rõ ràng
-        const quaternion = new THREE.Quaternion();
-        const euler = new THREE.Euler(
-          positions.glassesRotation.x + Math.PI, 
-          -positions.glassesRotation.y, // Vẫn đảo dấu cho trục Y
-          positions.glassesRotation.z, 
-          'ZYX' // Thay đổi thứ tự xoay từ XYZ sang ZYX
-        );
-        quaternion.setFromEuler(euler);
-        glassesRef.current.quaternion.copy(quaternion);
-      }
-    // Scale the glasses appropriately 
-    // You may need to adjust this multiplier based on your model size
-    const scaleFactor = eyeDistance * 3 * 3 * 4; 
-    glassesRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-    
-  });
+  // Parameters for smooth and limited control
+  const dampingFactor = 0.15; // Higher value = smoother but slower damping (0-1)
+  const rotateSpeed = 0.5; // Lower value = slower rotation
+  const zoomSpeed = 0.8; // Lower value = slower zoom
+  const panSpeed = 0.8; // Lower value = slower panning
 
-  // Clone the scene to make it usable in React
-  const glassesScene = scene.clone();
-  
+  // Zoom distance limits
+  const minDistance = 0; // Minimum zoom distance (closest to model)
+  const maxDistance = 1; // Maximum zoom distance (furthest from model)
+
+  // Initialize controls with enhanced parameters
+  useEffect(() => {
+    if (controlsRef.current) {
+      // Enable damping for smoother control
+      controlsRef.current.enableDamping = true;
+      controlsRef.current.dampingFactor = dampingFactor;
+
+      // Set rotation speed
+      controlsRef.current.rotateSpeed = rotateSpeed;
+
+      // Set zoom speed and limits
+      controlsRef.current.zoomSpeed = zoomSpeed;
+      controlsRef.current.minDistance = minDistance;
+      controlsRef.current.maxDistance = maxDistance;
+
+      // Set pan speed
+      controlsRef.current.panSpeed = panSpeed;
+
+      // Optional: Limit vertical rotation if needed
+      // controlsRef.current.minPolarAngle = Math.PI / 6; // 30 degrees from top
+      // controlsRef.current.maxPolarAngle = Math.PI * 5/6; // 150 degrees from top
+    }
+  }, []);
+
+  // Disable orbit controls when dragging model parts
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.enabled = !isDragging;
+    }
+  }, [isDragging]);
+
   return (
-    <>
-    <primitive 
-      ref={glassesRef}
-      object={glassesScene} 
-      position={[0, 0, 0]}
-      scale={3}
-      
+    <OrbitControls
+      ref={controlsRef}
+      args={[camera, gl.domElement]}
+      makeDefault
     />
-     <axesHelper args={[0.5]} />
-    </>
   );
 }
 
-function FaceDetection() {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const [eyePositions, setEyePositions] = useState({
-    leftEye: new THREE.Vector3(0, 0, 0),
-    rightEye: new THREE.Vector3(0, 0, 0),
-  });
-  const [calibrationAngleX, setCalibrationAngleX] = useState(null);
+// Scene component that wraps everything in the 3D scene
+function Scene({ modelUrl, onSelectPart, isDragging, setIsDragging }) {
+  return (
+    <Suspense fallback={null}>
+      <Stage environment="city" intensity={0.5}>
+        <ModelCustomize
+          url={modelUrl}
+          onSelectPart={onSelectPart}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={() => setIsDragging(false)}
+        />
+      </Stage>
+      <SceneControls isDragging={isDragging} />
+    </Suspense>
+  );
+}
 
+// Main component
+export default function Interactive3DViewer({
+  modelUrl = "/models/tim_nhat_837479.glb",
+}) {
+  const [selectedPart, setSelectedPart] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [originalMaterials, setOriginalMaterials] = useState({});
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [parts, setParts] = useState([]);
+  const [originalParts, setOriginalParts] = useState([]);
 
+  // Listen to loading progress
+  const { progress, errors } = useProgress();
+
+  const canvasRef = useRef();
+  const cameraRef = useRef();
+
+  // Set the loaded state when progress reaches 100%
   useEffect(() => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (progress === 100) {
+      // Add a small delay to ensure everything is rendered properly
+      const timer = setTimeout(() => {
+        setIsLoaded(true);
+      }, 500);
 
+      return () => clearTimeout(timer);
+    }
+  }, [progress]);
 
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+  const handleSelectPart = (part) => {
+    setSelectedPart(part);
 
-    // Dynamically import MediaPipe libraries
-    const loadFaceMesh = async () => {
-      try {
-        // Import FaceMesh dynamically
-        const faceMeshModule = await import('@mediapipe/face_mesh');
-        const FaceMesh = faceMeshModule.FaceMesh;
-        
-        // Import drawing utilities
-        const drawingUtilsModule = await import('@mediapipe/drawing_utils');
-        const drawConnectors = drawingUtilsModule.drawConnectors;
-        
-        // Constants for eye indices in FaceMesh
-        const LEFT_EYE_INDICES = [
-          33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246
-        ];
-
-        const RIGHT_EYE_INDICES = [
-          362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398
-        ];
-
-        const faceMesh = new FaceMesh({
-          locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-          }
-        });
-
-        faceMesh.setOptions({
-          maxNumFaces: 1,
-          refineLandmarks: true,
-          minDetectionConfidence: 0.5,
-          minTrackingConfidence: 0.5
-        });
-
-        faceMesh.onResults((results) => {
-          if (!results.multiFaceLandmarks) return;
-
-          // Clear canvas
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          
-          if (results.multiFaceLandmarks.length > 0) {
-            const landmarks = results.multiFaceLandmarks[0];
-            
-            // Calculate eye center positions
-            let leftEyeCenter = new THREE.Vector3(0, 0, 0);
-            let rightEyeCenter = new THREE.Vector3(0, 0, 0);
-            let noseCenter = new THREE.Vector3(
-                landmarks[168].x,
-                landmarks[168].y,
-                landmarks[168].z
-            );
-            
-            // Average left eye landmarks
-            LEFT_EYE_INDICES.forEach((index) => {
-                leftEyeCenter.x += landmarks[index].x;
-                leftEyeCenter.y += landmarks[index].y;
-                leftEyeCenter.z += landmarks[index].z;
-              });
-              leftEyeCenter.divideScalar(LEFT_EYE_INDICES.length);
-            
-              RIGHT_EYE_INDICES.forEach((index) => {
-                rightEyeCenter.x += landmarks[index].x;
-                rightEyeCenter.y += landmarks[index].y;
-                rightEyeCenter.z += landmarks[index].z;
-              });
-              rightEyeCenter.divideScalar(RIGHT_EYE_INDICES.length);
-            
-              // Chỉnh lại hệ tọa độ Three.js
-              leftEyeCenter.x = -((leftEyeCenter.x - 0.5) * 2);
-              leftEyeCenter.y = -((leftEyeCenter.y - 0.5) * 2);
-              rightEyeCenter.x = -((rightEyeCenter.x - 0.5) * 2);
-              rightEyeCenter.y = -((rightEyeCenter.y - 0.5) * 2);
-              noseCenter.x = -((noseCenter.x - 0.5) * 2);
-              noseCenter.y = -((noseCenter.y - 0.5) * 2);
-
-              const centerX = (leftEyeCenter.x + rightEyeCenter.x) + 5;
-              const centerY = (leftEyeCenter.y + rightEyeCenter.y) / 2;
-              const centerZ = (leftEyeCenter.z + rightEyeCenter.z) / 2;
-            
-              // Dịch kính xuống một chút để phù hợp hơn
-              const offsetY = (noseCenter.y - centerY) ;
-              // Tính góc nghiêng theo trục Y
-              const leftEar = landmarks[234];
-              const rightEar = landmarks[454];
-            
-
-              const eyeDistance = new THREE.Vector3()
-              .subVectors(leftEyeCenter, rightEyeCenter)
-              .length();
-          
-            // Xác định kích thước kính dựa vào khoảng cách thái dương
-            const faceWidth = Math.abs(landmarks[10].x - landmarks[338].x) * 2;
-            const scaleFactor = faceWidth * 2.5; // Điều chỉnh kích thước hợp lý
-            
-            const forehead = landmarks[10]; // Trán
-            const chin = landmarks[152]; // Cằm
-            const nose = landmarks[1]; // Đỉnh mũi
-
-            // Vector từ trán đến cằm để có được hướng ngửa/cúi
-            const faceUpVector = new THREE.Vector3(
-                forehead.x - chin.x,
-                forehead.y - chin.y,
-                forehead.z - chin.z
-            ).normalize();
-            
-            const refUpVector = new THREE.Vector3(0, 1, 0);
-            let headAngleX = Math.acos(faceUpVector.dot(refUpVector));
-
-            // Xác định dấu (ngửa hay cúi)
-            if (forehead.z > chin.z) {
-                headAngleX = -headAngleX;
-            }
-            
-
-            // --- Tính góc nghiêng theo trục Y (quay trái/phải) ---
-                // Vector ngang từ tai trái đến tai phải
-                const earVector = new THREE.Vector3(
-                    rightEar.x - leftEar.x,
-                    rightEar.y - leftEar.y,
-                    rightEar.z - leftEar.z
-                ).normalize();
-                
-                // Vector tham chiếu (1,0,0) - vector ngang
-                const refSideVector = new THREE.Vector3(1, 0, 0);
-                
-                // Góc giữa vector tai và vector tham chiếu ngang
-                let headAngleY = Math.acos(earVector.dot(refSideVector));
-                // Xác định dấu (quay trái hay phải)
-                if (rightEar.z > leftEar.z) {
-                    headAngleY = -headAngleY;
-                }
-                
-                // --- Tính góc nghiêng theo trục Z (nghiêng đầu) ---
-                // Sử dụng vị trí mắt để tính góc nghiêng
-                const eyeVector = new THREE.Vector3(
-                    rightEyeCenter.x - leftEyeCenter.x,
-                    rightEyeCenter.y - leftEyeCenter.y,
-                    0 // Bỏ qua thành phần z để tính góc trên mặt phẳng XY
-                ).normalize();
-                
-                const headAngleZ = Math.atan2(eyeVector.y, eyeVector.x);
-
-            
-            // Swap left and right eye positions to match mirrored video
-              setEyePositions({
-                leftEye: rightEyeCenter, // Swap lại do mirroring
-                rightEye: leftEyeCenter,
-                nose: noseCenter,
-                glassesPosition: { x: centerX, y: centerY + offsetY, z: centerZ },
-                glassesRotation: { z: headAngleZ, y: headAngleY ,x: headAngleX},
-                scale: scaleFactor
-              });
-            
-            // Draw eye contours on 2D canvas for debugging
-            ctx.save();
-            ctx.translate(canvas.width, 0);
-            ctx.scale(-1, 1);
-            
-            drawConnectors(
-              ctx, 
-              landmarks, 
-              [
-                ...LEFT_EYE_INDICES.map((idx, i) => [idx, LEFT_EYE_INDICES[(i + 1) % LEFT_EYE_INDICES.length]]),
-                ...RIGHT_EYE_INDICES.map((idx, i) => [idx, RIGHT_EYE_INDICES[(i + 1) % RIGHT_EYE_INDICES.length]])
-              ],
-              { color: '#FF3030' }
-            );
-            
-            ctx.restore();
-          }
-        });
-
-        // Use MediaPipe's Camera class when available or fallback to navigator.mediaDevices
-        let cameraUtils;
-        try {
-          cameraUtils = await import('@mediapipe/camera_utils');
-          const Camera = cameraUtils.Camera;
-          
-          const camera = new Camera(video, {
-            onFrame: async () => {
-              await faceMesh.send({ image: video });
-            },
-            width: 640,
-            height: 480
-          });
-
-          camera.start();
-          return () => camera.stop();
-        } catch (error) {
-          console.warn("Could not load @mediapipe/camera_utils, using fallback", error);
-          
-          // Fallback to basic getUserMedia
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-              video: { width: 640, height: 480 } 
-            });
-            video.srcObject = stream;
-            video.play();
-            
-            // Create animation frame loop as alternative to Camera class
-            let animationFrameId;
-            const processFrame = async () => {
-              if (video.readyState === 4) {
-                await faceMesh.send({ image: video });
-              }
-              animationFrameId = requestAnimationFrame(processFrame);
-            };
-            
-            processFrame();
-            return () => {
-              cancelAnimationFrame(animationFrameId);
-              stream.getTracks().forEach(track => track.stop());
-            };
-          } catch (mediaError) {
-            console.error("Camera access failed:", mediaError);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load MediaPipe:", error);
+    // Store the original material of the selected part
+    if (part && !originalMaterials[part.uuid]) {
+      if (Array.isArray(part.material)) {
+        setOriginalMaterials((prev) => ({
+          ...prev,
+          [part.uuid]: part.material.map((mat) => mat.clone()),
+        }));
+      } else {
+        setOriginalMaterials((prev) => ({
+          ...prev,
+          [part.uuid]: part.material.clone(),
+        }));
       }
-    };
+    }
+  };
 
-    const cleanup = loadFaceMesh();
-    return () => {
-      cleanup?.();
-    };
-  }, []);
+  const handleColorChange = (color) => {
+    if (!selectedPart) return;
+
+    // If reset was clicked, restore original material
+    if (color === "reset") {
+      console.log(originalMaterials);
+      if (originalMaterials[selectedPart.uuid]) {
+        const originalMaterial = originalMaterials[selectedPart.uuid];
+
+        setSelectedPart((prevPart) => {
+          let updatedPart = { ...prevPart };
+          if (Array.isArray(updatedPart.material)) {
+            updatedPart.material = originalMaterial.map((mat) => mat.clone());
+          } else {
+            updatedPart.material = originalMaterial.clone();
+          }
+          return updatedPart;
+        });
+      }
+      return;
+    }
+
+    // Handle different material types
+    setSelectedPart((prevPart) => {
+      let updatedPart = { ...prevPart };
+
+      if (Array.isArray(updatedPart.material)) {
+        updatedPart.material.forEach((mat) => {
+          applyColorToMaterial(mat, color);
+        });
+      } else {
+        applyColorToMaterial(updatedPart.material, color);
+      }
+
+      // Trả về đối tượng part đã cập nhật màu sắc
+      return updatedPart;
+    });
+
+    // Log for debugging
+    console.log(`Changed color of ${selectedPart.name} to ${color}`);
+  };
+
+  // Helper function to apply color to different material types
+  const applyColorToMaterial = (material, colorHex) => {
+    const color = new THREE.Color(colorHex);
+
+    // Handle different material types
+    if (
+      material.type === "MeshStandardMaterial" ||
+      material.type === "MeshPhysicalMaterial" ||
+      material.type === "MeshLambertMaterial"
+    ) {
+      material.color.set(color);
+    }
+
+    // For glass/mirror materials, try different approaches
+    if (
+      (material.name && material.name.toLowerCase().includes("mirror")) ||
+      (material.name && material.name.toLowerCase().includes("glass"))
+    ) {
+      material.color.set(color);
+      material.emissive.set(color);
+      material.emissiveIntensity = 0.5;
+
+      // Adjust transparency for glass
+      if (material.name.toLowerCase().includes("mirror")) {
+        material.transparent = true;
+        material.opacity = 0.2;
+      }
+    }
+
+    // For reflective materials, update reflection properties
+    if (material.metalness !== undefined) {
+      material.metalness = 0.8;
+      material.roughness = 0.2;
+    }
+
+    // For special shader materials
+    if (
+      material.type === "ShaderMaterial" ||
+      material.type === "RawShaderMaterial"
+    ) {
+      if (material.uniforms.color) {
+        material.uniforms.color.value.set(color);
+      }
+    }
+
+    // Ensure material update flag is set
+    material.needsUpdate = true;
+  };
+
+  // Preload the model
+  useEffect(() => {
+    useGLTF.preload(modelUrl);
+  }, [modelUrl]);
 
   return (
-    <div>
-      <h1>3D Glasses Overlay with Face Tracking</h1>
-      <div style={{ position: 'relative', width: '640px', height: '480px' }}>
-        <video
-          ref={videoRef}
-          style={{ width: '100%', height: '100%', transform: 'scaleX(-1)' }}
-        />
-        <canvas
-          ref={canvasRef}
-          width={640}
-          height={480}
-          style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', transform: 'scaleX(-1)' }}
-        />
-        {/* Overlay the Three.js canvas directly on top of the video */}
-        <div style={{ 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          width: '100%', 
-          height: '100%',
-          pointerEvents: 'none'
-        }}>
-          <Canvas camera={{ position: [0, 0, 2.5] }}>
-       
-            <GlassesModel positions={eyePositions} />
-            <Environment preset="warehouse" background={false} />
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        position: "relative",
+        background: "#f7f7f7",
+      }}
+    >
+      {!isLoaded && <LoadingScreen />}
 
-          </Canvas>
+      <Canvas
+        ref={canvasRef}
+        shadows
+        camera={{ position: [0, 0, 10], fov: 50 }}
+        onPointerMissed={() => setSelectedPart(null)}
+        gl={{
+          antialias: true, // Enable antialiasing for smoother rendering
+          powerPreference: "high-performance", // Request high performance GPU
+        }}
+        onCreated={({ camera }) => {
+          cameraRef.current = camera;
+        }}
+        dpr={[1, 2]} // Responsive DPR for better performance on different devices
+        style={{ visibility: isLoaded ? "visible" : "hidden" }}
+      >
+        <color attach="background" args={["#f7f7f7"]} />
+        <Suspense fallback={null}>
+          <Stage environment="city" intensity={0.5}>
+            <ModelCustomize
+              url={modelUrl}
+              onSelectPart={handleSelectPart}
+              onDragStart={() => setIsDragging(true)}
+              onDragEnd={() => setIsDragging(false)}
+              setParts={setParts}
+              setOriginalParts={setOriginalParts}
+            />
+          </Stage>
+          <SceneControls isDragging={isDragging} />
+        </Suspense>
 
+        {selectedPart && (
+          <EffectComposer multisampling={8} autoClear={false}>
+            <Outline
+              selection={[selectedPart]}
+              edgeStrength={5}
+              pulseSpeed={0.5}
+              visibleEdgeColor="#ffffff"
+              hiddenEdgeColor="#000000"
+              blur
+              width={500}
+            />
+          </EffectComposer>
+        )}
+        <Stats />
+        <ScreenshotHelper cameraRef={cameraRef} />
+      </Canvas>
+
+      {/* Navigation bar at top */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          padding: "15px 20px",
+          display: "flex",
+          justifyContent: "space-between",
+          backgroundColor: "#ffffff",
+          boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+          visibility: isLoaded ? "visible" : "hidden",
+          zIndex: 1000,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <h2 style={{ fontSize: "18px", fontWeight: "bold", margin: 0 }}>
+            Custom 3D Model Viewer
+          </h2>
         </div>
+        <button
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#000",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          Done
+        </button>
+      </div>
+
+      {/* Model controls panel */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "20px",
+          left: "20px",
+          right: "20px",
+          backgroundColor: "#ffffff",
+          padding: "20px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+          maxWidth: "800px",
+          margin: "0 auto",
+          visibility: isLoaded ? "visible" : "hidden",
+        }}
+      >
+        <ColorControls
+          selectedPart={selectedPart}
+          onColorChange={handleColorChange}
+          parts={parts}
+          setSelectedPart={setSelectedPart}
+        />
       </div>
     </div>
   );
 }
-
-// Preload the glasses model
-function Test() {
-  return (
-    <div className="App">
-      <h1>3D Glasses Overlay with Face Tracking</h1>
-      <FaceDetection />
-    </div>
-  );
-}
-
-export default Test;
