@@ -14,6 +14,8 @@ import {
   faPlus,
   faCartPlus,
   faVideo,
+  faCubes,
+  faCube,
 } from "@fortawesome/free-solid-svg-icons";
 
 import ProductRecommend from "../components/ProductRecommend";
@@ -26,6 +28,7 @@ import { getVariantsByProductSlug } from "../api/variantApi";
 import useCart from "../hooks/UseCart";
 import { encryptData } from "../utils/ultils";
 import VTOGlassModal from "../components/ar/VTOGlassModal";
+import Modal3DView from "../components/ar/Modal3DView";
 
 const products = [
   {
@@ -88,7 +91,7 @@ const ProductDetails = () => {
   const [variants, setVariants] = useState([]);
 
   const [showModalVTO, setShowModalVTO] = useState(false);
-
+  const [showModal3DView, setShowModal3DView] = useState(false);
   const [images, setImages] = useState([]);
 
   const { slug } = useParams();
@@ -212,9 +215,15 @@ const ProductDetails = () => {
               </div>
             ))}
           </Slider>
-          <div className="button-try" onClick={() => setShowModalVTO(true)}>
-            <FontAwesomeIcon className="icon" icon={faVideo} />
-            <button>Thử trực tiếp</button>
+          <div className="button-try">
+            <div className="direct" onClick={() => setShowModalVTO(true)}>
+              <FontAwesomeIcon className="icon" icon={faVideo} />
+              <button>Thử trực tiếp</button>
+            </div>
+            <div className="view" onClick={() => setShowModal3DView(true)}>
+              <FontAwesomeIcon className="icon" icon={faCube} />
+              <button>Xem mô hình 3D</button>
+            </div>
           </div>
         </div>
         <div className="button-group">
@@ -368,6 +377,16 @@ const ProductDetails = () => {
         <VTOGlassModal
           isOpen={showModalVTO}
           onClose={() => setShowModalVTO(false)}
+        />
+      ) : (
+        ""
+      )}
+
+      {showModal3DView ? (
+        <Modal3DView
+          isOpen={showModal3DView}
+          onClose={() => setShowModal3DView(false)}
+          modelUrl={"/models/tim_nhat_837479.glb"}
         />
       ) : (
         ""

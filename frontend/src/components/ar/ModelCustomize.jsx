@@ -10,39 +10,38 @@ const ModelCustomize = ({ url, onSelectPart, setParts, setOriginalParts }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [originalMaterials, setOriginalMaterials] = useState({});
   const [dragStartPos, setDragStartPos] = useState(null);
-
-  // Map parts by name for easier access
-  useEffect(() => {
-    let parts = [];
-    scene.traverse((child) => {
-      if (child.isMesh) {
-        parts = [...parts, child];
-      }
-    });
-    setParts(parts);
-    setOriginalParts(parts);
-    console.log("All parts:", parts);
-  }, [scene]);
+  const [materialMap, setMaterialMap] = useState({});
 
   // Store original materials when component mounts
   useEffect(() => {
-    const origMats = {};
-    scene.traverse((child) => {
-      if (child.isMesh && child.material) {
-        // Deep clone the material to preserve all properties
-        if (Array.isArray(child.material)) {
-          // Handle multi-material objects
-          origMats[child.uuid] = child.material.map((mat) => mat.clone());
-        } else {
-          origMats[child.uuid] = child.material.clone();
-        }
+    let parts = [];
+    const origMaterials = {};
 
-        // Debug material properties
-        console.log(`Material for ${child.name}:`, child.material);
+    scene.traverse((child) => {
+      if (child.isMesh) {
+        parts.push(child);
+
+        // Store the original material correctly
+        if (Array.isArray(child.material)) {
+          origMaterials[child.uuid] = child.material.map((mat) => mat.clone());
+        } else {
+          origMaterials[child.uuid] = child.material.clone();
+        }
       }
     });
-    setOriginalMaterials(origMats);
-  }, [scene]);
+
+    setParts(parts);
+    setOriginalParts(parts);
+    setMaterialMap(origMaterials);
+
+    // Make materials map available to parent component
+    if (window) {
+      window.originalMaterialsMap = origMaterials;
+    }
+
+    console.log("All parts:", parts);
+    console.log("Original materials stored:", origMaterials);
+  }, [scene, setParts, setOriginalParts]);
 
   // Update cursor only when hovering over the model
   useEffect(() => {

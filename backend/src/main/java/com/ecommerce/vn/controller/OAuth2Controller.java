@@ -51,11 +51,8 @@ public class OAuth2Controller {
 	@Autowired
 	private UserAuthProviderService userAuthProviderService;
 
-    private final ClientRegistrationRepository clientRegistrationRepository;
-
-    public OAuth2Controller(ClientRegistrationRepository clientRegistrationRepository) {
-        this.clientRegistrationRepository = clientRegistrationRepository;
-    }
+	@Autowired
+    private ClientRegistrationRepository clientRegistrationRepository;
 
     private static final JsonFactory JSON_FACTORY = 
             GsonFactory.getDefaultInstance();
@@ -84,12 +81,14 @@ public class OAuth2Controller {
                     user.setUserName(name);
                     userService.updateUser(user);
                     
-                    try {
-                        String username = user.getUserName() != null ? user.getUserName() : "";
-        				emailService.sendLinkAccountEmail(user.getEmail(),username, "google");
-        			} catch (IOException e) {
-        						
-        			}
+                    if(!userAuthProviderService.existsByUserAndProvider(user,"google")) {
+	                    try {
+	                        String username = user.getUserName() != null ? user.getUserName() : "";
+	        				emailService.sendLinkAccountEmail(user.getEmail(),username, "google");
+	        			} catch (IOException e) {
+	        						
+	        			}
+                    }
                 } catch (Exception e) {
                 	Role userRole = roleService.getRoleByName("USER");
                     user = new User();
@@ -147,12 +146,15 @@ public class OAuth2Controller {
                 user.setUserName(name);
                 userService.updateUser(user);
                 
-                try {
-                    String username = user.getUserName() != null ? user.getUserName() : "";
-    				emailService.sendLinkAccountEmail(user.getEmail(),username, "facebook");
-    			} catch (IOException e) {
-    						
-    			}
+                if(!userAuthProviderService.existsByUserAndProvider(user,"facebook")) {
+                	try {
+                		String username = user.getUserName() != null ? user.getUserName() : "";
+                		emailService.sendLinkAccountEmail(user.getEmail(),username, "facebook");
+                	} catch (IOException e) {
+                		
+                	}
+                	
+                }
                 
             } catch (Exception e) {
             	Role userRole = roleService.getRoleByName("USER");

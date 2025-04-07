@@ -7,6 +7,7 @@ import {
   faChevronRight,
   faUndo,
   faCamera,
+  faUndoAlt,
 } from "@fortawesome/free-solid-svg-icons";
 const ColorControls = ({
   selectedPart,
@@ -100,6 +101,28 @@ const ColorControls = ({
         </div>
         <div className="color-controls__message">
           Click on a part of the model to select it
+        </div>
+        <div className="color-controls__actions">
+          <button
+            onClick={() => onColorChange(null, true)} // Truyền tham số resetAll=true
+            className="color-controls__reset-all-button"
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#f44336",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              marginRight: "10px",
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faUndoAlt}
+              className="color-controls__button-icon"
+            />
+            Reset All Colors
+          </button>
         </div>
       </div>
     );
