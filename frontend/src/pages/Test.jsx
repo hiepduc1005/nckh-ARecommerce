@@ -1,6 +1,12 @@
 import React, { useRef, useState, useEffect, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { useGLTF, Stage, useProgress, Stats } from "@react-three/drei";
+import {
+  useGLTF,
+  Stage,
+  useProgress,
+  Stats,
+  Environment,
+} from "@react-three/drei";
 import * as THREE from "three";
 import { EffectComposer, Outline } from "@react-three/postprocessing";
 import LoadingScreen from "../components/ar/LoadingScreen";
@@ -237,7 +243,8 @@ export default function Interactive3DViewer({
       >
         <color attach="background" args={["#f7f7f7"]} />
         <Suspense fallback={null}>
-          <Stage environment="city" intensity={0.5}>
+          <Stage intensity={0.5}>
+            <Environment files="/hdr/studio_small_03_1k.hdr" />
             <ModelCustomize
               url={modelUrl}
               onSelectPart={handleSelectPart}

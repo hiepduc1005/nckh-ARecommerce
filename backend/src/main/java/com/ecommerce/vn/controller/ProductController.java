@@ -51,15 +51,23 @@ public class ProductController {
     //Tạo sản phẩm
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createProduct(
-            @RequestPart("image") MultipartFile image, 
+            @RequestPart("image") MultipartFile image,
+            @RequestPart("model") MultipartFile model,
             @RequestPart("product")  ProductCreateRequest request) {
     	if(image == null) {
     		return ResponseEntity.badRequest().body("Product image is empty!");
     	}
     	
+    	if(model == null) {
+    		return ResponseEntity.badRequest().body("Model is empty!");
+    	}
+    	
         Product product = productConvert.productCreateRequestConver(request);
         String imagePath = fileUploadService.uploadFileToServer(image);
         product.setImagePath(imagePath);
+        
+        String modelPath = fileUploadService.uploadModelToServer(model);
+        product.setModelPath(modelPath);
         
         Product saveProduct = productService.createProduct(product);
 
@@ -95,6 +103,7 @@ public class ProductController {
     @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateProduct(
             @RequestPart(name = "image", required = false) MultipartFile image, 
+            @RequestPart(name = "model", required = false) MultipartFile model,
             @RequestPart("product")  ProductUpdateRequest productUpdateRequest) {
     	
     	Product productToUpdate = productConvert.productUpdateRequestConver(productUpdateRequest);
@@ -102,6 +111,12 @@ public class ProductController {
     		String imagePath = fileUploadService.uploadFileToServer(image);    		
     		productToUpdate.setImagePath(imagePath);
     	}
+    	
+    	if(model != null) {
+    		String modelPath = fileUploadService.uploadModelToServer(model);    		
+    		productToUpdate.setModelPath(modelPath);
+    	}
+    	
     	
         Product updateProduct = productService.updateProduct(productToUpdate);
         ProductResponse response = productConvert.productConvertToProductResponse(updateProduct);

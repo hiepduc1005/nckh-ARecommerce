@@ -47,6 +47,9 @@ public class Product {
 	
 	@Column(name = "image_path")
 	private String imagePath;
+	
+	@Column(name = "model_path")
+	private String modelPath;
 
 
     @Column(name = "short_description")
@@ -108,6 +111,14 @@ public class Product {
 	
 	
 	
+	public String getModelPath() {
+		return modelPath;
+	}
+
+	public void setModelPath(String modelPath) {
+		this.modelPath = modelPath;
+	}
+
 	public String getSlug() {
 		return slug;
 	}

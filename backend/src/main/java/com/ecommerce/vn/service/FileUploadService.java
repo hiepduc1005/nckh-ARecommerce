@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileUploadService {
 
 	private final String uploadDir = "src/main/resources/static/uploads";
-	
+	private final String uploadModelDir = "src/main/resources/static/uploads/models";
 	public String uploadFileToServer(MultipartFile image) {
 		try {
 			Path uploadPath = Paths.get(uploadDir);
@@ -33,6 +33,29 @@ public class FileUploadService {
 		
 		} catch (Exception e) {
 			 throw new RuntimeException("Failed to save file: " + image.getOriginalFilename(), e);
+		}
+	}
+	
+	public String uploadModelToServer(MultipartFile model) {
+		try {
+			Path uploadPath = Paths.get(uploadModelDir);
+			
+			if(!Files.exists(uploadPath)) {
+				Files.createDirectories(uploadPath);
+			}
+			
+			StringBuffer fileName = new StringBuffer("");		
+			fileName.append(UUID.randomUUID());
+			fileName.append("_");
+			fileName.append(model.getOriginalFilename());
+			Path filePath = uploadPath.resolve(fileName.toString());
+
+			Files.write(filePath,model.getBytes());
+			
+			return "/uploads/models/" + fileName;
+		
+		} catch (Exception e) {
+			 throw new RuntimeException("Failed to save file: " + model.getOriginalFilename(), e);
 		}
 	}
 }

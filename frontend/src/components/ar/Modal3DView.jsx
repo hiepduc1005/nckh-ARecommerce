@@ -242,7 +242,7 @@ function Modal3DView({
               />
 
               <Model url={modelUrl} />
-              <Environment preset="studio" />
+              <Environment files="/hdr/studio_small_03_1k.hdr" />
             </Suspense>
 
             <ContactShadows

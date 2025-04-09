@@ -17,6 +17,7 @@ const ModelCustomize = ({ url, onSelectPart, setParts, setOriginalParts }) => {
     let parts = [];
     const origMaterials = {};
 
+    console.log(scene);
     scene.traverse((child) => {
       if (child.isMesh) {
         parts.push(child);

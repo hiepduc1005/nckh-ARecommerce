@@ -35,6 +35,7 @@ import AboutUs from "../pages/AboutUs";
 import ReturnPolicy from "../pages/ReturnPolicy";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
 import Interactive3DViewer from "../pages/Test";
+import ShoesCustomize from "../pages/ShoesCustomize";
 
 const AppRoutes = () => {
   return (
@@ -47,6 +48,7 @@ const AppRoutes = () => {
         <Route path="return-policy" element={<ReturnPolicy />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
         <Route path="test" element={<Interactive3DViewer />} />
+        <Route path="customize/shoes" element={<ShoesCustomize />} />
       </Route>
 
       <Route path="/cart" element={<CartLayout />}></Route>

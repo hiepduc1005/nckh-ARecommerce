@@ -49,6 +49,9 @@ public class Variant {
 	@Column(name = "image_path")
 	private String imagePath;
 	
+	@Column(columnDefinition = "json")
+	private String colorConfig; 
+	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -71,6 +74,19 @@ public class Variant {
     )
     private List<AttributeValue> attributeValues = new ArrayList<AttributeValue>();
 	
+	
+
+	public String getColorConfig() {
+		return colorConfig;
+	}
+
+
+
+	public void setColorConfig(String colorConfig) {
+		this.colorConfig = colorConfig;
+	}
+
+
 
 	//Getter and Setter
 	public List<AttributeValue> getAttributeValues() {

@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import com.ecommerce.vn.dto.attribute.AttributeResponse;
 import com.ecommerce.vn.dto.attribute.AttributeValueResponse;
 import com.ecommerce.vn.dto.product.ProductResponse;
 
@@ -19,10 +18,17 @@ public class VariantResponse {
 	private List<AttributeValueResponse> attributeValueResponses;
 	private LocalDateTime createdAt;
 	private LocalDateTime updateAt;
+	private String colorConfig;
 	private UUID createdBy;
 	private UUID updatedBy;
 	
 	
+	public String getColorConfig() {
+		return colorConfig;
+	}
+	public void setColorConfig(String colorConfig) {
+		this.colorConfig = colorConfig;
+	}
 	public String getImagePath() {
 		return imagePath;
 	}

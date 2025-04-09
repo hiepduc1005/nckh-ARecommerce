@@ -42,7 +42,7 @@ public class VariantConvert {
 		variantResponse.setUpdateAt(variant.getUpdateAt());
 		variantResponse.setUpdatedBy(variantResponse.getUpdatedBy());
 		variantResponse.setProductResponse(productConvert.productConvertToProductResponse(variant.getProduct()));
-
+		variantResponse.setColorConfig(variant.getColorConfig());
 		List<AttributeValueResponse> attributeValueResponses = variant.getAttributeValues()
 				.stream()
 				.map((attributeValue) -> attributeValueConvert.attributeConvertToAttributeValuesResponse(attributeValue))
@@ -62,7 +62,7 @@ public class VariantConvert {
 	    variant.setQuantity(variantCreateRequest.getQuantity());
 	    variant.setDiscountPrice(BigDecimal.valueOf(variantCreateRequest.getDiscountPrice()));
 	    variant.setProduct(product);
-
+	    variant.setColorConfig(variantCreateRequest.getColorConfig());
 	    // Chuyển đổi danh sách AttributeValue
 	    List<AttributeValue> attributeValues = variantCreateRequest.getAttributeValueCreateRequests()
 	            .stream()

@@ -13,6 +13,16 @@ public class VariantCreateRequest {
 	private Double discountPrice;
 	private Integer quantity;
 	private List<AttributeValueCreateRequest> attributeValueCreateRequests = new ArrayList<>();
+	private String colorConfig;
+	
+	
+	
+	public String getColorConfig() {
+		return colorConfig;
+	}
+	public void setColorConfig(String colorConfig) {
+		this.colorConfig = colorConfig;
+	}
 	public UUID getProductId() {
 		return productId;
 	}

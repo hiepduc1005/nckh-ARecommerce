@@ -55,8 +55,20 @@ public class ProductResponse {
 	
 	private List<RatingResponse> ratingResponses;
 	
+	private String modelPath;
 	
 	
+	
+	public String getModelPath() {
+		return modelPath;
+	}
+
+
+	public void setModelPath(String modelPath) {
+		this.modelPath = modelPath;
+	}
+
+
 	public String getSlug() {
 		return slug;
 	}

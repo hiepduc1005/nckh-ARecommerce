@@ -195,7 +195,7 @@ public class ProductConvert {
         productResponse.setMaxPrice(maxPrice);
         productResponse.setBrandResponse(brandResponse);
         productResponse.setSolded(product.getSoldQuantity());
-
+        productResponse.setModelPath(product.getModelPath());
         return productResponse;
     }
 
