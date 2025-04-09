@@ -75,10 +75,10 @@ public class AttributeConvert {
         attributeProductResponse.setId(attribute.getId());
         attributeProductResponse.setActive(attribute.getActive());
         attributeProductResponse.setAttributeName(attribute.getAttributeName());
-        attributeProductResponse.setCreatedAt(attributeProductResponse.getCreatedAt());
-        attributeProductResponse.setUpdateAt(attributeProductResponse.getUpdateAt());
-        attributeProductResponse.setCreatedBy(attributeProductResponse.getCreatedBy());
-        attributeProductResponse.setUpdatedBy(attributeProductResponse.getUpdatedBy());
+        attributeProductResponse.setCreatedAt(attribute.getCreatedAt());
+        attributeProductResponse.setUpdateAt(attribute.getUpdatedAt());
+        attributeProductResponse.setCreatedBy(attribute.getCreatedBy());
+        attributeProductResponse.setUpdatedBy(attribute.getUpdatedBy());
         
         List<AttributeValueResponse> attributeValueResponses = attribute.getAttributeValues()
         		.stream()

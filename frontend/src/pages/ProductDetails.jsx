@@ -93,6 +93,7 @@ const ProductDetails = () => {
   const [showModalVTO, setShowModalVTO] = useState(false);
   const [showModal3DView, setShowModal3DView] = useState(false);
   const [images, setImages] = useState([]);
+  const [colorConfig, setColorConfig] = useState(null);
 
   const { slug } = useParams();
   const { setLoading } = useLoading();
@@ -145,6 +146,7 @@ const ProductDetails = () => {
   const handleVariantSelect = (variant) => {
     setSelectedVariants(variant.id);
     setSelectVariantStock(variant.quantity);
+    setColorConfig(variant?.colorConfig);
     setQuantity(1);
   };
 
@@ -387,6 +389,7 @@ const ProductDetails = () => {
           isOpen={showModal3DView}
           onClose={() => setShowModal3DView(false)}
           modelUrl={"/models/tim_nhat_837479.glb"}
+          colorConfig={colorConfig ? JSON.parse(colorConfig) : {}}
         />
       ) : (
         ""

@@ -2,19 +2,29 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { createVariant } from "../../api/variantApi";
-import CreatableSelect from 'react-select/creatable';
+import CreatableSelect from "react-select/creatable";
 import ImageDropUploader from "../ImageDropUploader";
+import ModalInteracting3DModel from "../ar/ModalInteracting3DModel";
 
-const VariantModal = ({ show, handleClose, product, variant, token, onSuccess }) => {
+const VariantModal = ({
+  show,
+  handleClose,
+  product,
+  variant,
+  token,
+  onSuccess,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     price: "",
     discountPrice: "",
     quantity: "",
-    attributeValues: []
+    attributeValues: [],
   });
   const isEditMode = Boolean(variant);
-  const [image,setImage] = useState(null)
+  const [image, setImage] = useState(null);
+  const [showModalInteractive3D, setShowModalInteractive3D] = useState(false);
+  const [colorConfig, setColorConfig] = useState({});
 
   useEffect(() => {
     if (product?.attributeResponses) {
@@ -23,44 +33,49 @@ const VariantModal = ({ show, handleClose, product, variant, token, onSuccess })
         attributeId: attr.id,
         attributeValue: "",
       }));
-      
+
       setFormData({
         price: "",
         discountPrice: "",
         quantity: "",
-        attributeValues: initialAttributes
+        attributeValues: initialAttributes,
       });
     }
-    
+
     // If variant is provided, we're in edit mode, so populate fields
     if (variant) {
       setFormData({
         price: variant.price.toString(),
-        discountPrice: variant.discountPrice ? variant.discountPrice.toString() : "",
+        discountPrice: variant.discountPrice
+          ? variant.discountPrice.toString()
+          : "",
         quantity: variant.quantity.toString(),
-        attributeValues: variant.attributeValueResponses.map(attr => ({
+        attributeValues: variant.attributeValueResponses.map((attr) => ({
           attributeId: attr.attributeId,
-          attributeValue: attr.attributeValue
-        }))
+          attributeValue: attr.attributeValue,
+        })),
       });
+      setColorConfig(JSON.parse(variant?.colorConfig));
 
-      console.log(variant)
+      console.log(variant);
     }
   }, [product, variant]);
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSelectValue = (attributeId, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       attributeValues: prev.attributeValues.map((attr) =>
-        attr.attributeId === attributeId ? { ...attr, attributeValue: value } : attr
-      )
+        attr.attributeId === attributeId
+          ? { ...attr, attributeValue: value }
+          : attr
+      ),
     }));
   };
 
@@ -71,7 +86,9 @@ const VariantModal = ({ show, handleClose, product, variant, token, onSuccess })
     }
 
     // Validate attribute values are all filled
-    const missingAttributes = formData.attributeValues.some(attr => !attr.attributeValue);
+    const missingAttributes = formData.attributeValues.some(
+      (attr) => !attr.attributeValue
+    );
     if (missingAttributes) {
       toast.error("Vui lòng nhập đầy đủ thuộc tính cho biến thể!");
       return;
@@ -91,28 +108,35 @@ const VariantModal = ({ show, handleClose, product, variant, token, onSuccess })
         const variantData = {
           productId: product.id,
           price: parseFloat(formData.price),
-          discountPrice: formData.discountPrice ? parseFloat(formData.discountPrice) : 0,
+          discountPrice: formData.discountPrice
+            ? parseFloat(formData.discountPrice)
+            : 0,
           quantity: parseInt(formData.quantity, 10),
           attributeValueCreateRequests: formData.attributeValues,
+          colorConfig: JSON.stringify(colorConfig),
         };
 
         const formCreateVariant = new FormData();
-        formCreateVariant.append('variant', new Blob([JSON.stringify(variantData)], { type: "application/json" }));
+        formCreateVariant.append(
+          "variant",
+          new Blob([JSON.stringify(variantData)], { type: "application/json" })
+        );
         formCreateVariant.append("image", image);
 
         const data = await createVariant(formCreateVariant, token);
-        
-        if(data){
+
+        if (data) {
           toast.success("Thêm biến thể thành công!");
           console.log(data);
         }
-          
       }
-      
+
       if (onSuccess) onSuccess();
       closeModal();
     } catch (error) {
-      toast.error(isEditMode ? "Cập nhật biến thể thất bại!" : "Thêm biến thể thất bại!");
+      toast.error(
+        isEditMode ? "Cập nhật biến thể thất bại!" : "Thêm biến thể thất bại!"
+      );
       console.error("Error:", error);
     } finally {
       setIsLoading(false);
@@ -124,31 +148,38 @@ const VariantModal = ({ show, handleClose, product, variant, token, onSuccess })
       price: "",
       discountPrice: "",
       quantity: "",
-      attributeValues: []
-    })
+      attributeValues: [],
+    });
 
-    setImage(null)
-    handleClose()
-  }
+    setImage(null);
+    handleClose();
+  };
 
   const getAttributeName = (attributeId) => {
-    const attribute = product?.attributeResponses?.find(attr => attr.id === attributeId);
+    const attribute = product?.attributeResponses?.find(
+      (attr) => attr.id === attributeId
+    );
     return attribute?.attributeName || "Thuộc tính";
   };
 
   const getAttributeOptions = (attributeId) => {
-    const attribute = product?.attributeResponses?.find(attr => attr.id === attributeId);
-    return attribute?.attributeValueResponses?.map((val) => ({
-      label: val.attributeValue,
-      value: val.attributeValue,
-    })) || [];
+    const attribute = product?.attributeResponses?.find(
+      (attr) => attr.id === attributeId
+    );
+    return (
+      attribute?.attributeValueResponses?.map((val) => ({
+        label: val.attributeValue,
+        value: val.attributeValue,
+      })) || []
+    );
   };
 
   return (
     <Modal show={show} centered size="xl" onHide={closeModal} backdrop="static">
       <Modal.Header closeButton className="bg-light">
         <Modal.Title>
-          {isEditMode ? "Cập nhật biến thể" : "Thêm biến thể"} cho {product?.productName}
+          {isEditMode ? "Cập nhật biến thể" : "Thêm biến thể"} cho{" "}
+          {product?.productName}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-4">
@@ -168,11 +199,15 @@ const VariantModal = ({ show, handleClose, product, variant, token, onSuccess })
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label className="fw-bold">Giá khuyến mãi (VNĐ)</Form.Label>
+                <Form.Label className="fw-bold">
+                  Giá khuyến mãi (VNĐ)
+                </Form.Label>
                 <Form.Control
                   type="number"
                   value={formData.discountPrice}
-                  onChange={(e) => handleInputChange("discountPrice", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("discountPrice", e.target.value)
+                  }
                   placeholder="Nhập giá khuyến mãi (nếu có)"
                   className="shadow-sm"
                 />
@@ -191,35 +226,49 @@ const VariantModal = ({ show, handleClose, product, variant, token, onSuccess })
             />
           </Form.Group>
 
-
           <div className="mt-4 mb-3">
             <h5 className="border-bottom pb-2">Thuộc tính sản phẩm</h5>
           </div>
-          
+
           {formData.attributeValues.length > 0 ? (
             formData.attributeValues.map((attr) => (
               <Row key={attr.attributeId} className="mb-3">
                 <Col md={4}>
-                  <Form.Label className="fw-bold">{getAttributeName(attr.attributeId)}</Form.Label>
+                  <Form.Label className="fw-bold">
+                    {getAttributeName(attr.attributeId)}
+                  </Form.Label>
                 </Col>
                 <Col md={8}>
                   <CreatableSelect
-                    value={attr.attributeValue ? { label: attr.attributeValue, value: attr.attributeValue } : null}
-                    onChange={(selectedOption) => handleSelectValue(attr.attributeId, selectedOption.value)}
+                    value={
+                      attr.attributeValue
+                        ? {
+                            label: attr.attributeValue,
+                            value: attr.attributeValue,
+                          }
+                        : null
+                    }
+                    onChange={(selectedOption) =>
+                      handleSelectValue(attr.attributeId, selectedOption.value)
+                    }
                     options={getAttributeOptions(attr.attributeId)}
-                    placeholder={`Chọn hoặc nhập giá trị cho ${getAttributeName(attr.attributeId)}`}
+                    placeholder={`Chọn hoặc nhập giá trị cho ${getAttributeName(
+                      attr.attributeId
+                    )}`}
                     isClearable
                     isSearchable
-                    onCreateOption={(newValue) => handleSelectValue(attr.attributeId, newValue)}
+                    onCreateOption={(newValue) =>
+                      handleSelectValue(attr.attributeId, newValue)
+                    }
                     className="shadow-sm"
                     styles={{
                       control: (base) => ({
                         ...base,
-                        borderColor: '#ced4da',
-                        '&:hover': {
-                          borderColor: '#86b7fe'
-                        }
-                      })
+                        borderColor: "#ced4da",
+                        "&:hover": {
+                          borderColor: "#86b7fe",
+                        },
+                      }),
                     }}
                   />
                 </Col>
@@ -231,26 +280,50 @@ const VariantModal = ({ show, handleClose, product, variant, token, onSuccess })
         </Form>
         <Form.Group className="mb-4">
           <Form.Label className="fw-bold">Image</Form.Label>
-          <ImageDropUploader 
+          <ImageDropUploader
             onUpload={setImage}
             imagePreview={variant?.imagePath}
           />
         </Form.Group>
+        {product?.modelPath && (
+          <div className="mb-4 d-flex justify-content-center">
+            <Button
+              variant="outline-primary"
+              onClick={() => setShowModalInteractive3D(true)}
+              className="d-flex align-items-center gap-2"
+            >
+              <i className="bi bi-box"></i> Customize 3D Model
+            </Button>
+          </div>
+        )}
       </Modal.Body>
       <Modal.Footer className="bg-light">
         <Button variant="secondary" onClick={closeModal} disabled={isLoading}>
           Đóng
         </Button>
-        <Button 
-          variant="primary" 
-          onClick={handleSubmit} 
+        <Button
+          variant="primary"
+          onClick={handleSubmit}
           disabled={isLoading}
           className="d-flex align-items-center"
         >
-          {isLoading && <Spinner animation="border" size="sm" className="me-2" />}
+          {isLoading && (
+            <Spinner animation="border" size="sm" className="me-2" />
+          )}
           {isEditMode ? "Cập nhật biến thể" : "Thêm biến thể"}
         </Button>
       </Modal.Footer>
+      {showModalInteractive3D ? (
+        <ModalInteracting3DModel
+          isOpen={showModalInteractive3D}
+          modelUrl={`http://localhost:8080${product?.modelPath}`}
+          onClose={() => setShowModalInteractive3D(false)}
+          setConfig={setColorConfig}
+          config={colorConfig}
+        />
+      ) : (
+        ""
+      )}
     </Modal>
   );
 };

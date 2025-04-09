@@ -31,22 +31,39 @@ function Loader() {
 }
 
 // Model component with optimized material handling and camera adjustment
-function Model({ url }) {
+function Model({ url, colorConfig }) {
   const { scene } = useGLTF(url);
   const { camera } = useThree();
 
   useEffect(() => {
-    // Fix transparency issues
+    console.log(colorConfig);
     scene.traverse((node) => {
       if (!node.material) return;
+
+      const partName = node.name;
+      const config = colorConfig?.[partName];
+
+      console.log(config);
+
+      if (config && node.material) {
+        const materials = Array.isArray(node.material)
+          ? node.material
+          : [node.material];
+        materials.forEach((mat) => {
+          if (mat.color) {
+            mat.color.set(config.color);
+            mat.needsUpdate = true;
+          }
+        });
+      }
 
       const materials = Array.isArray(node.material)
         ? node.material
         : [node.material];
       materials.forEach((mat) => {
-        if (mat) {
-          mat.transparent = false;
-          mat.opacity = 1;
+        if (mat.name.toLowerCase().includes("mirror")) {
+          mat.transparent = true;
+          mat.opacity = 0.2;
         }
       });
     });
@@ -86,7 +103,7 @@ function Modal3DView({
   isOpen,
   onClose,
   modelUrl = "/path/to/glasses.glb",
-  onSaveView = () => console.log("Save view clicked"),
+  colorConfig,
 }) {
   const [copyStatus, setCopyStatus] = useState("idle"); // idle, copying, success, error
   const [showThumbnail, setShowThumbnail] = useState(false);
@@ -241,7 +258,7 @@ function Modal3DView({
                 castShadow
               />
 
-              <Model url={modelUrl} />
+              <Model url={modelUrl} colorConfig={colorConfig || {}} />
               <Environment files="/hdr/studio_small_03_1k.hdr" />
             </Suspense>
 

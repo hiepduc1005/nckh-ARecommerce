@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCube } from "@fortawesome/free-solid-svg-icons";
 import Modal3DView from "../components/ar/Modal3DView";
+import { formatToVNDate } from "../utils/ultils";
 
 const AdminProductDetails = () => {
   const { slug } = useParams();
@@ -423,12 +424,8 @@ const AdminProductDetails = () => {
                         <tr key={attribute.id}>
                           <td>{attribute.id}</td>
                           <td>{attribute.attributeName}</td>
-                          <td>
-                            {new Date(attribute.createdAt).toLocaleString()}
-                          </td>
-                          <td>
-                            {new Date(attribute.updateAt).toLocaleString()}
-                          </td>
+                          <td>{formatToVNDate(attribute.createdAt)}</td>
+                          <td>{formatToVNDate(attribute.updateAt)}</td>
                           <td>
                             <span
                               className={`status-badge ${

@@ -14,9 +14,7 @@ public class VariantCreateRequest {
 	private Integer quantity;
 	private List<AttributeValueCreateRequest> attributeValueCreateRequests = new ArrayList<>();
 	private String colorConfig;
-	
-	
-	
+		
 	public String getColorConfig() {
 		return colorConfig;
 	}
