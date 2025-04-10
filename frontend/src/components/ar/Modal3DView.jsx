@@ -10,6 +10,7 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 import "../../assets/styles/components/modal/Modal3DView.scss";
+import { trackARSessionEnd } from "../../utils/analytics";
 
 // Simplified Loader component
 function Loader() {
@@ -110,10 +111,12 @@ function Modal3DView({
   const canvasRef = useRef(null);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
 
+  const [sessionStart, setSessionStart] = useState(null);
+
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (!isOpen) return;
-
+    setSessionStart(Date.now());
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = "hidden";
 
@@ -121,6 +124,16 @@ function Modal3DView({
       document.body.style.overflow = originalStyle;
     };
   }, [isOpen]);
+
+  const handleClose = () => {
+    if (sessionStart) {
+      const duration = parseFloat(
+        ((Date.now() - sessionStart) / 1000).toFixed(2)
+      );
+      trackARSessionEnd(duration);
+    }
+    onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -227,7 +240,7 @@ function Modal3DView({
           className="modal-close-button"
           onClick={(e) => {
             e.stopPropagation();
-            onClose();
+            handleClose();
           }}
           aria-label="Close modal"
         >

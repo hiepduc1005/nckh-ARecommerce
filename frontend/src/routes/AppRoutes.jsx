@@ -36,6 +36,7 @@ import ReturnPolicy from "../pages/ReturnPolicy";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
 import Interactive3DViewer from "../pages/Test";
 import ShoesCustomize from "../pages/ShoesCustomize";
+import AdminDashboard from "../pages/AdminDashboard";
 
 const AppRoutes = () => {
   return (
@@ -77,7 +78,7 @@ const AppRoutes = () => {
       </Route>
 
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Dashboard />} />
+        <Route index element={<AdminDashboard />} />
         <Route path="attributes" element={<AdminAttribute />} />
         <Route path="tags" element={<AdminTag />} />
         <Route path="brands" element={<AdminBrand />} />

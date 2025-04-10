@@ -29,6 +29,7 @@ import useCart from "../hooks/UseCart";
 import { encryptData } from "../utils/ultils";
 import VTOGlassModal from "../components/ar/VTOGlassModal";
 import Modal3DView from "../components/ar/Modal3DView";
+import { trackARViewStart } from "../utils/analytics";
 
 const products = [
   {
@@ -99,6 +100,11 @@ const ProductDetails = () => {
   const { setLoading } = useLoading();
   const { addItem } = useCart();
   const navigate = useNavigate();
+
+  const handleShowModel3D = () => {
+    trackARViewStart(product.id);
+    setShowModal3DView(true);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -222,7 +228,7 @@ const ProductDetails = () => {
               <FontAwesomeIcon className="icon" icon={faVideo} />
               <button>Thử trực tiếp</button>
             </div>
-            <div className="view" onClick={() => setShowModal3DView(true)}>
+            <div className="view" onClick={() => handleShowModel3D()}>
               <FontAwesomeIcon className="icon" icon={faCube} />
               <button>Xem mô hình 3D</button>
             </div>

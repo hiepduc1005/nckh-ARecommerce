@@ -15,6 +15,7 @@ import { saveAs } from "file-saver";
 import ColorControls from "../components/ar/ColorControls";
 import ScreenshotHelper from "../components/helper/ScreenshotHelper";
 import SceneControls from "../components/ar/SceneControls";
+import { trackEvent } from "../utils/analytics";
 
 export default function Interactive3DViewer({
   modelUrl = "/models/tim_nhat_837479.glb",
@@ -27,7 +28,8 @@ export default function Interactive3DViewer({
   const [originalParts, setOriginalParts] = useState([]);
 
   // Listen to loading progress
-  const { progress, errors } = useProgress();
+  const { progress, errors, active } = useProgress();
+  const loadStart = useRef(null);
 
   const canvasRef = useRef();
   const cameraRef = useRef();
@@ -43,6 +45,24 @@ export default function Interactive3DViewer({
       return () => clearTimeout(timer);
     }
   }, [progress]);
+
+  useEffect(() => {
+    if (active && !loadStart.current) {
+      loadStart.current = Date.now();
+    }
+
+    if (!active && loadStart.current) {
+      const duration = Date.now() - loadStart.current;
+
+      trackEvent({
+        category: "AR",
+        action: "model_loaded",
+        value: duration,
+      });
+
+      loadStart.current = null; // reset
+    }
+  }, [active]);
 
   const handleSelectPart = (part) => {
     setSelectedPart(part);

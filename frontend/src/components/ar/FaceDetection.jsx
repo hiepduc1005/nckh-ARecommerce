@@ -8,6 +8,7 @@ import {
   Stats,
 } from "@react-three/drei";
 import * as THREE from "three";
+import { trackCameraPermission } from "../../utils/analytics";
 
 // Component to load and display 3D glasses model
 function GlassesModel({ positions }) {
@@ -282,6 +283,8 @@ const FaceDetection = () => {
           });
 
           camera.start();
+          trackCameraPermission(true);
+
           cleanupFunction = () => camera.stop();
 
           return () => camera.stop();
@@ -299,7 +302,8 @@ const FaceDetection = () => {
             video.srcObject = stream;
             video.play();
 
-            // Create animation frame loop as alternative to Camera class
+            trackCameraPermission(true);
+
             let lastTime = 0;
             let animationFrameId;
             const processFrame = async () => {
@@ -323,10 +327,12 @@ const FaceDetection = () => {
             };
           } catch (mediaError) {
             console.error("Camera access failed:", mediaError);
+            trackCameraPermission(false);
           }
         }
       } catch (error) {
         console.error("Failed to load MediaPipe:", error);
+        trackCameraPermission(false);
       }
     };
 

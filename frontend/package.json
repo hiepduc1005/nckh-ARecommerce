@@ -45,6 +45,7 @@
     "react-datepicker": "^8.0.0",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.5",
+    "react-ga4": "^2.1.0",
     "react-icons": "^5.4.0",
     "react-leaflet": "^4.2.1",
     "react-list": "^0.8.18",
@@ -57,6 +58,7 @@
     "react-stars": "^2.2.5",
     "react-tabs": "^6.1.0",
     "react-toastify": "^11.0.3",
+    "recharts": "^2.15.2",
     "sass": "^1.84.0",
     "slick-carousel": "^1.8.1",
     "three": "^0.173.0"

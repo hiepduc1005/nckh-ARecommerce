@@ -14,6 +14,7 @@ import ModelCustomize from "./ModelCustomize";
 import SceneControls from "./SceneControls";
 import ScreenshotHelper from "../helper/ScreenshotHelper";
 import ColorControls from "./ColorControls";
+import { trackEvent } from "../../utils/analytics";
 
 export default function Interactive3DViewer({
   modelUrl = "/models/tim_nhat_837479.glb",
@@ -29,7 +30,8 @@ export default function Interactive3DViewer({
   const [isColorConfigApplied, setIsColorConfigApplied] = useState(false);
 
   // Listen to loading progress
-  const { progress, errors } = useProgress();
+  const { progress, errors, active } = useProgress();
+  const loadStart = useRef(null);
 
   const canvasRef = useRef();
   const cameraRef = useRef();
@@ -45,6 +47,23 @@ export default function Interactive3DViewer({
       return () => clearTimeout(timer);
     }
   }, [progress]);
+
+  useEffect(() => {
+    if (active && !loadStart.current) {
+      loadStart.current = Date.now();
+    }
+
+    if (!active && loadStart.current) {
+      const duration = Date.now() - loadStart.current;
+      trackEvent({
+        category: "AR",
+        action: "model_loaded",
+        value: duration,
+      });
+
+      loadStart.current = null; // reset
+    }
+  }, [active]);
 
   // Apply colorConfig when parts are loaded and colorConfig exists
   useEffect(() => {
