@@ -52,6 +52,19 @@ export const formatToVNDate = (date) => {
     }
 }
 
+export const formatToVNDateDMY = (date) => {
+    if(date){
+        return format(new Date(date), "dd/MM/yyyy")
+    }
+}
+
+export const formatToVNDateYMD = (date) => {
+    if(date){
+        return format(new Date(date), "yyyy-MM-dd")
+    }
+}
+
+
 export const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
@@ -66,6 +79,7 @@ export const encryptData = (data) => {
 export const decryptData = (data) => {
     if (data) {
         const bytes = CryptoJS.Rabbit.decrypt(data, SECRET_KEY);
+        console.log(JSON.parse(bytes.toString(CryptoJS.enc.Utf8)))
         return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     }
     return null;

@@ -73,12 +73,13 @@ public class OrderServiceImpl implements OrderService {
 		order.setShippingFee(BigDecimal.ONE);
 		order.setShippingMethod("");
 		Coupon coupon = order.getCoupon();
+		BigDecimal totalPrice = calculateTotalPrice(order);
+		order.setTotalPrice(totalPrice);			
 		if(coupon != null) {
 			BigDecimal discountPrice = calculateTotalPriceWithCoupon(order,coupon);
 			order.setDiscountPrice(discountPrice);
+			
 		}
-		BigDecimal totalPrice = calculateTotalPrice(order);
-		order.setTotalPrice(totalPrice);			
 		
 		return orderRepository.save(order);
 	}

@@ -3,18 +3,25 @@ package com.ecommerce.vn.dto.coupon;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.ecommerce.vn.entity.coupon.CouponType;
 import com.ecommerce.vn.entity.product.DiscountType;
 
 public class CouponCreateRequest {
+	private String code;
 	private String couponDescription;
 	private BigDecimal discountValue;
 	private DiscountType discountType;
-	private CouponType couponType;
 	private Double minimumOrderAmount;
 	private Integer maxUsage;
 	private LocalDateTime couponStartDate;
 	private LocalDateTime couponEndDate;
+	
+	
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
 	public String getCouponDescription() {
 		return couponDescription;
 	}
@@ -33,12 +40,7 @@ public class CouponCreateRequest {
 	public void setDiscountType(DiscountType discountType) {
 		this.discountType = discountType;
 	}
-	public CouponType getCouponType() {
-		return couponType;
-	}
-	public void setCouponType(CouponType couponType) {
-		this.couponType = couponType;
-	}
+	
 	public Double getMinimumOrderAmount() {
 		return minimumOrderAmount;
 	}

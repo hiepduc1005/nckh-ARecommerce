@@ -32,10 +32,10 @@ public class CouponConvert {
 	
 	public Coupon couponCreateRequestConvertToCoupon(CouponCreateRequest couponCreateRequest) {
 		Coupon coupon = new Coupon();
+		coupon.setCode(couponCreateRequest.getCode());
 		coupon.setCouponDescription(couponCreateRequest.getCouponDescription());
 		coupon.setCouponEndDate(couponCreateRequest.getCouponEndDate());
 		coupon.setCouponStartDate(couponCreateRequest.getCouponStartDate());
-		coupon.setCouponType(couponCreateRequest.getCouponType());
 		coupon.setMaxUsage(couponCreateRequest.getMaxUsage());
 		coupon.setMinimumOrderAmount(couponCreateRequest.getMinimumOrderAmount());
 		coupon.setDiscountType(couponCreateRequest.getDiscountType());

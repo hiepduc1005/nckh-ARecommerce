@@ -37,6 +37,7 @@ import PrivacyPolicy from "../pages/PrivacyPolicy";
 import Interactive3DViewer from "../pages/Test";
 import ShoesCustomize from "../pages/ShoesCustomize";
 import AdminDashboard from "../pages/AdminDashboard";
+import AdminCoupon from "../pages/AdminCoupon";
 
 const AppRoutes = () => {
   return (
@@ -88,6 +89,7 @@ const AppRoutes = () => {
         <Route path="variants" element={<AdminVariants />} />
         <Route path="orders" element={<AdminOrder />} />
         <Route path="orders/:orderId" element={<AdminOrderDetails />} />
+        <Route path="coupons" element={<AdminCoupon />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

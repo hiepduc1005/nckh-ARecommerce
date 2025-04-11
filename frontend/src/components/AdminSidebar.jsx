@@ -1,21 +1,33 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FiHome, FiBox, FiTag, FiLayers, FiBriefcase, FiMenu, FiX, FiList, FiPackage, FiClipboard } from 'react-icons/fi';
-import '../assets/styles/components/AdminSidebar.scss';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  FiHome,
+  FiBox,
+  FiTag,
+  FiLayers,
+  FiBriefcase,
+  FiMenu,
+  FiX,
+  FiList,
+  FiPackage,
+  FiClipboard,
+} from "react-icons/fi";
+import "../assets/styles/components/AdminSidebar.scss";
+import { FaTicketAlt } from "react-icons/fa";
 
 const AdminSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
   const menuItems = [
-    { name: 'Dashboard', icon: <FiHome />, path: '/admin' },
-    { name: 'Order', icon: <FiClipboard />, path: '/admin/orders' },
-    { name: 'Products', icon: <FiBox />, path: '/admin/products' },
-    { name: 'Brands', icon: <FiBriefcase />, path: '/admin/brands' },
-    { name: 'Tags', icon: <FiTag />, path: '/admin/tags' },
-    { name: 'Categories', icon: <FiLayers />, path: '/admin/categories' },
-    { name: 'Attributes', icon: <FiList />, path: '/admin/attributes' },
-
+    { name: "Dashboard", icon: <FiHome />, path: "/admin" },
+    { name: "Order", icon: <FiClipboard />, path: "/admin/orders" },
+    { name: "Products", icon: <FiBox />, path: "/admin/products" },
+    { name: "Brands", icon: <FiBriefcase />, path: "/admin/brands" },
+    { name: "Tags", icon: <FiTag />, path: "/admin/tags" },
+    { name: "Categories", icon: <FiLayers />, path: "/admin/categories" },
+    { name: "Attributes", icon: <FiList />, path: "/admin/attributes" },
+    { name: "Coupons", icon: <FaTicketAlt />, path: "/admin/coupons" },
   ];
 
   const toggleSidebar = () => {
@@ -23,7 +35,7 @@ const AdminSidebar = () => {
   };
 
   return (
-    <div className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <div className={`admin-sidebar ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-header">
         <div className="logo-container">
           <div className="logo">
@@ -32,16 +44,18 @@ const AdminSidebar = () => {
           {!collapsed && <h2>Admin</h2>}
         </div>
         <button className="toggle-btn" onClick={toggleSidebar}>
-          {collapsed ? <FiMenu size={12}/> : <FiX />}
+          {collapsed ? <FiMenu size={12} /> : <FiX />}
         </button>
       </div>
-      
+
       <div className="sidebar-menu">
         {menuItems.map((item) => (
-          <Link 
-            to={item.path} 
+          <Link
+            to={item.path}
             key={item.name}
-            className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
+            className={`menu-item ${
+              location.pathname === item.path ? "active" : ""
+            }`}
           >
             <div className="icon">{item.icon}</div>
             {!collapsed && <span>{item.name}</span>}
@@ -49,7 +63,7 @@ const AdminSidebar = () => {
           </Link>
         ))}
       </div>
-      
+
       <div className="sidebar-footer">
         <div className="user-profile">
           <div className="avatar">AD</div>

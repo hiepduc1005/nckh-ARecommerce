@@ -171,12 +171,16 @@ const ProductDetails = () => {
       return;
     }
 
-    const data = [
-      {
-        quantity,
-        variant: selectedVariants,
-      },
-    ];
+    const data = {
+      coupon: null,
+      discountAmount: 0,
+      items: [
+        {
+          quantity,
+          variant: selectedVariants,
+        },
+      ],
+    };
 
     const encryptedData = encryptData(data);
     const encodedData = encodeURIComponent(encryptedData);

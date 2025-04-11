@@ -3,6 +3,8 @@ package com.ecommerce.vn.service.coupon;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+
 import com.ecommerce.vn.entity.coupon.Coupon;
 
 public interface CouponService {
@@ -24,6 +26,8 @@ public interface CouponService {
     void incrementUsageCount(UUID couponId);
     
     Coupon getCouponByCode(String code);
+
+	Page<Coupon> getCouponsWithPagination(int page, int size);
 
 
 }
