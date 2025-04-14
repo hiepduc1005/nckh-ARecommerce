@@ -11,6 +11,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.ecommerce.vn.entity.attribute.AttributeValue;
+import com.ecommerce.vn.entity.cart.CartItem;
+import com.ecommerce.vn.entity.order.OrderItem;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -24,6 +26,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Table(name = "variants")
@@ -48,7 +51,7 @@ public class Variant {
 	
 	@Column(name = "image_path")
 	private String imagePath;
-	
+
 	@Column(columnDefinition = "json")
 	private String colorConfig; 
 	
@@ -74,7 +77,37 @@ public class Variant {
     )
     private List<AttributeValue> attributeValues = new ArrayList<AttributeValue>();
 	
+	@OneToMany(mappedBy = "variant", cascade = CascadeType.ALL,orphanRemoval = true)
+	private List<CartItem>  cartItems = new ArrayList<>();
 	
+	@OneToMany(mappedBy = "variant")
+	private List<OrderItem>  orderItems  = new ArrayList<>();
+	
+	
+
+	public List<OrderItem> getOrderItems() {
+		return orderItems;
+	}
+
+
+
+	public void setOrderItems(List<OrderItem> orderItems) {
+		this.orderItems = orderItems;
+	}
+
+
+
+	public List<CartItem> getCartItems() {
+		return cartItems;
+	}
+
+
+
+	public void setCartItems(List<CartItem> cartItems) {
+		this.cartItems = cartItems;
+	}
+
+
 
 	public String getColorConfig() {
 		return colorConfig;

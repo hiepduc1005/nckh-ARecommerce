@@ -27,6 +27,7 @@ public class BrandConvert {
         brand.setSlug(slug);
 		brand.setName(brandCreateRequest.getName());
 		brand.setDescription(brandCreateRequest.getDescription());
+		brand.setCategory(brandCreateRequest.getCategory());
 		
 		return brand;
 	}
@@ -43,6 +44,8 @@ public class BrandConvert {
 		brandResponse.setCreatedAt(brand.getCreatedAt());
 		brandResponse.setUpdateAt(brand.getUpdateAt());
 		brandResponse.setId(brand.getId());
+		brandResponse.setCategory(brand.getCategory());
+		brandResponse.setTotalProducts(brand.getProducts().size());
 		
 		return brandResponse;
 	}
@@ -58,7 +61,7 @@ public class BrandConvert {
         brand.setSlug(slug);
 		brand.setName(brandUpdateRequest.getName());
 		brand.setDescription(brandUpdateRequest.getDescription());
-		
+		brand.setCategory(brandUpdateRequest.getCategory());
 		
 		return brand;
 	}

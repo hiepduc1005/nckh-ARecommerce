@@ -13,6 +13,8 @@ public class BrandResponse {
 	
 	private String imagePath;
 	
+	private String category;
+	
 	private String description;
 	
 	private int totalProducts;
@@ -22,6 +24,14 @@ public class BrandResponse {
 	private LocalDateTime updateAt;
 	
 	
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
 
 	public String getDescription() {
 		return description;

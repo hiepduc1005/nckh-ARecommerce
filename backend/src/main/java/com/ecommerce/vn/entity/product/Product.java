@@ -2,9 +2,7 @@ package com.ecommerce.vn.entity.product;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -74,7 +72,7 @@ public class Product {
 	@Column(name = "updated_by")
 	private UUID updatedBy;
 	
-	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<Variant> variants = new ArrayList<Variant>();
 	
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

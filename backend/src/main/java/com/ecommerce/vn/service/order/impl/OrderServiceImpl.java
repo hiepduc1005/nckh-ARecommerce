@@ -123,11 +123,37 @@ public class OrderServiceImpl implements OrderService {
 	public Order updateOrderStatus(UUID orderId, OrderStatus orderStatus) {
 		Order order = getOrderById(orderId);
 		if(order != null) {
+		    OrderStatus currentStatus = order.getOrderStatus();
+		   
+		    if (!isValidStatusTransition(currentStatus, orderStatus)) {
+		        throw new IllegalStateException("Không thể chuyển trạng thái từ " + currentStatus + " sang " + orderStatus);
+		    }
+
 			order.setOrderStatus(orderStatus);
 			updateOrder(order);
 		}
 
 		return order;
+	}
+	
+	private boolean isValidStatusTransition(OrderStatus current, OrderStatus next) {
+	    switch (current) {
+	        case PENDING:
+	            return next == OrderStatus.CANCELLED || next == OrderStatus.PAID || next == OrderStatus.PROCESSING;
+	        case PAID:
+	            return next == OrderStatus.PROCESSING || next == OrderStatus.REFUNDED;
+	        case PROCESSING:
+	            return next == OrderStatus.SHIPPED || next == OrderStatus.CANCELLED;
+	        case SHIPPED:
+	            return next == OrderStatus.DELIVERED;
+	        case DELIVERED:
+	            return next == OrderStatus.REFUNDED;
+	        case CANCELLED:
+	        case REFUNDED:
+	            return false; // Không được chuyển từ trạng thái cuối
+	        default:
+	            return false;
+	    }
 	}
 	
 	@Override

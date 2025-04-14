@@ -22,6 +22,7 @@ public class RoleServiceImpl implements RoleService {
 	private static final String MODERATOR_ROLE= "MODERATOR";
 	private static final String SUPPORT_ROLE= "SUPPORT";
 	private static final String USER_ROLE= "USER";
+	private static final String LOGISTICS_COODINATOR_ROLE= "LOGISTICS_COODINATOR";
 
 
 	@Override
@@ -64,6 +65,13 @@ public class RoleServiceImpl implements RoleService {
 	public Role createCustomerRole() {
 		Role role = new Role();
 		role.setRoleName(USER_ROLE);
+		return createRole(role);
+	}
+	
+	@Override
+	public Role createLogisticsCoordinatorRole() {
+		Role role = new Role();
+		role.setRoleName(LOGISTICS_COODINATOR_ROLE);
 		return createRole(role);
 	}
 

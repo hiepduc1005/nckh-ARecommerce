@@ -179,7 +179,6 @@ function Modal3DView({
         ]);
         setCopyStatus("success");
         setShowThumbnail(true);
-        onSaveView();
         setTimeout(() => setCopyStatus("idle"), 2000);
         setTimeout(() => setShowThumbnail(false), 4000);
       }

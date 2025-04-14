@@ -37,6 +37,8 @@ public class Brand {
 	
 	private String imagePath;
 	
+	private String category;
+	
 	@OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Product> products = new ArrayList<>();
 
@@ -57,6 +59,14 @@ public class Brand {
     
     
     
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
 	public String getDescription() {
 		return description;
 	}

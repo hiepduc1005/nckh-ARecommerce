@@ -8,7 +8,19 @@ public class BrandUpdateRequest {
 	
 	private String name;
 	
+	private String category;
+	
 	private String description;
+	
+	
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
 
 	public UUID getId() {
 		return id;

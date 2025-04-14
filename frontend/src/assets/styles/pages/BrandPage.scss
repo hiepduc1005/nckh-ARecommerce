@@ -1,0 +1,365 @@
+// BrandPage.scss
+
+// Variables
+$primary-color: #1C6758;
+$secondary-color: #3D8361;
+$accent-color: #D6CDA4;
+$text-color: #333;
+$light-gray: #eee;
+$white: #fff;
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+$transition: all 0.3s ease;
+$border-radius: 8px;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Main Styles
+.brand-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  color: $text-color;
+}
+
+// Header
+.brand-header {
+  text-align: center;
+  margin-bottom: 3rem;
+
+  h1 {
+    color: $primary-color;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: lighten($text-color, 20%);
+    font-size: 1.1rem;
+  }
+}
+
+// Filters
+.brand-filters {
+  margin-bottom: 2rem;
+  
+  @media (min-width: 768px) {
+    @include flex-between;
+  }
+  
+  @media (max-width: 767px) {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+
+  .search-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    padding-right: 3rem;
+    border: 1px solid $light-gray;
+    border-radius: $border-radius;
+    font-size: 1rem;
+    transition: $transition;
+
+    &:focus {
+      outline: none;
+      border-color: $secondary-color;
+      box-shadow: 0 0 0 2px rgba($secondary-color, 0.2);
+    }
+  }
+
+  .search-button {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+  }
+}
+
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .category-button {
+    padding: 0.6rem 1.2rem;
+    background-color: $light-gray;
+    border: none;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: $transition;
+    font-weight: 500;
+
+    &:hover {
+      background-color: darken($light-gray, 5%);
+    }
+
+    &.active {
+      background-color: $primary-color;
+      color: $white;
+    }
+  }
+}
+
+// Brand Grid
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.brand-card {
+  background-color: $white;
+  border-radius: $border-radius;
+  overflow: hidden;
+  box-shadow: $shadow;
+  transition: $transition;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  &.featured {
+    border: 2px solid $accent-color;
+  }
+
+  .brand-logo {
+    height: 140px;
+    @include flex-center;
+    background-color: $light-gray;
+    padding: 1rem;
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .brand-info {
+    padding: 1.5rem;
+
+    h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.4rem;
+      color: $primary-color;
+    }
+
+    .brand-category {
+      color: $secondary-color;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.8rem;
+    }
+
+    .brand-description {
+      color: $text-color;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      margin-bottom: 1rem;
+    }
+
+    .brand-stats {
+      @include flex-between;
+      font-size: 0.9rem;
+      color: lighten($text-color, 20%);
+    }
+  }
+}
+
+// Loading state
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: lighten($text-color, 30%);
+}
+
+// No results
+.no-results {
+  text-align: center;
+  padding: 3rem;
+  background-color: $light-gray;
+  border-radius: $border-radius;
+
+  p {
+    font-size: 1.1rem;
+    color: lighten($text-color, 20%);
+  }
+}
+
+// Featured Brands
+.featured-brands {
+  margin-top: 4rem;
+  
+  h2 {
+    color: $primary-color;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .featured-brands-list {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    
+    .featured-brand-item {
+      width: 120px;
+      height: 80px;
+      background-color: $white;
+      border-radius: $border-radius;
+      @include flex-center;
+      box-shadow: $shadow;
+      padding: 0.8rem;
+      transition: $transition;
+      cursor: pointer;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+      
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+    }
+  }
+}
+
+// Brand Detail Modal
+.brand-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  @include flex-center;
+  z-index: 1000;
+  
+  .modal-content {
+    background-color: $white;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    border-radius: $border-radius;
+    overflow-y: auto;
+    position: relative;
+    
+    .close-button {
+      position: absolute;
+      right: 1.5rem;
+      top: 1.5rem;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: lighten($text-color, 20%);
+      transition: $transition;
+      
+      &:hover {
+        color: $text-color;
+      }
+    }
+  }
+
+  .brand-detail-header {
+    padding: 2rem;
+    @include flex-between;
+    background-color: $light-gray;
+    
+    @media (max-width: 576px) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+    }
+    
+    .detail-logo {
+      width: 150px;
+      height: auto;
+      object-fit: contain;
+    }
+    
+    .detail-header-info {
+      h2 {
+        font-size: 2rem;
+        color: $primary-color;
+        margin: 0 0 0.5rem;
+      }
+      
+      .origin {
+        color: lighten($text-color, 20%);
+        font-size: 0.95rem;
+      }
+    }
+  }
+  
+  .brand-detail-body {
+    padding: 2rem;
+    
+    .detail-section {
+      margin-bottom: 1.5rem;
+      
+      h3 {
+        color: $secondary-color;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      p {
+        line-height: 1.6;
+        color: $text-color;
+      }
+    }
+  }
+  
+  .brand-detail-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid $light-gray;
+    text-align: center;
+    
+    .view-products-btn {
+      background-color: $primary-color;
+      color: $white;
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: $border-radius;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: $transition;
+      
+      &:hover {
+        background-color: darken($primary-color, 10%);
+      }
+    }
+  }
+}

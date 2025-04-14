@@ -26,4 +26,6 @@ public interface RoleService {
     Role createAdminRole();
     
     Role getRoleByName(String roleName);
+
+	Role createLogisticsCoordinatorRole();
 }
