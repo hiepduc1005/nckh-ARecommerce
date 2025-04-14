@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import com.ecommerce.vn.dto.coupon.CouponResponse;
 import com.ecommerce.vn.entity.order.OrderStatus;
+import com.ecommerce.vn.entity.order.OrderStatusHistory;
 import com.ecommerce.vn.entity.order.PaymentMethod;
 
 public class OrderResponse {
@@ -27,12 +28,19 @@ public class OrderResponse {
     private String notes;
     private String paymentUrl;
     private List<OrderItemResponse> orderItems = new ArrayList<OrderItemResponse>();
+    private List<OrderStatusHistory> orderStatusHistories = new ArrayList<>();
     private BigDecimal totalPrice;
     private BigDecimal discountPrice;
     private BigDecimal shippingFee;
+   
     
     
-    
+	public List<OrderStatusHistory> getOrderStatusHistories() {
+		return orderStatusHistories;
+	}
+	public void setOrderStatusHistories(List<OrderStatusHistory> orderStatusHistories) {
+		this.orderStatusHistories = orderStatusHistories;
+	}
 	public String getPaymentUrl() {
 		return paymentUrl;
 	}

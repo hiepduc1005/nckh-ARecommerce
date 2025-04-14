@@ -17,6 +17,7 @@ import com.ecommerce.vn.config.Utils;
 import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
+import com.ecommerce.vn.entity.order.OrderStatusHistory;
 import com.ecommerce.vn.entity.order.PaymentMethod;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.repository.OrderRepository;
@@ -128,7 +129,11 @@ public class OrderServiceImpl implements OrderService {
 		    if (!isValidStatusTransition(currentStatus, orderStatus)) {
 		        throw new IllegalStateException("Không thể chuyển trạng thái từ " + currentStatus + " sang " + orderStatus);
 		    }
+		    
+		    List<OrderStatusHistory> histories = order.getOrderStatusHistories();
+		    histories.add(new OrderStatusHistory(orderStatus, order));
 
+		    order.setOrderStatusHistories(histories);
 			order.setOrderStatus(orderStatus);
 			updateOrder(order);
 		}

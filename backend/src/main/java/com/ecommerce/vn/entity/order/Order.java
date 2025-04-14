@@ -65,6 +65,9 @@ public class Order {
 	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems = new ArrayList<OrderItem>();
 	
+	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<OrderStatusHistory> orderStatusHistories  = new ArrayList<OrderStatusHistory>();
+	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -96,6 +99,14 @@ public class Order {
     private BigDecimal discountPrice;
 	
 	
+
+	public List<OrderStatusHistory> getOrderStatusHistories() {
+		return orderStatusHistories;
+	}
+
+	public void setOrderStatusHistories(List<OrderStatusHistory> orderStatusHistories) {
+		this.orderStatusHistories = orderStatusHistories;
+	}
 
 	public String getPaymentUrl() {
 		return paymentUrl;
