@@ -26,6 +26,8 @@ public interface CouponService {
     void incrementUsageCount(UUID couponId);
     
     Coupon getCouponByCode(String code);
+    
+    Coupon createGiftCoupon(Double value);
 
 	Page<Coupon> getCouponsWithPagination(int page, int size);
 

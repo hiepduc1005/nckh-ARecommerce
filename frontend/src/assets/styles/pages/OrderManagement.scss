@@ -583,4 +583,79 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06
     }
   }
 }
+
+.coupon-section {
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .coupon-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .coupon-code {
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 0.5rem 0.75rem;
+      background-color: #fff;
+      border: 1px dashed #ddd;
+      border-radius: 4px;
+      display: inline-block;
+      color: #e53935;
+      letter-spacing: 1px;
+    }
+
+    .coupon-description {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.4;
+    }
+
+    .coupon-details {
+      font-size: 0.9rem;
+      color: #666;
+
+      p {
+        margin: 0.3rem 0;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media screen and (max-width: 768px) {
+  .coupon-section {
+    padding: 0.875rem;
+    
+    h3 {
+      font-size: 1.1rem;
+    }
+    
+    .coupon-info {
+      .coupon-code {
+        font-size: 1rem;
+      }
+      
+      .coupon-description {
+        font-size: 0.9rem;
+      }
+      
+      .coupon-details {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
 }

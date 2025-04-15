@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.vn.dto.order.OrderCreateRequest;
 import com.ecommerce.vn.dto.order.OrderResponse;
+import com.ecommerce.vn.dto.order.OrderStatusUpdateCreateRequest;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
 import com.ecommerce.vn.service.convert.OrderConvert;
@@ -53,17 +54,17 @@ public class OrderController {
 		return ResponseEntity.ok(orderResponse);
 	}
 	
-	 @GetMapping("/pagination")
-	    public ResponseEntity<Page<OrderResponse>> getOrdersWithPaginationAndSorting(
-	            @RequestParam("page") int page,
-	            @RequestParam("size") int size,
-	            @RequestParam(value ="sortBy" , required = false) String sortBy) {
-	    	
-	    	Page<Order> orders = orderService.getOrdersWithPaginationAndSorting(page, size, sortBy);
-	        
-	    	Page<OrderResponse> orderResponse = orders.map(order -> orderConvert.orderConvertToOrderResponse(order));
-	    	return new ResponseEntity<>(orderResponse, HttpStatus.OK);
-	    }
+	@GetMapping("/pagination")
+    public ResponseEntity<Page<OrderResponse>> getOrdersWithPaginationAndSorting(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam(value ="sortBy" , required = false) String sortBy) {
+    	
+    	Page<Order> orders = orderService.getOrdersWithPaginationAndSorting(page, size, sortBy);
+        
+    	Page<OrderResponse> orderResponse = orders.map(order -> orderConvert.orderConvertToOrderResponse(order));
+    	return new ResponseEntity<>(orderResponse, HttpStatus.OK);
+    }
 
 	
 	@GetMapping("/{orderId}")
@@ -90,8 +91,8 @@ public class OrderController {
 		return ResponseEntity.ok(orderResponses);
 	}
 	
-	@GetMapping("/status/{orderStatus}")
-	public ResponseEntity<List<OrderResponse>> getOrdersByStatus(@PathVariable(name = "orderStatus", required = false) OrderStatus orderStatus){
+	@GetMapping("/status/{orderStatus}/user")
+	public ResponseEntity<List<OrderResponse>> getOrdersUserByStatus(@PathVariable(name = "orderStatus", required = false) OrderStatus orderStatus){
 		
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 		List<OrderResponse> orders = orderService.getOrdersByUserEmail(email)
@@ -103,12 +104,22 @@ public class OrderController {
 		return ResponseEntity.ok(orders);
 	}
 
-	
-	
-	@PutMapping("/status/{orderId}")
-    public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable(name = "orderId") UUID orderId, @RequestBody OrderStatus orderStatus) {
+	@GetMapping("/status/{orderStatus}")
+	public ResponseEntity<Page<OrderResponse>> getOrdersByStatus(
+			@PathVariable(name = "orderStatus", required = false) OrderStatus orderStatus,
+			@RequestParam("page") int page,
+            @RequestParam("size") int size ){
 		
-		Order order = orderService.updateOrderStatus(orderId,orderStatus);
+		Page<Order> orders = orderService.getOrdersByStatus(orderStatus,page,size);
+    	Page<OrderResponse> orderResponse = orders.map(order -> orderConvert.orderConvertToOrderResponse(order));
+
+		return ResponseEntity.ok(orderResponse);
+	}
+
+	
+	@PutMapping("/status")
+    public ResponseEntity<OrderResponse> updateOrderStatus(@RequestBody OrderStatusUpdateCreateRequest orderStatus) {
+		Order order = orderService.updateOrderStatus(orderStatus.getOrderId(),orderStatus.getOrderStatus());
 		
 		OrderResponse orderResponse = orderConvert.orderConvertToOrderResponse(order);
 		

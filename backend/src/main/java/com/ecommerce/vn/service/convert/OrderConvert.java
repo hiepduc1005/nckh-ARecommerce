@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.ecommerce.vn.dto.order.OrderCreateRequest;
 import com.ecommerce.vn.dto.order.OrderItemResponse;
 import com.ecommerce.vn.dto.order.OrderResponse;
+import com.ecommerce.vn.dto.order.OrderStatusHistoryResponse;
 import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderItem;
@@ -31,6 +32,9 @@ public class OrderConvert {
 	
 	@Autowired
 	private CouponConvert couponConvert;
+	
+	@Autowired
+	private OrderStatusHistoryConvert historyConvert;
 	
 	
 	public Order orderCreateConvertToOrder(OrderCreateRequest orderCreateRequest) {
@@ -58,6 +62,7 @@ public class OrderConvert {
 		        .stream()
 		        .map(orderItem -> orderItemConvert.orderItemCreateConvertToOrderItem(orderItem,order))
 		        .collect(Collectors.toCollection(ArrayList::new));
+		
 		
 		order.setOrderItems(orderItems);
 		
@@ -95,7 +100,13 @@ public class OrderConvert {
 				.map((orderItem) -> orderItemConvert.orderItemConvertToOrderItemResponse(orderItem))
 				.toList();
 		
+		List<OrderStatusHistoryResponse> historyResponses = order.getOrderStatusHistories()
+				.stream()
+				.map((history) -> historyConvert.orderStatusHistoryConvertToOrderStatusHistoryResponse(history))
+				.toList();
+		
 		orderResponse.setOrderItems(orderItemResponses);
+		orderResponse.setOrderStatusHistories(historyResponses);
 		orderResponse.setOrderStatus(order.getOrderStatus());
 		orderResponse.setOrderExpireAt(order.getExpiresAt());
 		

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +49,6 @@ public class CouponServiceImpl implements CouponService {
 	    	throw new RuntimeException("Start date must not after end date");
 	    }
 
-	    // Lưu coupon mới vào database
 	    return couponRepository.save(coupon);
 	}
 
@@ -148,6 +148,20 @@ public class CouponServiceImpl implements CouponService {
 	public Page<Coupon> getCouponsWithPagination(int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		return couponRepository.findAll(pageable);
+	}
+
+
+	@Override
+	public Coupon createGiftCoupon(Double value) {
+		Coupon coupon = new Coupon();
+		LocalDateTime startDate = LocalDateTime.now();
+		LocalDateTime expireDate = startDate.plusDays(1);
+		
+		coupon.setCouponStartDate(startDate);
+		coupon.setCouponEndDate(expireDate);
+		coupon.setDiscountValue(BigDecimal.valueOf(value));
+		
+		return createCoupon(coupon);
 	}
 	
 	

@@ -36,7 +36,7 @@ public interface OrderService {
     List<Order> getOrdersByUserEmail(String email);
 
 
-    List<Order> getOrdersByStatus(OrderStatus status);
+    Page<Order> getOrdersByStatus(OrderStatus status,int page, int size);
 
     List<Order> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate);
 

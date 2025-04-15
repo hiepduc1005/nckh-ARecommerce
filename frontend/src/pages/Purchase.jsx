@@ -3,7 +3,7 @@ import noOrder from "../assets/images/no-order.png";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import "../assets/styles/pages/Purchase.scss";
 import { formatCurrency, formatToVNDate } from "../utils/ultils";
-import { getOrdersByStatus } from "../api/orderApi";
+import { getOrdersUserByStatus } from "../api/orderApi";
 import useAuth from "../hooks/UseAuth";
 const Purchase = () => {
   const [orders, setOrders] = useState([]);
@@ -56,7 +56,7 @@ const Purchase = () => {
     try {
       const status = getTypeFromUrl().toUpperCase();
 
-      const data = await getOrdersByStatus(token, status);
+      const data = await getOrdersUserByStatus(token, status);
       setOrders(data);
     } catch (error) {
       console.error("Error fetching orders:", error);

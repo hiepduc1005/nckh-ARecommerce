@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "../assets/styles/pages/OrderManagement.scss";
 import { toast } from "react-toastify";
-import { getOrdersPaginate } from "../api/orderApi";
+import {
+  getOrdersByStatus,
+  getOrdersPaginate,
+  updateOrderStatus,
+} from "../api/orderApi";
 import useAuth from "../hooks/UseAuth";
+import { formatToVNDate } from "../utils/ultils";
 
 // Enum for order statuses
 const OrderStatus = {
@@ -27,116 +32,30 @@ const statusTextMap = {
 };
 
 const OrderManagement = () => {
-  const [orders, setOrders] = useState([
-    {
-      id: "DH001",
-      customer: "Nguyễn Văn A",
-      address: "123 Nguyễn Huệ, Quận 1, TP.HCM",
-      products: [
-        { name: "Áo thun", quantity: 2, price: 250000 },
-        { name: "Quần jeans", quantity: 1, price: 450000 },
-      ],
-      status: OrderStatus.PROCESSING,
-      createDate: "2025-04-10",
-      statusHistory: [
-        { status: OrderStatus.PENDING, date: "2025-04-10", time: "08:00" },
-        { status: OrderStatus.PAID, date: "2025-04-10", time: "08:30" },
-        { status: OrderStatus.PROCESSING, date: "2025-04-10", time: "10:15" },
-      ],
-    },
-    {
-      id: "DH002",
-      customer: "Trần Thị B",
-      address: "456 Lê Lợi, Quận 5, TP.HCM",
-      products: [{ name: "Túi xách", quantity: 1, price: 850000 }],
-      status: OrderStatus.SHIPPED,
-      createDate: "2025-04-11",
-      statusHistory: [
-        { status: OrderStatus.PENDING, date: "2025-04-11", time: "09:00" },
-        { status: OrderStatus.PAID, date: "2025-04-11", time: "09:45" },
-        { status: OrderStatus.PROCESSING, date: "2025-04-11", time: "11:20" },
-        { status: OrderStatus.SHIPPED, date: "2025-04-12", time: "08:00" },
-      ],
-    },
-    {
-      id: "DH003",
-      customer: "Phạm Văn C",
-      address: "789 Võ Văn Tần, Quận 3, TP.HCM",
-      products: [
-        { name: "Giày thể thao", quantity: 1, price: 1200000 },
-        { name: "Tất", quantity: 3, price: 50000 },
-      ],
-      status: OrderStatus.PENDING,
-      createDate: "2025-04-12",
-      statusHistory: [
-        { status: OrderStatus.PENDING, date: "2025-04-12", time: "07:15" },
-      ],
-    },
-    {
-      id: "DH004",
-      customer: "Lê Thị D",
-      address: "101 Điện Biên Phủ, Quận Bình Thạnh, TP.HCM",
-      products: [{ name: "Đồng hồ", quantity: 1, price: 2500000 }],
-      status: OrderStatus.DELIVERED,
-      createDate: "2025-04-08",
-      statusHistory: [
-        { status: OrderStatus.PENDING, date: "2025-04-08", time: "10:30" },
-        { status: OrderStatus.PAID, date: "2025-04-08", time: "10:45" },
-        { status: OrderStatus.PROCESSING, date: "2025-04-08", time: "14:20" },
-        { status: OrderStatus.SHIPPED, date: "2025-04-09", time: "09:00" },
-        { status: OrderStatus.DELIVERED, date: "2025-04-10", time: "15:30" },
-      ],
-    },
-    {
-      id: "DH005",
-      customer: "Hoàng Văn E",
-      address: "202 Nguyễn Văn Cừ, Quận 5, TP.HCM",
-      products: [
-        { name: "Laptop", quantity: 1, price: 18500000 },
-        { name: "Chuột không dây", quantity: 1, price: 450000 },
-      ],
-      status: OrderStatus.CANCELLED,
-      createDate: "2025-04-09",
-      statusHistory: [
-        { status: OrderStatus.PENDING, date: "2025-04-09", time: "11:15" },
-        { status: OrderStatus.CANCELLED, date: "2025-04-09", time: "11:45" },
-      ],
-    },
-    {
-      id: "DH006",
-      customer: "Ngô Thị F",
-      address: "303 Cách Mạng Tháng 8, Quận 10, TP.HCM",
-      products: [{ name: "Bàn phím", quantity: 1, price: 1200000 }],
-      status: OrderStatus.REFUNDED,
-      createDate: "2025-04-07",
-      statusHistory: [
-        { status: OrderStatus.PENDING, date: "2025-04-07", time: "08:30" },
-        { status: OrderStatus.PAID, date: "2025-04-07", time: "08:45" },
-        { status: OrderStatus.PROCESSING, date: "2025-04-07", time: "10:00" },
-        { status: OrderStatus.SHIPPED, date: "2025-04-08", time: "08:15" },
-        { status: OrderStatus.DELIVERED, date: "2025-04-09", time: "14:30" },
-        { status: OrderStatus.REFUNDED, date: "2025-04-10", time: "09:45" },
-      ],
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Tất cả");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [newStatus, setNewStatus] = useState("");
   const [showStatusModal, setShowStatusModal] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [ordersPerPage] = useState(5);
   const { token } = useAuth();
 
   // Status options for filters and dropdowns
   const statusOptions = Object.values(OrderStatus).map(
     (status) => statusTextMap[status]
   );
-  const filterOptions = ["Tất cả", ...statusOptions];
+  const filterOptions = [
+    { value: "ALL", label: "Tất cả" },
+    ...Object.entries(OrderStatus).map(([key, value]) => ({
+      value,
+      label: statusTextMap[value],
+    })),
+  ];
 
   const fetchOrder = async () => {
     const data = await getOrdersPaginate(token, currentPage);
@@ -147,8 +66,31 @@ const OrderManagement = () => {
   };
 
   useEffect(() => {
-    fetchOrder();
-  }, [currentPage]);
+    if (statusFilter) {
+      fetchOrderByStatus(statusFilter);
+    }
+  }, [currentPage, statusFilter]);
+
+  const fetchOrderByStatus = async (status) => {
+    if (status === "ALL") {
+      const data = await getOrdersPaginate(token, currentPage);
+      if (data) {
+        setOrders(data.content);
+        setTotalPages(data.totalPages);
+      }
+    } else {
+      const data = await getOrdersByStatus(token, status, currentPage);
+      if (data) {
+        setOrders(data.content);
+        setTotalPages(data.totalPages);
+      }
+    }
+  };
+
+  const handleFilterChange = async (status) => {
+    setStatusFilter(status);
+    // fetchOrderByStatus(status);
+  };
 
   // Check if status transition is valid
   const isValidStatusTransition = (current, next) => {
@@ -160,7 +102,11 @@ const OrderManagement = () => {
           OrderStatus.PROCESSING,
         ].includes(next);
       case OrderStatus.PAID:
-        return [OrderStatus.PROCESSING, OrderStatus.REFUNDED].includes(next);
+        return [
+          OrderStatus.PROCESSING,
+          OrderStatus.REFUNDED,
+          OrderStatus.SHIPPED,
+        ].includes(next);
       case OrderStatus.PROCESSING:
         return [OrderStatus.SHIPPED, OrderStatus.CANCELLED].includes(next);
       case OrderStatus.SHIPPED:
@@ -175,18 +121,6 @@ const OrderManagement = () => {
     }
   };
 
-  // Filter orders by search term and status
-  const filteredOrders = orders.filter((order) => {
-    const matchSearch =
-      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchStatus =
-      statusFilter === "Tất cả" || statusTextMap[order.status] === statusFilter;
-
-    return matchSearch && matchStatus;
-  });
-
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -195,7 +129,7 @@ const OrderManagement = () => {
     setSelectedOrder(order);
   };
 
-  const handleUpdateStatus = () => {
+  const handleUpdateStatus = async () => {
     if (!newStatus || !selectedOrder) return;
 
     // Convert displayed status back to enum value
@@ -203,39 +137,35 @@ const OrderManagement = () => {
       (key) => statusTextMap[key] === newStatus
     );
 
-    if (!isValidStatusTransition(selectedOrder.status, selectedStatusEnum)) {
+    if (
+      !isValidStatusTransition(
+        selectedOrder.status || selectedOrder.orderStatus,
+        selectedStatusEnum
+      )
+    ) {
       toast.error(
         `Không thể chuyển trạng thái từ ${
-          statusTextMap[selectedOrder.status]
+          statusTextMap[selectedOrder.status || selectedOrder.orderStatus]
         } sang ${newStatus}`
       );
       return;
     }
 
-    const now = new Date();
-    const dateStr = now.toISOString().split("T")[0];
-    const timeStr = `${now.getHours().toString().padStart(2, "0")}:${now
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
+    const dataUpdate = {
+      orderId: selectedOrder.id,
+      orderStatus: selectedStatusEnum,
+    };
 
-    const updatedOrders = orders.map((order) => {
-      if (order.id === selectedOrder.id) {
-        const updatedOrder = {
-          ...order,
-          status: selectedStatusEnum,
-          statusHistory: [
-            ...order.statusHistory,
-            { status: selectedStatusEnum, date: dateStr, time: timeStr },
-          ],
-        };
-        setSelectedOrder(updatedOrder);
-        return updatedOrder;
-      }
-      return order;
-    });
+    const data = await updateOrderStatus(token, dataUpdate);
 
-    setOrders(updatedOrders);
+    if (data) {
+      setSelectedOrder(data);
+      fetchOrder();
+      toast.success("Cập nhật trạng thái đơn hàng thành công!");
+    } else {
+      toast.error("Không thể cập nhật được trạng thái đơn hàng!");
+    }
+
     setShowStatusModal(false);
     setNewStatus("");
   };
@@ -293,11 +223,11 @@ const OrderManagement = () => {
                 />
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
+                  onChange={(e) => handleFilterChange(e.target.value)}
                 >
                   {filterOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
+                    <option key={option.value} value={option.value}>
+                      {option.label}
                     </option>
                   ))}
                 </select>
@@ -308,24 +238,31 @@ const OrderManagement = () => {
               {orders.length > 0 ? (
                 orders.map((order) => (
                   <div
-                    key={order.id}
+                    key={order.id || order.code}
                     className={`order-item ${
-                      selectedOrder?.id === order.id ? "selected" : ""
+                      selectedOrder?.id === order.id ||
+                      selectedOrder?.code === order.code
+                        ? "selected"
+                        : ""
                     }`}
                     onClick={() => handleOrderSelect(order)}
                   >
                     <div className="header">
-                      <span className="order-id">{order.code}</span>
+                      <span className="order-id">{order.code || order.id}</span>
                       <span
                         className={`status-badge ${getStatusClass(
-                          order.orderStatus
+                          order.orderStatus || order.status
                         )}`}
                       >
-                        {statusTextMap[order.orderStatus]}
+                        {statusTextMap[order.orderStatus || order.status]}
                       </span>
                     </div>
-                    <div className="customer-name">{order.email}</div>
-                    <div className="order-date">{order.createdAt}</div>
+                    <div className="customer-name">
+                      {order.email || order.customer}
+                    </div>
+                    <div className="order-date">
+                      {order.createdAt || order.createDate}
+                    </div>
                   </div>
                 ))
               ) : (
@@ -334,7 +271,7 @@ const OrderManagement = () => {
             </div>
 
             {/* Pagination controls */}
-            {filteredOrders.length > 0 && (
+            {orders.length > 0 && (
               <div className="pagination">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
@@ -372,7 +309,9 @@ const OrderManagement = () => {
             {selectedOrder ? (
               <div>
                 <div className="header">
-                  <h2>Chi tiết đơn hàng #{selectedOrder.code}</h2>
+                  <h2>
+                    Chi tiết đơn hàng #{selectedOrder.code || selectedOrder.id}
+                  </h2>
                   <button onClick={() => setShowStatusModal(true)}>
                     Cập nhật trạng thái
                   </button>
@@ -381,24 +320,80 @@ const OrderManagement = () => {
                 <div className="customer-info-grid">
                   <div className="info-block">
                     <h3>Thông tin khách hàng</h3>
-                    <p>{selectedOrder.email}</p>
-                    <p className="address">{selectedOrder.address}</p>
+                    <p>{selectedOrder.email || selectedOrder.customer}</p>
+                    <p>{selectedOrder.phone}</p>
+                    <p className="address">
+                      {selectedOrder.address}{" "}
+                      {selectedOrder.specificAddress
+                        ? `, ${selectedOrder.specificAddress}`
+                        : ""}
+                    </p>
+                    {selectedOrder.notes && (
+                      <p>Ghi chú: {selectedOrder.notes}</p>
+                    )}
                   </div>
                   <div className="info-block">
                     <h3>Thông tin đơn hàng</h3>
-                    <p>Ngày tạo: {selectedOrder.createdAt}</p>
+                    <p>
+                      Ngày tạo:{" "}
+                      {formatToVNDate(
+                        selectedOrder.createdAt || selectedOrder.createDate
+                      )}
+                    </p>
                     <p>
                       Trạng thái:
                       <span
                         className={`status-badge ${getStatusClass(
-                          selectedOrder.orderStatus
+                          selectedOrder.orderStatus || selectedOrder.status
                         )}`}
                       >
-                        {statusTextMap[selectedOrder.orderStatus]}
+                        {
+                          statusTextMap[
+                            selectedOrder.orderStatus || selectedOrder.status
+                          ]
+                        }
                       </span>
+                    </p>
+                    <p>
+                      Phương thức thanh toán:{" "}
+                      {selectedOrder.paymentMethod || "N/A"}
                     </p>
                   </div>
                 </div>
+
+                {/* Thêm phần mã giảm giá nếu có */}
+                {selectedOrder.couponResponse && (
+                  <div className="coupon-section">
+                    <h3>Mã giảm giá</h3>
+                    <div className="coupon-info">
+                      <div className="coupon-code">
+                        {selectedOrder.couponResponse.code}
+                      </div>
+                      <div className="coupon-description">
+                        {selectedOrder.couponResponse.couponDescription}
+                      </div>
+                      <div className="coupon-details">
+                        <p>
+                          Giá trị: {selectedOrder.couponResponse.discountValue}
+                          {selectedOrder.couponResponse.discountType ===
+                          "PERCENTAGE"
+                            ? "%"
+                            : "đ"}
+                        </p>
+                        <p>
+                          Hiệu lực:{" "}
+                          {formatToVNDate(
+                            selectedOrder.couponResponse.couponStartDate
+                          )}{" "}
+                          -{" "}
+                          {formatToVNDate(
+                            selectedOrder.couponResponse.couponEndDate
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="products-section">
                   <h3>Sản phẩm</h3>
@@ -413,39 +408,83 @@ const OrderManagement = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {selectedOrder.orderItems.map((product, index) => (
-                          <tr key={product.id}>
-                            <td>
-                              {
-                                product.variantResponse.productResponse
-                                  .productName
-                              }
-                            </td>
-                            <td>
-                              {formatCurrency(
-                                product.variantResponse.discountPrice
-                                  ? product.variantResponse.discountPrice
-                                  : product.variantResponse.price
-                              )}
-                            </td>
-                            <td>{product.quantity}</td>
-                            <td>
-                              {formatCurrency(
-                                (product.variantResponse.discountPrice
-                                  ? product.variantResponse.discountPrice
-                                  : product.variantResponse.price) *
-                                  product.quantity
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                        {selectedOrder.orderItems
+                          ? selectedOrder.orderItems.map((product) => (
+                              <tr key={product.id}>
+                                <td>
+                                  {
+                                    product.variantResponse.productResponse
+                                      .productName
+                                  }
+                                </td>
+                                <td>
+                                  {formatCurrency(
+                                    product.variantResponse.discountPrice
+                                      ? product.variantResponse.discountPrice
+                                      : product.variantResponse.price
+                                  )}
+                                </td>
+                                <td>{product.quantity}</td>
+                                <td>
+                                  {formatCurrency(
+                                    (product.variantResponse.discountPrice
+                                      ? product.variantResponse.discountPrice
+                                      : product.variantResponse.price) *
+                                      product.quantity
+                                  )}
+                                </td>
+                              </tr>
+                            ))
+                          : selectedOrder.products &&
+                            selectedOrder.products.map((product, index) => (
+                              <tr key={index}>
+                                <td>{product.name}</td>
+                                <td>{formatCurrency(product.price)}</td>
+                                <td>{product.quantity}</td>
+                                <td>
+                                  {formatCurrency(
+                                    product.price * product.quantity
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
                       </tbody>
                       <tfoot>
                         <tr>
-                          <td colSpan="3">Tổng cộng:</td>
+                          <td colSpan="3">Tổng tiền sản phẩm:</td>
                           <td>
                             {formatCurrency(
-                              calculateTotal(selectedOrder.orderItems)
+                              selectedOrder.totalPrice ||
+                                calculateTotal(selectedOrder.products || [])
+                            )}
+                          </td>
+                        </tr>
+                        {selectedOrder.couponResponse && (
+                          <tr>
+                            <td colSpan="3">Giảm giá:</td>
+                            <td className="discount-price">
+                              -
+                              {formatCurrency(
+                                selectedOrder.totalPrice -
+                                  selectedOrder.discountPrice
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                        {selectedOrder.shippingFee !== undefined && (
+                          <tr>
+                            <td colSpan="3">Phí vận chuyển:</td>
+                            <td>{formatCurrency(selectedOrder.shippingFee)}</td>
+                          </tr>
+                        )}
+                        <tr className="total-row">
+                          <td colSpan="3">Thành tiền:</td>
+                          <td>
+                            {formatCurrency(
+                              selectedOrder.discountPrice !== undefined
+                                ? selectedOrder.discountPrice
+                                : selectedOrder.totalPrice ||
+                                    calculateTotal(selectedOrder.products || [])
                             )}
                           </td>
                         </tr>
@@ -458,7 +497,10 @@ const OrderManagement = () => {
                   <h3>Lịch sử trạng thái</h3>
                   <div className="timeline">
                     <div className="timeline-items">
-                      {selectedOrder.statusHistory.map((status, index) => (
+                      {(selectedOrder.orderStatusHistories?.length > 0
+                        ? selectedOrder.orderStatusHistories
+                        : selectedOrder.statusHistory
+                      )?.map((status, index) => (
                         <div key={index} className="timeline-item">
                           <div className="timeline-icon">
                             <svg
@@ -480,11 +522,49 @@ const OrderManagement = () => {
                               {statusTextMap[status.status]}
                             </p>
                             <p className="status-date">
-                              {status.date} {status.time}
+                              {status.updatedAt
+                                ? formatToVNDate(status.updatedAt)
+                                : `${status.date} ${status.time}`}
                             </p>
                           </div>
                         </div>
                       ))}
+                      {!selectedOrder.orderStatusHistories?.length &&
+                        !selectedOrder.statusHistory?.length && (
+                          <div className="timeline-item">
+                            <div className="timeline-icon">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="status-text">
+                                {
+                                  statusTextMap[
+                                    selectedOrder.orderStatus ||
+                                      selectedOrder.status
+                                  ]
+                                }
+                              </p>
+                              <p className="status-date">
+                                {formatToVNDate(
+                                  selectedOrder.createdAt ||
+                                    selectedOrder.createDate
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -527,7 +607,9 @@ const OrderManagement = () => {
                   // Don't show current status in dropdown
                   if (
                     selectedOrder &&
-                    statusTextMap[selectedOrder.status] === option
+                    statusTextMap[
+                      selectedOrder.orderStatus || selectedOrder.status
+                    ] === option
                   ) {
                     return null;
                   }

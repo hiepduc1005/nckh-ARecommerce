@@ -1,7 +1,9 @@
 package com.ecommerce.vn.service.order.impl;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +23,7 @@ import com.ecommerce.vn.entity.order.OrderStatusHistory;
 import com.ecommerce.vn.entity.order.PaymentMethod;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.repository.OrderRepository;
+import com.ecommerce.vn.service.EmailService;
 import com.ecommerce.vn.service.coupon.CouponService;
 import com.ecommerce.vn.service.order.OrderService;
 import com.ecommerce.vn.service.user.UserService;
@@ -38,6 +41,9 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private EmailService emailService;
 
 	@Override
 	public Order createOrder(Order order) {
@@ -63,11 +69,8 @@ public class OrderServiceImpl implements OrderService {
 	        }
 	    } while (orderRepository.existsByCode(code));
 	
-		if(order.getPaymentMethod().equals(PaymentMethod.COD)) {
-			order.setOrderStatus(OrderStatus.PROCESSING);
-		}else {
-			order.setOrderStatus(OrderStatus.PENDING);
-		}
+		order.setOrderStatus(OrderStatus.PENDING);
+
 		
 		order.setExpiresAt(LocalDateTime.now().plusMinutes(15));
 		order.setCode(code);	
@@ -81,6 +84,8 @@ public class OrderServiceImpl implements OrderService {
 			order.setDiscountPrice(discountPrice);
 			
 		}
+		
+		order.setOrderStatusHistories(Arrays.asList(new OrderStatusHistory(order.getOrderStatus(), order)));
 		
 		return orderRepository.save(order);
 	}
@@ -106,10 +111,16 @@ public class OrderServiceImpl implements OrderService {
 			throw new RuntimeException("Order id id null");
 		}
 		
+		Order order = orderRepository.findById(updatedOrder.getId()).get();
 		if(orderRepository.findById(updatedOrder.getId()).isEmpty()) {
 			throw new RuntimeException("Order not found");
 		}
 		
+		if(!order.getOrderStatus().equals(updatedOrder.getOrderStatus())) {
+			List<OrderStatusHistory> histories = order.getOrderStatusHistories();
+			histories.add(new OrderStatusHistory(updatedOrder.getOrderStatus(), updatedOrder));
+			updatedOrder.setOrderStatusHistories(histories);
+		}
 		return orderRepository.save(updatedOrder);
 	}
 
@@ -126,7 +137,7 @@ public class OrderServiceImpl implements OrderService {
 		if(order != null) {
 		    OrderStatus currentStatus = order.getOrderStatus();
 		   
-		    if (!isValidStatusTransition(currentStatus, orderStatus)) {
+		    if (!isValidStatusTransition(currentStatus, orderStatus,order)) {
 		        throw new IllegalStateException("Không thể chuyển trạng thái từ " + currentStatus + " sang " + orderStatus);
 		    }
 		    
@@ -136,17 +147,23 @@ public class OrderServiceImpl implements OrderService {
 		    order.setOrderStatusHistories(histories);
 			order.setOrderStatus(orderStatus);
 			updateOrder(order);
+			try {
+				sendEmailByStatus(orderStatus,order);
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
 		}
 
 		return order;
 	}
 	
-	private boolean isValidStatusTransition(OrderStatus current, OrderStatus next) {
+	private boolean isValidStatusTransition(OrderStatus current, OrderStatus next, Order order) {
 	    switch (current) {
 	        case PENDING:
 	            return next == OrderStatus.CANCELLED || next == OrderStatus.PAID || next == OrderStatus.PROCESSING;
 	        case PAID:
-	            return next == OrderStatus.PROCESSING || next == OrderStatus.REFUNDED;
+	            return next == OrderStatus.PROCESSING || next == OrderStatus.REFUNDED || (!order.getPaymentMethod().equals(PaymentMethod.COD) && next == OrderStatus.SHIPPED);
 	        case PROCESSING:
 	            return next == OrderStatus.SHIPPED || next == OrderStatus.CANCELLED;
 	        case SHIPPED:
@@ -158,6 +175,29 @@ public class OrderServiceImpl implements OrderService {
 	            return false; // Không được chuyển từ trạng thái cuối
 	        default:
 	            return false;
+	    }
+	}
+	
+	private void sendEmailByStatus(OrderStatus status, Order order) throws IOException {
+	    switch (status) {
+	        case PENDING:
+	        	break;
+	        case PAID:
+	        	break;
+	        case PROCESSING:
+	        	emailService.sendConfirmOrderEmail(order.getEmail(), order.getEmail(), order);
+	        	break;
+	        case SHIPPED:
+	        	break;
+	        case DELIVERED:
+	        	Coupon coupon = couponService.createGiftCoupon(10.0);
+	        	emailService.sendSuccessDeliveryEmail(order.getEmail(), order.getEmail(), coupon, order);
+	        	break;
+	        case CANCELLED:
+	        	Coupon c = couponService.createGiftCoupon(15.0);
+	        	emailService.sendCancelOrderEmail(order.getEmail(), order.getEmail(), order, c);
+	        	break;
+	        default:
 	    }
 	}
 	
@@ -226,11 +266,13 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public List<Order> getOrdersByStatus(OrderStatus status) {
+	public Page<Order> getOrdersByStatus(OrderStatus status,int page, int size) {
 		if(status == null) {
 			throw new RuntimeException("Status is missing.");
 		}
-		return orderRepository.findByOrderStatus(status);
+		
+		Pageable pageable = PageRequest.of(page, size);
+		return orderRepository.findByOrderStatus(status,pageable);
 	}
 
 	@Override
@@ -257,7 +299,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<Order> getPaidOrders() {
 		
-		return getOrdersByStatus(OrderStatus.PAID);
+		return null;
 	}
 
 	@Override
