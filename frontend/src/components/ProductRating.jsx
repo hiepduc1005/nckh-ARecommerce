@@ -1,157 +1,262 @@
-import React, { useState } from 'react';
-import ReactStars from "react-rating-stars-component";
-import '../assets/styles/components/ProductRating.scss';
-import useAuth from '../hooks/UseAuth';
-import { toast } from 'react-toastify';
-import useLoading from '../hooks/UseLoading';
-import { createRating } from '../api/ratingApi';
+import React, { useState, useEffect } from "react";
+import { Star, Upload, X } from "lucide-react";
+import "../assets/styles/components/ProductRating.scss";
+import { toast } from "react-toastify";
+import useAuth from "../hooks/UseAuth";
+import { createRating, getRatingByUserInProduct } from "../api/ratingApi";
+import { formatCurrency } from "../utils/ultils";
+const ProductRating = ({ order, product, onClose, onSubmit }) => {
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [images, setImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-const ProductRating = ({ productId, existingRatings = []}) => {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
-  const [comments,setComments] = useState([])
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const { user, token } = useAuth();
 
-  const {token,user,isAuthenticated} = useAuth()
-  const {setLoading} = useLoading()
+  useEffect(() => {
+    const fetchRatingByUserInProduct = async () => {
+      const data = await getRatingByUserInProduct(product.id, token);
 
-  
-  // Calculate average rating
-  const averageRating = existingRatings.length > 0 
-    ? existingRatings.reduce((sum, item) => sum + item.ratingValue, 0) / existingRatings.length 
-    : 0;
-  
-  // Handle rating change
-  const handleRatingChange = (newRating) => {
-    setRating(newRating);
+      if (data) {
+        setRating(data.ratingValue);
+        setComment(data.comment);
+        const listImagePreviews = data?.imagePaths?.map(
+          (imagePath) => `http://localhost:8080${imagePath}`
+        );
+        setPreviewImages(listImagePreviews);
+      }
+    };
+
+    if (token && product.id) {
+      fetchRatingByUserInProduct();
+    }
+  }, [token, product]);
+
+  const handleRatingChange = (value) => {
+    setRating(value);
   };
-  
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true)
-    
-    if (rating === 0) {
-      toast.error('Please select a rating')
-      setLoading(false)
+
+  const handleCommentChange = (e) => {
+    setComment(e.target.value);
+  };
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + images.length > 5) {
+      toast.error("Bạn chỉ có thể tải lên tối đa 5 ảnh");
       return;
     }
-    setSubmitting(true);
-    
+
+    setImages([...images, ...files]);
+
+    // Create preview URLs
+    const newPreviewImages = files.map((file) => URL.createObjectURL(file));
+    setPreviewImages([...previewImages, ...newPreviewImages]);
+  };
+
+  console.log(order);
+  const removeImage = (index) => {
+    const updatedImages = [...images];
+    updatedImages.splice(index, 1);
+    setImages(updatedImages);
+
+    const updatedPreviews = [...previewImages];
+    URL.revokeObjectURL(updatedPreviews[index]); // Clean up URL object
+    updatedPreviews.splice(index, 1);
+    setPreviewImages(updatedPreviews);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!token) {
+      toast.error("Vui lòng đăng nhập để đánh giá");
+      return;
+    }
+
+    if (rating === 0) {
+      toast.error("Vui lòng chọn số sao đánh giá");
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      const ratingData = {
-        productId,
-        userId: user?.id,
+      const dataRatingCreate = {
+        productId: product.id,
+        userId: user.id,
         ratingValue: rating,
-        comment
+        comment: comment,
       };
-      
-      const data = await createRating(ratingData,token)
-      if(data){
-        setComments(prev => [...prev,data])
-        toast.success("Thank for your review!")
+      const formData = new FormData();
+      formData.append(
+        "rating",
+        new Blob([JSON.stringify(dataRatingCreate)], {
+          type: "application/json",
+        })
+      );
+
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
+
+      const data = createRating(formData, token);
+      if (data) {
+        setIsSubmitting(false);
+        toast.success("Cảm ơn đánh giá của bạn");
+        onClose();
       }
-      setComment('');
-      setRating(0);
-    } catch (err) {
-      toast.error("Failed to submit review!")
-      console.error(err);
-    } finally {
-      setSubmitting(false);
-      setLoading(false)
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      setIsSubmitting(false);
+      toast.error("Đã xảy ra lỗi khi gửi đánh giá. Vui lòng thử lại sau.");
+      onClose();
     }
   };
-  
+
+  // Clean up preview URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      previewImages.forEach(URL.revokeObjectURL);
+    };
+  }, []);
+
   return (
-    <div className="product-rating-container">
-      {/* Average Rating Display */}
-      <div className="rating-summary">
-        <div className="average-rating">
-          <ReactStars
-            count={5}
-            value={averageRating}
-            size={24}
-            edit={false}
-            isHalf={true}
-            activeColor="#ffd700"
-          />
-          <span className="rating-value">{averageRating.toFixed(1)}</span>
-          <span className="review-count">({existingRatings.length} {existingRatings.length === 1 ? 'review' : 'reviews'})</span>
+    <div className="product-rating-modal">
+      <div className="rating-modal-content">
+        <div className="rating-modal-header">
+          <h2>Đánh giá sản phẩm</h2>
+          <button className="close-btn" onClick={onClose}>
+            <X size={24} />
+          </button>
         </div>
-      </div>
-      
-      {/* Review Form */}
-      <div className="rating-form-container">
-        <h3 className="form-title">Write a Review</h3>       
-        <form onSubmit={handleSubmit} className="rating-form">
-          <div className="form-group">
-            <label className="form-label">Your Rating: {rating ? rating.toFixed(1) : '0.0'} / 5.0</label>
-            <div className="interactive-stars">
-              <ReactStars
-                count={5}
-                onChange={handleRatingChange}
-                size={36}
-                value={rating}
-                isHalf={true}
-                emptyIcon={<i className="far fa-star"></i>}
-                halfIcon={<i className="fa fa-star-half-alt"></i>}
-                fullIcon={<i className="fa fa-star"></i>}
-                activeColor="#ffd700"
+
+        {order?.variants?.map((variant) => (
+          <div
+            key={
+              variant.id || `${order.product.id}-${variant.variantResponse.id}`
+            }
+            className="order-item"
+          >
+            <div className="item-image">
+              <img
+                src={`http://localhost:8080${variant.variantResponse.imagePath}`}
+                alt={order.product.productName}
               />
             </div>
+            <div className="item-details">
+              <div className="item-name">{order.product.productName}</div>
+              <div className="item-variant">
+                <span>
+                  {variant.variantResponse.attributeValueResponses.map(
+                    (attributeValue, index, array) => (
+                      <span key={attributeValue.attributeName}>
+                        {attributeValue.attributeName}:{" "}
+                        <strong>{attributeValue.attributeValue}</strong>
+                        {index < array.length - 1 ? " | " : ""}
+                      </span>
+                    )
+                  ) || "Ngẫu nhiên"}
+                </span>
+              </div>
+              <div className="item-quantity">x{variant.quantity}</div>
+            </div>
+            <div className="item-price">
+              <div className="original-price">
+                {formatCurrency(variant.variantResponse.price)}
+              </div>
+              <div className="discount-price">
+                {formatCurrency(variant.variantResponse.discountPrice)}
+              </div>
+            </div>
           </div>
-          
-          <div className="form-group">
-            <label htmlFor="comment" className="form-label">Your Review</label>
+        ))}
+
+        <form onSubmit={handleSubmit}>
+          <div className="rating-stars">
+            <p>Mức độ hài lòng:</p>
+            <div className="stars-container">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  size={32}
+                  onClick={() => handleRatingChange(star)}
+                  className={star <= rating ? "star filled" : "star"}
+                  fill={star <= rating ? "#FFC107" : "none"}
+                  stroke={star <= rating ? "#FFC107" : "#ccc"}
+                />
+              ))}
+            </div>
+            <p className="rating-text">
+              {rating === 5
+                ? "Rất hài lòng"
+                : rating === 4
+                ? "Hài lòng"
+                : rating === 3
+                ? "Bình thường"
+                : rating === 2
+                ? "Không hài lòng"
+                : "Rất không hài lòng"}
+            </p>
+          </div>
+
+          <div className="rating-comment">
             <textarea
-              id="comment"
-              rows="4"
-              className="comment-textarea"
+              placeholder="Chia sẻ thêm đánh giá của bạn về sản phẩm này..."
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Share your experience with this product..."
+              onChange={handleCommentChange}
+              rows={4}
             ></textarea>
           </div>
-          
-          <button
-            type="submit"
-            disabled={submitting}
-            className={`submit-button ${submitting ? 'submitting' : ''}`}
-          >
-            {submitting ? 'Submitting...' : 'Submit Review'}
-          </button>
-        </form>
-      </div>
-      
-      <div className="reviews-container">
-        <h3 className="section-title">Customer Reviews</h3>
-        {existingRatings.length === 0 ? (
-          <p className="no-reviews">No reviews yet. Be the first to review this product!</p>
-        ) : (
-          <div className="reviews-list">
-            {existingRatings.map((review) => (
-              <div key={review.id} className="review-item">
-                <div className="review-header">
-                  <div className="reviewer-info">
-                    <div className="stars-container">
-                      {renderRatingStars(review.ratingValue)}
-                    </div>
-                    <span className="reviewer-name">{review.userResponse?.name || 'Anonymous'}</span>
-                    {review.isVerified && (
-                      <span className="verified-badge">Verified Purchase</span>
-                    )}
-                  </div>
-                  <div className="review-date">
-                    {formatDate(review.createdAt)}
-                  </div>
+
+          <div className="rating-images">
+            <p>Thêm hình ảnh (tối đa 5 ảnh):</p>
+            <div className="images-container">
+              {previewImages.map((url, index) => (
+                <div key={index} className="image-preview">
+                  <img src={url} alt={`Preview ${index + 1}`} />
+                  <button
+                    type="button"
+                    className="remove-image"
+                    onClick={() => removeImage(index)}
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
-                <p className="review-comment">{review.comment}</p>
-              </div>
-            ))}
+              ))}
+
+              {images.length < 5 && (
+                <label className="upload-image-label">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    className="upload-input"
+                  />
+                  <div className="upload-placeholder">
+                    <Upload size={24} />
+                    <span>Tải ảnh</span>
+                  </div>
+                </label>
+              )}
+            </div>
+            <p className="image-limit-text">{images.length}/5 ảnh đã tải lên</p>
           </div>
-        )}
+
+          <div className="rating-actions">
+            <button type="button" className="cancel-btn" onClick={onClose}>
+              Hủy
+            </button>
+            <button
+              type="submit"
+              className="submit-btn"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Đang gửi..." : "Gửi đánh giá"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

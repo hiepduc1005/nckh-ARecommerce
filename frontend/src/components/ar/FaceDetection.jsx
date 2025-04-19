@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, Suspense } from "react";
+import React, { useRef, useEffect, useState, Suspense, memo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   useGLTF,
@@ -10,16 +10,85 @@ import {
 import * as THREE from "three";
 import { trackCameraPermission } from "../../utils/analytics";
 
-// Component to load and display 3D glasses model
-function GlassesModel({ positions }) {
-  // Load the 3D glasses model - replace with your .glb URL
+// Preload mô hình để giảm độ trễ khi tải
+useGLTF.preload("/models/face.glb");
+useGLTF.preload("/models/trang_sua_c2ceb8.glb");
+
+// Component FaceOccluder với tối ưu hóa
+const FaceOccluder = memo(({ positions }) => {
+  const { scene } = useGLTF("/models/face.glb");
+  const occluderRef = useRef();
+  const [isDebug, setIsDebug] = useState(true); // Có thể điều khiển qua props nếu cần
+
+  useEffect(() => {
+    if (occluderRef.current) {
+      occluderRef.current.traverse((child) => {
+        if (child.isMesh) {
+          child.material = new THREE.MeshBasicMaterial(
+            isDebug
+              ? {
+                  color: 0xffffff,
+                  transparent: true,
+                  opacity: 0.5,
+                  side: THREE.DoubleSide,
+                }
+              : { colorWrite: false, depthWrite: true, side: THREE.DoubleSide }
+          );
+        }
+      });
+    }
+  }, [isDebug]);
+
+  useFrame(() => {
+    if (!occluderRef.current || !positions.nose) return;
+
+    const threshold = 0.01; // Ngưỡng thay đổi để giảm tần suất cập nhật
+    const { x, y, z } = positions.nose;
+    const currentPos = occluderRef.current.position;
+
+    // Chỉ cập nhật nếu thay đổi vượt ngưỡng
+    if (
+      Math.abs(currentPos.x - (x - 1)) > threshold ||
+      Math.abs(currentPos.y - y) > threshold ||
+      Math.abs(currentPos.z - (z - 1)) > threshold
+    ) {
+      occluderRef.current.position.set(x * 3.8, y - 0.2, z / 0.05 - 0.5);
+    }
+
+    if (positions.glassesRotation) {
+      const quaternion = new THREE.Quaternion();
+      const euler = new THREE.Euler(
+        -positions.glassesRotation.x,
+        -positions.glassesRotation.y - Math.PI,
+        positions.glassesRotation.z,
+        "ZYX"
+      );
+      quaternion.setFromEuler(euler);
+      occluderRef.current.quaternion.copy(quaternion);
+    }
+
+    if (positions.scale) {
+      const scaleFactor = positions.scale * 6.2;
+      occluderRef.current.scale.set(
+        scaleFactor * 0.01,
+        scaleFactor * 0.01,
+        scaleFactor * 0.01
+      );
+    }
+  });
+
+  return <primitive ref={occluderRef} object={scene} />;
+});
+
+// Component GlassesModel với tối ưu hóa
+const GlassesModel = memo(({ positions }) => {
   const { scene, materials } = useGLTF("/models/trang_sua_c2ceb8.glb");
   const glassesRef = useRef();
 
   useEffect(() => {
     if (materials && materials["glasses_mirror.001"]) {
       const lensMaterial = materials["glasses_mirror.001"];
-      lensMaterial.color = new THREE.Color("#FFD700"); // Màu vàng
+      lensMaterial.color = new THREE.Color("#FFD700");
       lensMaterial.metalness = 1.0;
       lensMaterial.roughness = 0;
       lensMaterial.envMapIntensity = 2.0;
@@ -29,13 +98,14 @@ function GlassesModel({ positions }) {
   }, [materials]);
 
   useFrame(() => {
-    if (!glassesRef.current) return;
-    // Calculate position between eyes for glasses center
+    if (!glassesRef.current || !positions.leftEye || !positions.rightEye)
+      return;
+
+    const threshold = 0.01;
     const centerX = (positions.leftEye.x + positions.rightEye.x) / 0.8;
     const centerY = (positions.leftEye.y + positions.rightEye.y) / 1.1;
     const centerZ = (positions.leftEye.z + positions.rightEye.z) / 1;
 
-    // Calculate scale based on eye distance
     const eyeDistance = new THREE.Vector3()
       .subVectors(
         new THREE.Vector3(
@@ -51,44 +121,36 @@ function GlassesModel({ positions }) {
       )
       .length();
 
-    const offsetY = eyeDistance * 1.3; // Điều chỉnh hệ số nếu cần
+    const offsetY = eyeDistance * 1.3;
     const adjustedY = centerY + offsetY;
 
-    // Update glasses position
-    glassesRef.current.position.set(centerX, adjustedY, centerZ);
+    const currentPos = glassesRef.current.position;
+    if (
+      Math.abs(currentPos.x - centerX) > threshold ||
+      Math.abs(currentPos.y - adjustedY) > threshold ||
+      Math.abs(currentPos.z - centerZ) > threshold
+    ) {
+      glassesRef.current.position.set(centerX, adjustedY, centerZ);
+    }
 
     if (positions.glassesRotation) {
-      // Tạo quaternion từ các góc Euler, nhưng chỉ định thứ tự rõ ràng
       const quaternion = new THREE.Quaternion();
       const euler = new THREE.Euler(
         positions.glassesRotation.x + Math.PI,
-        -positions.glassesRotation.y, // Vẫn đảo dấu cho trục Y
+        -positions.glassesRotation.y,
         positions.glassesRotation.z,
-        "ZYX" // Thay đổi thứ tự xoay từ XYZ sang ZYX
+        "ZYX"
       );
       quaternion.setFromEuler(euler);
       glassesRef.current.quaternion.copy(quaternion);
     }
-    // Scale the glasses appropriately
-    // You may need to adjust this multiplier based on your model size
+
     const scaleFactor = eyeDistance * 3 * 3 * 4;
     glassesRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
   });
 
-  // Clone the scene to make it usable in React
-  const glassesScene = scene.clone();
-
-  return (
-    <>
-      <primitive
-        ref={glassesRef}
-        object={glassesScene}
-        position={[0, 0, 0]}
-        scale={3}
-      />
-    </>
-  );
-}
+  return <primitive ref={glassesRef} object={scene} />;
+});
 
 const FaceDetection = () => {
   const videoRef = useRef(null);
@@ -96,8 +158,11 @@ const FaceDetection = () => {
   const [eyePositions, setEyePositions] = useState({
     leftEye: new THREE.Vector3(0, 0, 0),
     rightEye: new THREE.Vector3(0, 0, 0),
+    nose: new THREE.Vector3(0, 0, 0),
+    glassesRotation: { x: 0, y: 0, z: 0 },
+    scale: 1,
   });
-  const [calibrationAngleX, setCalibrationAngleX] = useState(null);
+  const [showOccluder, setShowOccluder] = useState(true);
 
   useEffect(() => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -108,32 +173,14 @@ const FaceDetection = () => {
 
     let cleanupFunction = null;
 
-    // Dynamically import MediaPipe libraries
     const loadFaceMesh = async () => {
       try {
-        // Import FaceMesh dynamically
         const faceMeshModule = await import("@mediapipe/face_mesh");
         const FaceMesh = faceMeshModule.FaceMesh;
 
-        // Import drawing utilities
-        const drawingUtilsModule = await import("@mediapipe/drawing_utils");
-        const drawConnectors = drawingUtilsModule.drawConnectors;
-
-        // Constants for eye indices in FaceMesh
-        const LEFT_EYE_INDICES = [
-          33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160,
-          161, 246,
-        ];
-
-        const RIGHT_EYE_INDICES = [
-          362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385,
-          384, 398,
-        ];
-
         const faceMesh = new FaceMesh({
-          locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-          },
+          locateFile: (file) =>
+            `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
         });
 
         faceMesh.setOptions({
@@ -145,14 +192,19 @@ const FaceDetection = () => {
 
         faceMesh.onResults((results) => {
           if (!results.multiFaceLandmarks) return;
-
-          // Clear canvas
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
           if (results.multiFaceLandmarks.length > 0) {
             const landmarks = results.multiFaceLandmarks[0];
+            const LEFT_EYE_INDICES = [
+              33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160,
+              161, 246,
+            ];
+            const RIGHT_EYE_INDICES = [
+              362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386,
+              385, 384, 398,
+            ];
 
-            // Calculate eye center positions
             let leftEyeCenter = new THREE.Vector3(0, 0, 0);
             let rightEyeCenter = new THREE.Vector3(0, 0, 0);
             let noseCenter = new THREE.Vector3(
@@ -161,7 +213,6 @@ const FaceDetection = () => {
               landmarks[168].z
             );
 
-            // Average left eye landmarks
             LEFT_EYE_INDICES.forEach((index) => {
               leftEyeCenter.x += landmarks[index].x;
               leftEyeCenter.y += landmarks[index].y;
@@ -176,7 +227,6 @@ const FaceDetection = () => {
             });
             rightEyeCenter.divideScalar(RIGHT_EYE_INDICES.length);
 
-            // Chỉnh lại hệ tọa độ Three.js
             leftEyeCenter.x = -((leftEyeCenter.x - 0.5) * 2);
             leftEyeCenter.y = -((leftEyeCenter.y - 0.5) * 2);
             rightEyeCenter.x = -((rightEyeCenter.x - 0.5) * 2);
@@ -184,165 +234,84 @@ const FaceDetection = () => {
             noseCenter.x = -((noseCenter.x - 0.5) * 2);
             noseCenter.y = -((noseCenter.y - 0.5) * 2);
 
-            const centerX = leftEyeCenter.x + rightEyeCenter.x + 5;
-            const centerY = (leftEyeCenter.y + rightEyeCenter.y) / 2;
-            const centerZ = (leftEyeCenter.z + rightEyeCenter.z) / 2;
-
-            // Dịch kính xuống một chút để phù hợp hơn
-            const offsetY = noseCenter.y - centerY;
-            // Tính góc nghiêng theo trục Y
-            const leftEar = landmarks[234];
-            const rightEar = landmarks[454];
-
-            const eyeDistance = new THREE.Vector3()
-              .subVectors(leftEyeCenter, rightEyeCenter)
-              .length();
-
-            // Xác định kích thước kính dựa vào khoảng cách thái dương
             const faceWidth = Math.abs(landmarks[10].x - landmarks[338].x) * 2;
-            const scaleFactor = faceWidth * 2.5; // Điều chỉnh kích thước hợp lý
+            const scaleFactor = faceWidth * 2.5;
 
-            const forehead = landmarks[10]; // Trán
-            const chin = landmarks[152]; // Cằm
-            const nose = landmarks[1]; // Đỉnh mũi
-
-            // Vector từ trán đến cằm để có được hướng ngửa/cúi
+            const forehead = landmarks[10];
+            const chin = landmarks[152];
             const faceUpVector = new THREE.Vector3(
               forehead.x - chin.x,
               forehead.y - chin.y,
               forehead.z - chin.z
             ).normalize();
-
             const refUpVector = new THREE.Vector3(0, 1, 0);
             let headAngleX = Math.acos(faceUpVector.dot(refUpVector));
+            if (forehead.z > chin.z) headAngleX = -headAngleX;
 
-            // Xác định dấu (ngửa hay cúi)
-            if (forehead.z > chin.z) {
-              headAngleX = -headAngleX;
-            }
-
-            // --- Tính góc nghiêng theo trục Y (quay trái/phải) ---
-            // Vector ngang từ tai trái đến tai phải
+            const leftEar = landmarks[234];
+            const rightEar = landmarks[454];
             const earVector = new THREE.Vector3(
               rightEar.x - leftEar.x,
               rightEar.y - leftEar.y,
               rightEar.z - leftEar.z
             ).normalize();
-
-            // Vector tham chiếu (1,0,0) - vector ngang
             const refSideVector = new THREE.Vector3(1, 0, 0);
-
-            // Góc giữa vector tai và vector tham chiếu ngang
             let headAngleY = Math.acos(earVector.dot(refSideVector));
-            // Xác định dấu (quay trái hay phải)
-            if (rightEar.z > leftEar.z) {
-              headAngleY = -headAngleY;
-            }
+            if (rightEar.z > leftEar.z) headAngleY = -headAngleY;
 
-            // --- Tính góc nghiêng theo trục Z (nghiêng đầu) ---
-            // Sử dụng vị trí mắt để tính góc nghiêng
             const eyeVector = new THREE.Vector3(
               rightEyeCenter.x - leftEyeCenter.x,
               rightEyeCenter.y - leftEyeCenter.y,
-              0 // Bỏ qua thành phần z để tính góc trên mặt phẳng XY
+              0
             ).normalize();
-
             const headAngleZ = Math.atan2(eyeVector.y, eyeVector.x);
 
-            // Swap left and right eye positions to match mirrored video
             setEyePositions({
-              leftEye: rightEyeCenter, // Swap lại do mirroring
+              leftEye: rightEyeCenter,
               rightEye: leftEyeCenter,
               nose: noseCenter,
-              glassesPosition: { x: centerX, y: centerY + offsetY, z: centerZ },
               glassesRotation: { z: headAngleZ, y: headAngleY, x: headAngleX },
               scale: scaleFactor,
             });
-
-            // Draw eye contours on 2D canvas for debugging
-            ctx.save();
-            ctx.translate(canvas.width, 0);
-            ctx.scale(-1, 1);
-
-            ctx.restore();
           }
         });
 
-        // Use MediaPipe's Camera class when available or fallback to navigator.mediaDevices
-        let cameraUtils;
-        try {
-          cameraUtils = await import("@mediapipe/camera_utils");
-          const Camera = cameraUtils.Camera;
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 640, height: 480 },
+        });
+        video.srcObject = stream;
+        video.play();
 
-          const camera = new Camera(video, {
-            onFrame: async () => {
-              await faceMesh.send({ image: video });
-            },
-            width: 640,
-            height: 480,
-          });
-
-          camera.start();
-          trackCameraPermission(true);
-
-          cleanupFunction = () => camera.stop();
-
-          return () => camera.stop();
-        } catch (error) {
-          console.warn(
-            "Could not load @mediapipe/camera_utils, using fallback",
-            error
-          );
-
-          // Fallback to basic getUserMedia
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-              video: { width: 640, height: 480 },
-            });
-            video.srcObject = stream;
-            video.play();
-
-            trackCameraPermission(true);
-
-            let lastTime = 0;
-            let animationFrameId;
-            const processFrame = async () => {
-              if (timestamp - lastTime < 33) {
-                animationFrameId = requestAnimationFrame(processFrame);
-                return;
-              }
-              lastTime = timestamp;
-              await faceMesh.send({ image: video });
-              animationFrameId = requestAnimationFrame(processFrame);
-            };
-
-            processFrame();
-            cleanupFunction = () => {
-              cancelAnimationFrame(animationFrameId);
-              stream.getTracks().forEach((track) => track.stop());
-            };
-            return () => {
-              cancelAnimationFrame(animationFrameId);
-              stream.getTracks().forEach((track) => track.stop());
-            };
-          } catch (mediaError) {
-            console.error("Camera access failed:", mediaError);
-            trackCameraPermission(false);
+        let lastTime = 0;
+        let animationFrameId;
+        const processFrame = async (timestamp) => {
+          if (timestamp - lastTime < 33) {
+            animationFrameId = requestAnimationFrame(processFrame);
+            return;
           }
-        }
+          lastTime = timestamp;
+          await faceMesh.send({ image: video });
+          animationFrameId = requestAnimationFrame(processFrame);
+        };
+
+        processFrame(0);
+        cleanupFunction = () => {
+          cancelAnimationFrame(animationFrameId);
+          stream.getTracks().forEach((track) => track.stop());
+        };
       } catch (error) {
-        console.error("Failed to load MediaPipe:", error);
+        console.error("Failed to load MediaPipe or camera:", error);
         trackCameraPermission(false);
       }
     };
 
     loadFaceMesh();
     return () => {
-      if (cleanupFunction && typeof cleanupFunction === "function") {
-        cleanupFunction();
-      }
+      if (cleanupFunction) cleanupFunction();
     };
   }, []);
+
+  const toggleOccluder = () => setShowOccluder(!showOccluder);
 
   return (
     <div>
@@ -363,7 +332,6 @@ const FaceDetection = () => {
             transform: "scaleX(-1)",
           }}
         />
-        {/* Overlay the Three.js canvas directly on top of the video */}
         <div
           style={{
             position: "absolute",
@@ -375,14 +343,22 @@ const FaceDetection = () => {
           }}
         >
           <Canvas camera={{ position: [0, 0, 2.5] }}>
-            <Suspense>
+            <Suspense fallback={null}>
+              {showOccluder && <FaceOccluder positions={eyePositions} />}
               <GlassesModel positions={eyePositions} />
               <directionalLight position={[2, 2, 2]} intensity={1} />
+              <ambientLight intensity={0.5} />
             </Suspense>
             <Stats />
           </Canvas>
         </div>
       </div>
+      <button
+        onClick={toggleOccluder}
+        style={{ marginTop: "10px", padding: "8px 16px", cursor: "pointer" }}
+      >
+        {showOccluder ? "Ẩn Occluder" : "Hiện Occluder"}
+      </button>
     </div>
   );
 };

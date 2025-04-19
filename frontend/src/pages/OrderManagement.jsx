@@ -89,7 +89,6 @@ const OrderManagement = () => {
 
   const handleFilterChange = async (status) => {
     setStatusFilter(status);
-    // fetchOrderByStatus(status);
   };
 
   // Check if status transition is valid

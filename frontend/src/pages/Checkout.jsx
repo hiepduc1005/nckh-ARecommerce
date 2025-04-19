@@ -24,7 +24,7 @@ const Checkout = () => {
   const [address, setAddress] = useState("");
   const [reciveEmail, setReciveEmail] = useState(false);
   const [specificAddress, setSpecificAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("COD");
   const [cartItems, setCartItems] = useState([]);
   const [phone, setPhone] = useState("");
   const [customerNote, setCustomerNote] = useState("");

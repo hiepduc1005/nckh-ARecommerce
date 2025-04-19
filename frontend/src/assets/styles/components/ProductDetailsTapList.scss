@@ -1,0 +1,77 @@
+.product-details-tab-list {
+    margin-top: 30px;
+    
+    // Customize react-tabs styles
+    :global {
+      .react-tabs {
+        &__tab-list {
+          border-bottom: 1px solid #ddd;
+          margin: 0 0 20px;
+          padding: 0;
+        }
+  
+        &__tab {
+          display: inline-block;
+          border: none;
+          border-bottom: 2px solid transparent;
+          bottom: -1px;
+          position: relative;
+          list-style: none;
+          padding: 10px 20px;
+          cursor: pointer;
+          margin-right: 10px;
+          transition: all 0.2s;
+          font-weight: 500;
+  
+          &--selected {
+            border-bottom: 2px solid #ee4d2d;
+            color: #ee4d2d;
+          }
+  
+          &:focus {
+            outline: none;
+            box-shadow: none;
+          }
+  
+          &:hover:not(&--selected) {
+            color: #ee4d2d;
+          }
+        }
+  
+        &__tab-panel {
+          display: none;
+          padding: 20px 0;
+  
+          &--selected {
+            display: block;
+          }
+        }
+      }
+    }
+  
+    .description-content {
+      line-height: 1.6;
+      color: #333;
+  
+      p {
+        margin: 0;
+      }
+  
+      .no-description {
+        font-style: italic;
+        color: #666;
+        text-align: center;
+        padding: 30px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+      }
+    }
+  
+    .reviews-content {
+      .loading-reviews {
+        text-align: center;
+        padding: 30px;
+        color: #666;
+      }
+    }
+  }
