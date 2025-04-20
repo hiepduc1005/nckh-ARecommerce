@@ -1,5 +1,7 @@
 package com.ecommerce.vn.service.convert;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,9 @@ public class RatingConvert {
 	private UserService userService;
 	
 	public RatingResponse ratingConvertToRatingResponse(Rating rating) {
+		if(rating == null) {
+			return null;
+		}
 		RatingResponse ratingResponse = new RatingResponse();
 		ratingResponse.setId(rating.getId());
 		ratingResponse.setProductId(rating.getProduct().getId());
@@ -33,7 +38,8 @@ public class RatingConvert {
 		ratingResponse.setCreatedAt(rating.getCreatedAt());
 		ratingResponse.setUserResponse(userConvert.userConvertToUserResponse(rating.getUser()));
 		ratingResponse.setUpdatedAt(rating.getUpdatedAt());
-		
+		List<String> images = rating.getImages().stream().map((image) -> image.getImageUrl()).toList();
+		ratingResponse.setImagePaths(images);
 		return ratingResponse;
 	}
 	
@@ -41,6 +47,7 @@ public class RatingConvert {
 		Rating rating = new Rating();
 		rating.setComment(ratingCreateRequest.getComment());
 		rating.setRatingValue(ratingCreateRequest.getRatingValue());
+		rating.setIsVerified(true);
 		
 		User user = userService.findUserByUuId(ratingCreateRequest.getUserId());
 		Product product = productService.getProductById(ratingCreateRequest.getProductId());

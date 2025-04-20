@@ -3,11 +3,13 @@ package com.ecommerce.vn.service.order.impl;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,11 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.vn.config.Utils;
 import com.ecommerce.vn.entity.coupon.Coupon;
+import com.ecommerce.vn.entity.coupon.CouponUsage;
 import com.ecommerce.vn.entity.order.Order;
+import com.ecommerce.vn.entity.order.OrderItem;
 import com.ecommerce.vn.entity.order.OrderStatus;
 import com.ecommerce.vn.entity.order.OrderStatusHistory;
 import com.ecommerce.vn.entity.order.PaymentMethod;
 import com.ecommerce.vn.entity.user.User;
+import com.ecommerce.vn.exception.InvalidCouponException;
 import com.ecommerce.vn.repository.OrderRepository;
 import com.ecommerce.vn.service.EmailService;
 import com.ecommerce.vn.service.coupon.CouponService;
@@ -46,18 +51,19 @@ public class OrderServiceImpl implements OrderService {
 	private EmailService emailService;
 
 	@Override
+	@Transactional
 	public Order createOrder(Order order) {
 		
 		if(isOrderEmpty(order)) {
 			throw new RuntimeException("Order is empty!");
 		}
 		
-		order.getOrderItems().stream().forEach(orderItem -> {
-			if(orderItem.getQuantity() > orderItem.getVariant().getQuantity()) {
-				throw new RuntimeException("Số sản phẩm có sẵn không đủ!");
-			}
-			orderItem.getVariant().setQuantity(orderItem.getVariant().getQuantity() -  orderItem.getQuantity() );
-		});
+		for (OrderItem orderItem : order.getOrderItems()) {
+		    if (orderItem.getQuantity() > orderItem.getVariant().getQuantity()) {
+		        throw new RuntimeException("Số sản phẩm có sẵn không đủ!");
+		    }
+		    orderItem.getVariant().setQuantity(orderItem.getVariant().getQuantity() - orderItem.getQuantity());
+		}
 		
 		String code;
 	    int attempts = 0;
@@ -79,10 +85,34 @@ public class OrderServiceImpl implements OrderService {
 		Coupon coupon = order.getCoupon();
 		BigDecimal totalPrice = calculateTotalPrice(order);
 		order.setTotalPrice(totalPrice);			
-		if(coupon != null) {
-			BigDecimal discountPrice = calculateTotalPriceWithCoupon(order,coupon);
-			order.setDiscountPrice(discountPrice);
-			
+		if (coupon != null) {
+		    if (!couponService.isCouponValid(coupon.getId())) {
+		        throw new InvalidCouponException("Mã giảm giá hết hạn hoặc không hợp lệ!");
+		    }
+		    
+		    List<CouponUsage> couponUsages  =  coupon.getCouponUsages();
+		    if (couponUsages == null) {
+		        couponUsages = new ArrayList<>();
+		        coupon.setCouponUsages(couponUsages);
+		    }
+		    boolean isCouponUsedByEmail = couponUsages
+		        .stream()
+		        .anyMatch(usage -> usage.getEmail().equals(order.getEmail()));
+		    if (isCouponUsedByEmail) {
+		        throw new InvalidCouponException("Mã giảm giá đã được sử dụng bởi email này!");
+		    }
+		    
+		    if (coupon.getCouponUsages() == null) {
+		        coupon.setCouponUsages(new ArrayList<>());
+		    }
+		    CouponUsage couponUsage = new CouponUsage();
+		    couponUsage.setCoupon(coupon);
+		    couponUsage.setEmail(order.getEmail());
+		    couponUsage.setUsedAt(LocalDateTime.now());
+		    
+		    couponUsages.add(couponUsage);
+		    coupon.setCouponUsages(couponUsages);
+		    order.setDiscountPrice(calculateTotalPriceWithCoupon(order, coupon));
 		}
 		
 		order.setOrderStatusHistories(Arrays.asList(new OrderStatusHistory(order.getOrderStatus(), order)));
@@ -106,22 +136,22 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	@Transactional
 	public Order updateOrder(Order updatedOrder) {
 		if(updatedOrder.getId() == null) {
 			throw new RuntimeException("Order id id null");
 		}
 		
-		Order order = orderRepository.findById(updatedOrder.getId()).get();
-		if(orderRepository.findById(updatedOrder.getId()).isEmpty()) {
-			throw new RuntimeException("Order not found");
-		}
-		
+		Order order = orderRepository.findById(updatedOrder.getId())
+	            .orElseThrow(() -> new RuntimeException("Order not found"));
+		order.setPaymentUrl(updatedOrder.getPaymentUrl());
 		if(!order.getOrderStatus().equals(updatedOrder.getOrderStatus())) {
-			List<OrderStatusHistory> histories = order.getOrderStatusHistories();
-			histories.add(new OrderStatusHistory(updatedOrder.getOrderStatus(), updatedOrder));
-			updatedOrder.setOrderStatusHistories(histories);
+			Hibernate.initialize(order.getOrderStatusHistories()); // Tải collection
+	        OrderStatusHistory history = new OrderStatusHistory(updatedOrder.getOrderStatus(), order);
+	        order.getOrderStatusHistories().add(history);
+	      
 		}
-		return orderRepository.save(updatedOrder);
+	    return order;
 	}
 
 	@Override
@@ -179,7 +209,8 @@ public class OrderServiceImpl implements OrderService {
 	}
 	
 	private void sendEmailByStatus(OrderStatus status, Order order) throws IOException {
-	    switch (status) {
+		String description;
+		switch (status) {
 	        case PENDING:
 	        	break;
 	        case PAID:
@@ -190,11 +221,13 @@ public class OrderServiceImpl implements OrderService {
 	        case SHIPPED:
 	        	break;
 	        case DELIVERED:
-	        	Coupon coupon = couponService.createGiftCoupon(10.0);
+	        	description = "Mã giảm giá cảm ơn vì đã mua hàng!";
+	        	Coupon coupon = couponService.createGiftCoupon(10.0,description);
 	        	emailService.sendSuccessDeliveryEmail(order.getEmail(), order.getEmail(), coupon, order);
 	        	break;
 	        case CANCELLED:
-	        	Coupon c = couponService.createGiftCoupon(15.0);
+	        	description = "Quà xin lỗi";
+	        	Coupon c = couponService.createGiftCoupon(15.0,description);
 	        	emailService.sendCancelOrderEmail(order.getEmail(), order.getEmail(), order, c);
 	        	break;
 	        default:

@@ -16,12 +16,10 @@ export const createRating = async (data, token) => {
   }
 };
 
-export const getRatingsPaginate = async (page, size) => {
+export const getRatingsPaginate = async (productId, page, size, value = 0) => {
   try {
     const res = await axiosInstance.get(
-      `api/v1/rating/product/{productId}/pagination?page=${
-        page - 1
-      }&size=${size}`
+      `api/v1/rating/product/${productId}?page=${page}&size=${size}&value=${value}`
     );
 
     return res.data;

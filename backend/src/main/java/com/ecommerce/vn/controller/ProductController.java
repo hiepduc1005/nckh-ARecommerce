@@ -162,8 +162,7 @@ public class ProductController {
             @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice,
             @RequestParam(value = "keyword", required = false) String keyword) {
         
-    	System.out.println(categories);
-    	System.out.println(brands);
+    
 
     	List<String> listCategory = categories.isEmpty() ? null : Arrays.asList(categories.split(","));
     	List<String> listBrand = brands.isEmpty() ? null : Arrays.asList(brands.split(","));

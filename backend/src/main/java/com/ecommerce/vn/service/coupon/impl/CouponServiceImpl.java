@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.ecommerce.vn.entity.coupon.Coupon;
+import com.ecommerce.vn.entity.coupon.CouponType;
+import com.ecommerce.vn.entity.product.DiscountType;
 import com.ecommerce.vn.repository.CouponRepository;
 import com.ecommerce.vn.service.coupon.CouponService;
 
@@ -152,13 +154,18 @@ public class CouponServiceImpl implements CouponService {
 
 
 	@Override
-	public Coupon createGiftCoupon(Double value) {
+	public Coupon createGiftCoupon(Double value,String description) {
 		Coupon coupon = new Coupon();
 		LocalDateTime startDate = LocalDateTime.now();
-		LocalDateTime expireDate = startDate.plusDays(1);
+		LocalDateTime expireDate = startDate.plusDays(15);
 		
 		coupon.setCouponStartDate(startDate);
+		coupon.setCouponType(CouponType.ORDER_DISCOUNT);
+		coupon.setDiscountType(DiscountType.PERCENTAGE);
+		coupon.setMaxUsage(1);
+		coupon.setTimeUsed(0);
 		coupon.setCouponEndDate(expireDate);
+		coupon.setCouponDescription(description);
 		coupon.setDiscountValue(BigDecimal.valueOf(value));
 		
 		return createCoupon(coupon);

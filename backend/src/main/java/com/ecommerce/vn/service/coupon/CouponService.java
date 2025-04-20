@@ -27,7 +27,7 @@ public interface CouponService {
     
     Coupon getCouponByCode(String code);
     
-    Coupon createGiftCoupon(Double value);
+    Coupon createGiftCoupon(Double value,String description);
 
 	Page<Coupon> getCouponsWithPagination(int page, int size);
 

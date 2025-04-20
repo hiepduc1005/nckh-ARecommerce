@@ -48,6 +48,11 @@ const ProductRating = ({ order, product, onClose, onSubmit }) => {
       return;
     }
 
+    if (previewImages.length >= 5) {
+      toast.error("Bạn chỉ có thể tải lên tối đa 5 ảnh");
+      return;
+    }
+
     setImages([...images, ...files]);
 
     // Create preview URLs
@@ -225,7 +230,7 @@ const ProductRating = ({ order, product, onClose, onSubmit }) => {
                 </div>
               ))}
 
-              {images.length < 5 && (
+              {previewImages.length < 5 && (
                 <label className="upload-image-label">
                   <input
                     type="file"
@@ -241,7 +246,9 @@ const ProductRating = ({ order, product, onClose, onSubmit }) => {
                 </label>
               )}
             </div>
-            <p className="image-limit-text">{images.length}/5 ảnh đã tải lên</p>
+            <p className="image-limit-text">
+              {previewImages.length}/5 ảnh đã tải lên
+            </p>
           </div>
 
           <div className="rating-actions">

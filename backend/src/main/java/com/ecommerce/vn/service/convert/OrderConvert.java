@@ -11,11 +11,13 @@ import com.ecommerce.vn.dto.order.OrderCreateRequest;
 import com.ecommerce.vn.dto.order.OrderItemResponse;
 import com.ecommerce.vn.dto.order.OrderResponse;
 import com.ecommerce.vn.dto.order.OrderStatusHistoryResponse;
+import com.ecommerce.vn.dto.order.OrderUserResponse;
 import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderItem;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.service.coupon.CouponService;
+import com.ecommerce.vn.service.rating.RatingService;
 import com.ecommerce.vn.service.user.UserService;
 
 @Service
@@ -36,6 +38,11 @@ public class OrderConvert {
 	@Autowired
 	private OrderStatusHistoryConvert historyConvert;
 	
+	@Autowired
+	private RatingConvert ratingConvert;
+	
+	@Autowired
+	private RatingService ratingService;
 	
 	public Order orderCreateConvertToOrder(OrderCreateRequest orderCreateRequest) {
 		if(orderCreateRequest == null) {
@@ -75,6 +82,49 @@ public class OrderConvert {
 			return null;
 		}
 		OrderResponse orderResponse = new OrderResponse();
+		Coupon coupon = order.getCoupon();
+		if(coupon != null) {
+			orderResponse.setCouponResponse(couponConvert.couponConvertToCouponResponse(coupon));
+		}
+		
+		orderResponse.setCode(order.getCode());
+		orderResponse.setId(order.getId());
+		orderResponse.setCreatedAt(order.getCreatedAt());
+		orderResponse.setOrderApprovedAt(order.getOrderApprovedAt());
+		orderResponse.setDiscountPrice(order.getDiscountPrice());
+		orderResponse.setTotalPrice(order.getTotalPrice());
+		orderResponse.setNotes(order.getNotes());
+		orderResponse.setPaymentMethod(order.getPaymentMethod());
+		orderResponse.setShippingFee(order.getShippingFee());
+		orderResponse.setEmail(order.getEmail());
+		orderResponse.setAddress(order.getAddress());
+		orderResponse.setSpecificAddress(order.getSpecificAddress());
+		orderResponse.setPhone(order.getPhone());
+		orderResponse.setPaymentUrl(order.getPaymentUrl());
+		
+		List<OrderItemResponse> orderItemResponses = order.getOrderItems()
+				.stream()
+				.map((orderItem) -> orderItemConvert.orderItemConvertToOrderItemResponse(orderItem))
+				.toList();
+		
+		List<OrderStatusHistoryResponse> historyResponses = order.getOrderStatusHistories()
+				.stream()
+				.map((history) -> historyConvert.orderStatusHistoryConvertToOrderStatusHistoryResponse(history))
+				.toList();
+		
+		orderResponse.setOrderItems(orderItemResponses);
+		orderResponse.setOrderStatusHistories(historyResponses);
+		orderResponse.setOrderStatus(order.getOrderStatus());
+		orderResponse.setOrderExpireAt(order.getExpiresAt());
+		
+		return orderResponse;
+	}
+	
+	public OrderUserResponse orderConvertToOrderUserResponse(Order order) {
+		if(order == null) {
+			return null;
+		}
+		OrderUserResponse orderResponse = new OrderUserResponse();
 		Coupon coupon = order.getCoupon();
 		if(coupon != null) {
 			orderResponse.setCouponResponse(couponConvert.couponConvertToCouponResponse(coupon));

@@ -65,7 +65,7 @@ public class Order {
 	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems = new ArrayList<OrderItem>();
 	
-	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<OrderStatusHistory> orderStatusHistories  = new ArrayList<OrderStatusHistory>();
 	
 	@CreatedDate

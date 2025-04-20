@@ -1,6 +1,8 @@
 package com.ecommerce.vn.entity.rating;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -10,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.user.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -19,6 +22,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -47,6 +51,9 @@ public class Rating {
 	@Column(name = "is_verified", nullable = false)
     private Boolean isVerified;
 	
+	@OneToMany(mappedBy = "rating", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RatingImage> images = new ArrayList<>();
+	
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -54,6 +61,26 @@ public class Rating {
 	@LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+	
+	
+	
+	public List<RatingImage> getImages() {
+		return images;
+	}
+
+	public void setImages(List<RatingImage> images) {
+		this.images = images;
+	}
+
+	public void addImage(RatingImage image) {
+        images.add(image);
+        image.setRating(this);
+    }
+
+    public void removeImage(RatingImage image) {
+        images.remove(image);
+        image.setRating(null);
+    }
 	
 	public UUID getId() {
 		return id;

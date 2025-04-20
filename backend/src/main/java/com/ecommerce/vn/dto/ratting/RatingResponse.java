@@ -1,6 +1,7 @@
 package com.ecommerce.vn.dto.ratting;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import com.ecommerce.vn.dto.user.UserResponse;
@@ -13,8 +14,17 @@ public class RatingResponse {
 	private Double ratingValue;
     private String comment;
     private Boolean isVerified;
+    private List<String> imagePaths;
 	private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    
+	public List<String> getImagePaths() {
+		return imagePaths;
+	}
+	public void setImagePaths(List<String> imagePaths) {
+		this.imagePaths = imagePaths;
+	}
 	public UUID getId() {
 		return id;
 	}

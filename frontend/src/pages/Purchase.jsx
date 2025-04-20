@@ -14,6 +14,8 @@ const Purchase = () => {
   const [showRating, setShowRating] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [ratedProducts, setRatedProducts] = useState({});
+
   const location = useLocation();
 
   const { token } = useAuth();
@@ -64,6 +66,23 @@ const Purchase = () => {
 
       const data = await getOrdersUserByStatus(token, status);
       setOrders(data);
+
+      const deliveredOrders = data.filter(
+        (order) => order.orderStatus === "DELIVERED"
+      );
+      const ratedStatus = {};
+
+      for (const order of deliveredOrders) {
+        for (const item of order.orderItems) {
+          const productId = item.variantResponse.productResponse.id;
+          if (!(productId in ratedStatus)) {
+            const isRated = await checkUserRatedProduct(productId, token);
+            ratedStatus[productId] = isRated;
+          }
+        }
+      }
+
+      setRatedProducts(ratedStatus);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {
@@ -244,7 +263,7 @@ const Purchase = () => {
                         className="rate-btn"
                         onClick={() => handleOpenRating(item, item.product)}
                       >
-                        {isProductRated(item.product.id)
+                        {ratedProducts[item.product.id]
                           ? "CẬP NHẬP ĐÁNH GIÁ"
                           : `ĐÁNH GIÁ ${item.product.productName}`}
                       </button>

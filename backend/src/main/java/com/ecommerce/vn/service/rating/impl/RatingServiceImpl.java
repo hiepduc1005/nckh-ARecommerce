@@ -1,8 +1,11 @@
 package com.ecommerce.vn.service.rating.impl;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,11 +13,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.rating.Rating;
+import com.ecommerce.vn.entity.rating.RatingImage;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.repository.RatingRepository;
+import com.ecommerce.vn.service.FileUploadService;
 import com.ecommerce.vn.service.product.ProductService;
 import com.ecommerce.vn.service.rating.RatingService;
 import com.ecommerce.vn.service.user.UserService;
@@ -31,9 +37,12 @@ public class RatingServiceImpl implements RatingService {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private FileUploadService fileUploadService;
 
 	@Override
-	public Rating createRating(Rating rating) {
+	public Rating createRating(Rating rating, MultipartFile[] images) {
 		Product product = rating.getProduct();
 		
 	    User user = rating.getUser();
@@ -44,8 +53,17 @@ public class RatingServiceImpl implements RatingService {
     		Optional<Rating> ratingOp = ratingRepository.findByUserInProduct(product,user);
     		
     		if(ratingOp.isPresent()) {
-    			return updateRating(ratingOp.get().getId(), rating.getRatingValue(), rating.getComment());	
-    		}	    	
+    			return updateRating(ratingOp.get().getId(), rating.getRatingValue(), rating.getComment(),images);	
+    		}	    
+    		
+    		if(images != null && images.length > 0 && images.length <= 5) {
+    			Arrays.stream(images).forEach(image -> {
+    				String imageUrl = fileUploadService.uploadFileToServer(image);
+    				RatingImage ratingImage = new RatingImage();
+    				ratingImage.setImageUrl(imageUrl);
+    				rating.addImage(ratingImage);
+    			});    			
+    		}
 	    	
 	    	return ratingRepository.save(rating);
 	    }
@@ -54,10 +72,22 @@ public class RatingServiceImpl implements RatingService {
 	}
 
 	@Override
-	public Rating updateRating(UUID ratingId, Double ratingValue, String comment) {
+	public Rating updateRating(UUID ratingId, Double ratingValue, String comment, MultipartFile[] images) {
 		Rating rating = getRatingById(ratingId);
 		rating.setComment(comment);
 		rating.setRatingValue(ratingValue);
+		
+		int remainingSlots = 5 - rating.getImages().size();
+
+		if(images != null && images.length > 0 && remainingSlots > 0) {
+			Arrays.stream(images).forEach(image -> {
+				String imageUrl = fileUploadService.uploadFileToServer(image);
+				RatingImage ratingImage = new RatingImage();
+				ratingImage.setImageUrl(imageUrl);
+				rating.addImage(ratingImage);
+			});			
+		}
+
 		return ratingRepository.save(rating);
 	}
 
@@ -78,9 +108,12 @@ public class RatingServiceImpl implements RatingService {
 	}
 
 	@Override
-	public List<Rating> getRatingsByProduct(UUID productId) {
+	@Transactional(readOnly = true)
+	public Page<Rating> getRatingsByProduct(UUID productId, int page, int size) {
 		Product product = productService.getProductById(productId);
-		return ratingRepository.findByProduct(product);
+		Pageable pageable = PageRequest.of(page, size);
+
+		return ratingRepository.findByProduct(product,pageable);
 	}
 	
 	@Override
@@ -105,13 +138,41 @@ public class RatingServiceImpl implements RatingService {
 	@Override
 	public boolean hasCustomerRatedProduct(Product product, User user) {
 		// TODO Auto-generated method stub
-		return false;
+	    return ratingRepository.isUserRatedThisProduct(product, user) > 0;
 	}
 
 	@Override
 	public Page<Rating> getProductsWithPaginationAndSorting(int page, int size, String sortBy) {
 		Pageable pageable = PageRequest.of(page, size);
 		return ratingRepository.findAll(pageable);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Rating getUserRatingProduct(User user, Product product) {
+		return  ratingRepository.findByUserInProduct(product,user).get();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<Rating> getRatingsByProductAndValue(UUID productId, Double ratingValue, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Product product = productService.getProductById(productId);
+
+		return ratingRepository.findByProductAndValue(product, ratingValue, pageable);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Map<Integer, Long> getRatingDistributionByProduct(UUID productId) {
+		Product product = productService.getProductById(productId);
+
+	    List<Object[]> rawDistribution = ratingRepository.getRatingDistributionRaw(product);
+	    return rawDistribution.stream()
+	            .collect(Collectors.toMap(
+	                    row -> ((Number) row[0]).intValue(), // Rating value (e.g., 1, 2, 3, 4, 5)
+	                    row -> ((Number) row[1]).longValue() // Count
+	            ));
 	}
 
 
