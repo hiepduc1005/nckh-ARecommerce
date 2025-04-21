@@ -3,6 +3,7 @@ package com.ecommerce.vn.security;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -56,6 +57,25 @@ public class SecurityConfig {
 		provider.setPasswordEncoder(passwordConfig.passwordEncoder());
 		return provider;
 	}
+	
+//	@Bean
+//	public FilterRegistrationBean<GlobalRateLimitFilter> globalRateLimitFilter() {
+//		FilterRegistrationBean<GlobalRateLimitFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+//		filterRegistrationBean.setFilter(new GlobalRateLimitFilter());
+//		filterRegistrationBean.addUrlPatterns("/api/**");
+//		filterRegistrationBean.setOrder(1);
+//		return filterRegistrationBean;
+//		
+//	}
+//	
+//	@Bean
+//    public FilterRegistrationBean<IPRateLimitFilter> ipRateLimitFilter() {
+//        FilterRegistrationBean<IPRateLimitFilter> registrationBean = new FilterRegistrationBean<>();
+//        registrationBean.setFilter(new IPRateLimitFilter());
+//        registrationBean.addUrlPatterns("/api/**");
+//        registrationBean.setOrder(2);
+//        return registrationBean;
+//    }
 	
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {

@@ -263,17 +263,17 @@ const ProductReviews = ({ productId }) => {
                     {review.userResponse?.avatar ? (
                       <img
                         src={review.userResponse.avatar}
-                        alt={review.userResponse.username}
+                        alt={review.userResponse.userName}
                       />
                     ) : (
                       <div className="avatar-placeholder">
-                        {review.userResponse?.username?.charAt(0) || "U"}
+                        {review.userResponse?.userName?.charAt(0) || "U"}
                       </div>
                     )}
                   </div>
                   <div className="user-details">
                     <div className="username">
-                      {review.userResponse?.username || "Người dùng ẩn danh"}
+                      {review.userResponse?.userName || "Người dùng ẩn danh"}
                     </div>
                     <div className="review-date">
                       {formatToVNDate(review.createdAt)}

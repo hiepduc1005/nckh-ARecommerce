@@ -119,7 +119,7 @@ public class RatingController {
 		}
 		Page<RatingResponse> ratingResponses = 
 				ratings.map((rating) -> ratingConvert.ratingConvertToRatingResponse(rating));
-				
+				 
 		Double average = ratingService.getAverageRatingByProduct(productId);
 		Map<Integer, Long> distribution = ratingService.getRatingDistributionByProduct(productId);
 		Long total = ratingService.getTotalRatingsByProduct(productId);
