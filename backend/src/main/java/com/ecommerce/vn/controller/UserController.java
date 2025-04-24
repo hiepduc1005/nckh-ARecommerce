@@ -193,6 +193,13 @@ public class UserController {
 	}
 	
 
+	@GetMapping("/test")
+    public String test() {
+        return "Hello, this request is allowed!";
+    }
+	
+	
+
 	@DeleteMapping("/{userId}")
 	public ResponseEntity<String> deleteUser(@PathVariable("userId") UUID userId){
 		try {

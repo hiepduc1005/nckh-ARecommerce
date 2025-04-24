@@ -58,25 +58,6 @@ public class SecurityConfig {
 		return provider;
 	}
 	
-//	@Bean
-//	public FilterRegistrationBean<GlobalRateLimitFilter> globalRateLimitFilter() {
-//		FilterRegistrationBean<GlobalRateLimitFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-//		filterRegistrationBean.setFilter(new GlobalRateLimitFilter());
-//		filterRegistrationBean.addUrlPatterns("/api/**");
-//		filterRegistrationBean.setOrder(1);
-//		return filterRegistrationBean;
-//		
-//	}
-//	
-//	@Bean
-//    public FilterRegistrationBean<IPRateLimitFilter> ipRateLimitFilter() {
-//        FilterRegistrationBean<IPRateLimitFilter> registrationBean = new FilterRegistrationBean<>();
-//        registrationBean.setFilter(new IPRateLimitFilter());
-//        registrationBean.addUrlPatterns("/api/**");
-//        registrationBean.setOrder(2);
-//        return registrationBean;
-//    }
-	
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();

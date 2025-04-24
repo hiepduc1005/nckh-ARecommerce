@@ -24,15 +24,16 @@ public class IPRateLimitFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String clientIp = request.getRemoteAddr();
         try {
-			if (rateLimiterPerIP.resolveBucket(clientIp).tryConsume(1)) {
-			    filterChain.doFilter(request, response); // Cho phép request đi tiếp
-			} else {
-			    response.setStatus(429); // Too Many Requests
-			    response.getWriter().write("Too many requests from your IP");
-			}
-		} catch (ExecutionException | IOException | ServletException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            if (rateLimiterPerIP.resolveBucket(clientIp).tryConsume(1)) {
+                filterChain.doFilter(request, response);
+            } else {
+                response.setStatus(429);
+                response.getWriter().write("Too many requests from your IP (IP limit exceeded)");
+            }
+        } catch (ExecutionException e) {
+            response.setStatus(500);
+            response.getWriter().write("Internal server error while processing rate limit");
+            e.printStackTrace();
+        }
     }
 }

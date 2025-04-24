@@ -11,13 +11,13 @@ public class GlobalRateLimiter {
 	
 	public GlobalRateLimiter() {
 		Bandwidth limit = Bandwidth.builder()
-                .capacity(100) // Dung lượng tối đa 100 token
-                .refillGreedy(100, Duration.ofMinutes(1)) // Làm mới 100 token mỗi phút
+                .capacity(10000) 
+                .refillGreedy(10000, Duration.ofMinutes(1)) 
                 .build();
 		this.bucket = Bucket.builder().addLimit(limit).build();
 	}
 	
 	public boolean tryConsume() {
-        return bucket.tryConsume(1); // Mỗi request tiêu thụ 1 token
+        return bucket.tryConsume(1);
     }
 }
