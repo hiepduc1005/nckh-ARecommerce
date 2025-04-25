@@ -20,6 +20,7 @@ public class ModelDesign {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+	@Column(name = "session_id")
 	private String sessionId;
 	
 	@ManyToOne
