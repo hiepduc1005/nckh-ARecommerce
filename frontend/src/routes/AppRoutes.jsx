@@ -40,6 +40,8 @@ import AdminDashboard from "../pages/AdminDashboard";
 import AdminCoupon from "../pages/AdminCoupon";
 import BrandPage from "../pages/BrandPage";
 import OrderManagement from "../pages/OrderManagement";
+import AdminModelCustomize from "../pages/AdminModelCustomize";
+import CustomzieDetails from "../pages/CustomzieDetails";
 
 const AppRoutes = () => {
   return (
@@ -54,6 +56,7 @@ const AppRoutes = () => {
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
         <Route path="test" element={<Interactive3DViewer />} />
         <Route path="customize/shoes" element={<ShoesCustomize />} />
+        <Route path="customize/:customizeId" element={<CustomzieDetails />} />
       </Route>
 
       <Route path="/cart" element={<CartLayout />}></Route>
@@ -94,6 +97,7 @@ const AppRoutes = () => {
         <Route path="orders/:orderId" element={<AdminOrderDetails />} />
         <Route path="coupons" element={<AdminCoupon />} />
         <Route path="orders-management" element={<OrderManagement />} />
+        <Route path="model-customize" element={<AdminModelCustomize />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

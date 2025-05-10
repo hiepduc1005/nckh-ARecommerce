@@ -2,65 +2,97 @@ import React, { useEffect, useState } from "react";
 import Interactive3DViewer from "./Interactive3DViewer";
 import "../../assets/styles/components/modal/ModalInteracting3DModel.scss";
 import { useGLTF } from "@react-three/drei";
+
 const ModalInteracting3DModel = ({
   isOpen,
   onClose,
+  onSave,
   modelUrl,
   setConfig,
   config,
 }) => {
+  const [colorConfig, setColorConfig] = useState({});
+  const [hasChanges, setHasChanges] = useState(false);
+
+  // Initialize colorConfig from props when config changes or modal opens
+  useEffect(() => {
+    if (config && isOpen) {
+      setColorConfig(config);
+      setHasChanges(false); // Reset changes flag when loading a config
+    }
+  }, [config, isOpen]);
+
+  // Track changes in colorConfig
+  useEffect(() => {
+    // Only set hasChanges to true if colorConfig has keys and is different from initial config
+    if (Object.keys(colorConfig).length > 0) {
+      // Compare with config to see if there are actual changes
+      const hasRealChanges =
+        JSON.stringify(colorConfig) !== JSON.stringify(config);
+      setHasChanges(hasRealChanges);
+    }
+  }, [colorConfig, config]);
+
+  // Cleanup model when component unmounts or when modelUrl changes
+  useEffect(() => {
+    return () => {
+      if (modelUrl) {
+        useGLTF.clear(modelUrl);
+      }
+    };
+  }, [modelUrl]);
+
+  // Early return if modal is not open or no model URL
   if (!isOpen || !modelUrl) return null;
 
-  const [colorConfig, setColorConfig] = useState({});
-
-  useEffect(() => {
-    if (config) {
-      setColorConfig(config);
-    }
-  }, [config]);
-
   const handleOnClose = () => {
-    useGLTF.clear(modelUrl);
-    setConfig(colorConfig);
-    onClose();
+    // Update parent config and close modal
+    const updatedConfig = { ...config, ...colorConfig };
+    setConfig(updatedConfig);
+    onClose(updatedConfig);
+  };
+
+  const handleOnSave = () => {
+    // Pass the current colorConfig back to parent on save
+    const updatedConfig = { ...config, ...colorConfig };
+    setConfig(updatedConfig);
+
+    // Call parent's onSave with the updated config
+    if (onSave) {
+      onSave(updatedConfig);
+    }
+
+    console.log("Config being saved:", updatedConfig);
+  };
+
+  const handleClearConfig = () => {
+    // Clear the color configuration
+    setColorConfig({});
+    setHasChanges(false);
   };
 
   return (
     <div className="fullscreen-modal">
       <div className="fullscreen-modal__content">
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            padding: "15px 20px",
-            display: "flex",
-            justifyContent: "space-between",
-            backgroundColor: "#ffffff",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-            zIndex: 1000,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <h2 style={{ fontSize: "18px", fontWeight: "bold", margin: 0 }}>
-              Custom 3D Model Viewer
-            </h2>
+        <div className="modal-header">
+          <div className="modal-title">
+            <h2>Custom 3D Model Viewer</h2>
           </div>
-          <button
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#000",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-            onClick={() => handleOnClose()}
-          >
-            Done
-          </button>
+          <div className="modal-actions">
+            {hasChanges && Object.keys(colorConfig).length > 0 && (
+              <>
+                <button className="save-button" onClick={handleOnSave}>
+                  Save
+                </button>
+                <button className="clear-button" onClick={handleClearConfig}>
+                  Clear
+                </button>
+              </>
+            )}
+            <button className="close-button" onClick={handleOnClose}>
+              Close
+            </button>
+          </div>
         </div>
         <div className="fullscreen-modal__body">
           <Interactive3DViewer

@@ -354,7 +354,7 @@ export default function Interactive3DViewer({
       <div
         style={{
           position: "absolute",
-          bottom: "20px",
+          bottom: "0px",
           left: "20px",
           right: "20px",
           backgroundColor: "#ffffff",

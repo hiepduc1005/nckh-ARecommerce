@@ -11,6 +11,7 @@ import {
   FiList,
   FiPackage,
   FiClipboard,
+  FiEdit,
 } from "react-icons/fi";
 import "../assets/styles/components/AdminSidebar.scss";
 import { FaTicketAlt } from "react-icons/fa";
@@ -28,6 +29,11 @@ const AdminSidebar = () => {
     { name: "Categories", icon: <FiLayers />, path: "/admin/categories" },
     { name: "Attributes", icon: <FiList />, path: "/admin/attributes" },
     { name: "Coupons", icon: <FaTicketAlt />, path: "/admin/coupons" },
+    {
+      name: "Model Customize",
+      icon: <FiEdit />,
+      path: "/admin/model-customize",
+    },
   ];
 
   const toggleSidebar = () => {

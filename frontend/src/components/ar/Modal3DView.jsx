@@ -69,17 +69,28 @@ function Model({ url, colorConfig }) {
       });
     });
 
-    // Auto-adjust camera to fit model
+    // Tính toán box để chuẩn hóa kích thước
     const box = new THREE.Box3().setFromObject(scene);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
 
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const fov = camera.fov * (Math.PI / 180);
-    const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.3;
+    // Đặt lại vị trí của model để center ở gốc tọa độ
+    scene.position.x = -center.x;
+    scene.position.y = -center.y;
+    scene.position.z = -center.z;
 
-    camera.position.set(0, 0, cameraZ);
-    camera.lookAt(center);
+    // Tính toán scale để chuẩn hóa kích thước
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const targetSize = 2; // Kích thước chuẩn mong muốn
+    const scale = targetSize / maxDim;
+
+    // Áp dụng scale chuẩn hóa
+    scene.scale.set(scale, scale, scale);
+
+    // Đặt camera ở vị trí cố định, đảm bảo nhìn thấy toàn bộ model
+    camera.position.set(0, 0, 3);
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
   }, [scene, camera]);
 
   return (

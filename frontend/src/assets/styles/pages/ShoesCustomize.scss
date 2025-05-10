@@ -1,473 +1,405 @@
+// src/assets/styles/pages/ShoesList.scss
+
 // Variables
-$primary-color: #3b82f6;
-$primary-hover: #2563eb;
-$light-gray: #f3f4f6;
-$gray: #e5e7eb;
-$dark-gray: #6b7280;
-$white: #ffffff;
-$black: #000000;
-$shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-$border-radius: 0.5rem;
+$primary-color: #3498db;
+$secondary-color: #2c3e50;
+$accent-color: #e74c3c;
+$light-gray: #f5f5f5;
+$medium-gray: #e0e0e0;
+$dark-gray: #777;
+$white: #fff;
+$box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+$transition: all 0.3s ease;
 
-// Color variables
-$red: #ef4444;
-$blue: #3b82f6;
-$green: #10b981;
-$yellow: #f59e0b;
-$purple: #8b5cf6;
-$pink: #ec4899;
-$indigo: #6366f1;
-$orange: #f97316;
-
-// Mixins
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@mixin flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-// Container styles
-.shoes-customize {
+.shoes-list-page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
 
-// Page title
-.page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-// Introduction section
-.page-intro {
-  padding: 1rem;
-  background-color: $light-gray;
-  border-radius: $border-radius;
-  margin-bottom: 2rem;
-  @include flex-between;
-  
-  .intro-text {
-    .intro-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    
-    .intro-description {
-      color: $dark-gray;
-    }
+  .page-title {
+    font-size: 2.2rem;
+    color: $secondary-color;
+    margin-bottom: 1.5rem;
+    text-align: center;
   }
-  
-  .view-toggle {
+
+  .page-intro {
     display: flex;
-    gap: 0.5rem;
-    background-color: $white;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    box-shadow: $shadow;
-    
-    .toggle-button {
-      padding: 0.5rem;
-      border-radius: 0.25rem;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      color: $dark-gray;
-      
-      &:hover {
-        background-color: $light-gray;
-      }
-      
-      &.active {
-        background-color: rgba($primary-color, 0.1);
-        color: $primary-color;
-      }
-    }
-  }
-}
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 0 0.5rem;
 
-// Grid View
-.shoes-grid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1.5rem;
-  
-  @media (min-width: 640px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .shoe-card {
-    background-color: $white;
-    border-radius: $border-radius;
-    overflow: hidden;
-    box-shadow: $shadow-md;
-    transition: box-shadow 0.3s ease;
-    cursor: pointer;
-    
-    &:hover {
-      box-shadow: $shadow-lg;
-      
-      .customize-overlay {
-        opacity: 1;
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .intro-text {
+      max-width: 70%;
+
+      @media (max-width: 768px) {
+        max-width: 100%;
+      }
+
+      .intro-title {
+        font-size: 1.5rem;
+        color: $secondary-color;
+        margin-bottom: 0.5rem;
+      }
+
+      .intro-description {
+        color: $dark-gray;
+        font-size: 1rem;
+        line-height: 1.5;
       }
     }
-    
-    .shoe-image-container {
-      height: 12rem;
-      position: relative;
-      overflow: hidden;
-      
-      .shoe-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-      }
-      
-      .customize-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba($black, 0.5);
-        @include flex-center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        
-        .customize-button {
-          background-color: $primary-color;
+
+    .view-toggle {
+      display: flex;
+      gap: 0.5rem;
+
+      .toggle-button {
+        background: $white;
+        border: 1px solid $medium-gray;
+        border-radius: 4px;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: $transition;
+
+        &:hover {
+          border-color: $primary-color;
+        }
+
+        &.active {
+          background: $primary-color;
+          border-color: $primary-color;
           color: $white;
-          padding: 0.5rem 1.5rem;
-          border-radius: 0.25rem;
-          font-weight: 500;
-          font-size: 1rem;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          transform: translateY(0);
-          transition: transform 0.3s ease;
+
+          svg {
+            stroke: $white;
+          }
+        }
+
+        svg {
+          stroke: $dark-gray;
+          transition: $transition;
         }
       }
     }
-    
-    &:hover {
-      .shoe-image-container {
-        .shoe-image {
-          transform: scale(1.1);
-        }
-        
+  }
+
+  // Grid View
+  .shoes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 992px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+
+    .shoe-card {
+      background: $white;
+      border-radius: 8px;
+      box-shadow: $box-shadow;
+      overflow: hidden;
+      transition: $transition;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
         .customize-overlay {
+          opacity: 1;
+        }
+      }
+
+      .shoe-image-container {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+
+        .shoe-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: $transition;
+        }
+
+        .customize-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: $transition;
+
           .customize-button {
-            transform: translateY(0);
+            background: $primary-color;
+            color: $white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: $transition;
+
+            &:hover {
+              background: darken($primary-color, 10%);
+            }
           }
         }
       }
-    }
-    
-    .shoe-info {
-      padding: 1rem;
-      
-      .shoe-name {
-        font-size: 1.125rem;
-        font-weight: 600;
-      }
-      
-      .shoe-details {
-        @include flex-between;
-        margin-top: 0.5rem;
-        
-        .shoe-price {
-          color: $dark-gray;
+
+      .shoe-info {
+        padding: 1rem;
+
+        .shoe-name {
+          font-size: 1.2rem;
+          margin-bottom: 0.5rem;
+          color: $secondary-color;
         }
-        
-        .details-button {
-          font-size: 0.875rem;
-          color: $primary-color;
-          border: none;
-          background: transparent;
-          cursor: pointer;
-          
-          &:hover {
-            color: $primary-hover;
+
+        .shoe-details {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .shoe-price {
+            font-weight: 600;
+            color: $secondary-color;
+          }
+
+          .details-button {
+            background: transparent;
+            border: 1px solid $primary-color;
+            color: $primary-color;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: $transition;
+
+            &:hover {
+              background: $primary-color;
+              color: $white;
+            }
           }
         }
       }
     }
   }
-}
 
-// List View
-.shoes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  
-  .shoe-list-item {
-    background-color: $white;
-    border-radius: $border-radius;
-    overflow: hidden;
-    box-shadow: $shadow-md;
+  // List View
+  .shoes-list {
     display: flex;
-    cursor: pointer;
-    transition: box-shadow 0.3s ease;
-    
-    &:hover {
-      box-shadow: $shadow-lg;
-      
-      .shoe-list-image {
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .shoe-list-item {
+      display: flex;
+      background: $white;
+      border-radius: 8px;
+      box-shadow: $box-shadow;
+      overflow: hidden;
+      transition: $transition;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+      }
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
         .list-customize-overlay {
           opacity: 1;
         }
+      }
+
+      .shoe-list-image {
+        position: relative;
+        width: 250px;
+        min-width: 250px;
         
+        @media (max-width: 768px) {
+          width: 100%;
+          height: 200px;
+        }
+
         img {
-          transform: scale(1.1);
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .list-customize-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: $transition;
+
+          .list-customize-button {
+            background: $primary-color;
+            color: $white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: $transition;
+
+            &:hover {
+              background: darken($primary-color, 10%);
+            }
+          }
         }
       }
-    }
-    
-    .shoe-list-image {
-      width: 10rem;
-      height: 9rem;
-      flex-shrink: 0;
-      position: relative;
-      overflow: hidden;
-      
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-      }
-      
-      .list-customize-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba($black, 0.5);
-        @include flex-center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        
-        .list-customize-button {
-          background-color: $primary-color;
-          color: $white;
-          padding: 0.4rem 1rem;
-          border-radius: 0.25rem;
-          font-weight: 500;
-          font-size: 0.9rem;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+      .shoe-list-info {
+        flex: 1;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+
+        .shoe-list-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 1rem;
+
+          .shoe-list-name {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: $secondary-color;
+          }
+
+          .shoe-list-price {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: $secondary-color;
+            margin-top: 0;
+          }
         }
-      }
-    }
-    
-    .shoe-list-info {
-      padding: 1rem;
-      flex-grow: 1;
-      
-      .shoe-list-header {
-        .shoe-list-name {
-          font-size: 1.125rem;
-          font-weight: 600;
-        }
-        
-        .shoe-list-price {
+
+        .shoe-list-description {
           color: $dark-gray;
-          margin-top: 0.25rem;
+          line-height: 1.6;
+          margin-bottom: 1rem;
         }
-      }
-      
-      .shoe-list-description {
-        font-size: 0.875rem;
-        color: $dark-gray;
-        margin-top: 0.5rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
       }
     }
   }
-}
 
-// Customization View
-.customization-view {
-  margin-bottom: 2rem;
-  
-  .customization-header {
-    @include flex-between;
-    margin-bottom: 1rem;
+  // Pagination
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    gap: 1rem;
+
+    .pagination-button {
+      background: $white;
+      border: 1px solid $primary-color;
+      color: $primary-color;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: $transition;
+
+      &:hover:not(:disabled) {
+        background: $primary-color;
+        color: $white;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: $medium-gray;
+        color: $dark-gray;
+      }
+    }
+
+    .page-info {
+      color: $dark-gray;
+      font-size: 0.9rem;
+    }
+  }
+
+  // Loading State
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
     
-    .customization-title {
-      font-size: 1.5rem;
-      font-weight: 700;
+    p {
+      color: $dark-gray;
+      font-size: 1.2rem;
+    }
+  }
+
+  // Error State
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    gap: 1rem;
+    
+    p {
+      color: $accent-color;
+      font-size: 1.2rem;
     }
     
-    .back-button {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background-color: $gray;
-      border-radius: 0.25rem;
+    .retry-button {
+      background: $primary-color;
+      color: $white;
       border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: $transition;
       
       &:hover {
-        background-color: darken($gray, 5%);
+        background: darken($primary-color, 10%);
       }
     }
   }
-  
-  .customization-container {
-    background-color: $white;
-    border-radius: $border-radius;
-    box-shadow: $shadow-lg;
-    padding: 1.5rem;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+
+  // No Shoes Message
+  .no-shoes-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
     
-    @media (min-width: 768px) {
-      grid-template-columns: 2fr 1fr;
-    }
-    
-    .model-container {
-      .model-placeholder {
-        aspect-ratio: 16 / 9;
-        background-color: $light-gray;
-        border-radius: $border-radius;
-        @include flex-center;
-        
-        p {
-          font-weight: 700;
-          color: $white;
-        }
-        
-        &.red { background-color: $red; }
-        &.blue { background-color: $blue; }
-        &.green { background-color: $green; }
-        &.yellow { background-color: $yellow; }
-        &.purple { background-color: $purple; }
-        &.pink { background-color: $pink; }
-        &.indigo { background-color: $indigo; }
-        &.orange { background-color: $orange; }
-      }
-    }
-    
-    .options-container {
-      .options-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-      }
-      
-      .options-price {
-        color: $dark-gray;
-        margin-bottom: 0.5rem;
-      }
-      
-      .options-description {
-        font-size: 0.875rem;
-        color: $dark-gray;
-        margin-bottom: 1rem;
-      }
-      
-      .customization-options {
-        margin-top: 1.5rem;
-        
-        .options-subtitle {
-          font-weight: 600;
-          margin-bottom: 0.5rem;
-        }
-        
-        .color-options {
-          display: flex;
-          gap: 0.5rem;
-          margin-bottom: 1.5rem;
-          
-          .color-option {
-            width: 2rem;
-            height: 2rem;
-            border-radius: 9999px;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            
-            &:hover {
-              transform: scale(1.1);
-              box-shadow: 0 0 0 2px $white, 0 0 0 4px currentColor;
-            }
-            
-            &.red { background-color: $red; }
-            &.blue { background-color: $blue; }
-            &.green { background-color: $green; }
-            &.yellow { background-color: $yellow; }
-            &.purple { background-color: $purple; }
-          }
-        }
-        
-        .material-options {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-          margin-bottom: 1.5rem;
-          
-          .material-option {
-            padding: 0.25rem 0.75rem;
-            border: 1px solid $gray;
-            border-radius: 0.25rem;
-            background-color: $light-gray;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            
-            &:hover {
-              background-color: darken($light-gray, 5%);
-            }
-          }
-        }
-        
-        .save-button {
-          width: 100%;
-          padding: 0.75rem 0;
-          background-color: $primary-color;
-          color: $white;
-          border-radius: $border-radius;
-          border: none;
-          font-weight: 500;
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-          
-          &:hover {
-            background-color: $primary-hover;
-          }
-        }
-      }
+    p {
+      color: $dark-gray;
+      font-size: 1.2rem;
     }
   }
 }
