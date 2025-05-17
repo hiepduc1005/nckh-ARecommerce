@@ -3,9 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import ModalInteracting3DModel from "../components/ar/ModalInteracting3DModel";
 import "../assets/styles/pages/CustomizeDetails.scss";
 import {
+  createModelDesign,
   getModelCustomizeById,
   getModelsDesignBySessionId,
+  deleteModelDesign,
 } from "../api/modelCustomize";
+import { captureModelImage, captureModelImageFromURL } from "../utils/ultils";
+import ShareDesignModal from "../components/modal/ShareDesignModal";
+import { toast } from "react-toastify";
 
 const CustomizeDetails = () => {
   const { customizeId } = useParams();
@@ -16,6 +21,10 @@ const CustomizeDetails = () => {
   const [config, setConfig] = useState({});
   const [userDesigns, setUserDesigns] = useState([]);
   const [designsLoading, setDesignsLoading] = useState(false);
+  const [selectedDesign, setSelectedDesign] = useState(null);
+
+  // Add state for share modal
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -40,17 +49,14 @@ const CustomizeDetails = () => {
 
     if (customizeId) {
       fetchCustomizeModel();
+      fetchUserDesigns();
     }
   }, [customizeId, navigate]);
-
-  useEffect(() => {
-    console.log(config);
-  }, [config]);
 
   const fetchUserDesigns = async () => {
     try {
       setDesignsLoading(true);
-      const sessionId = localStorage.getItem("sessionId");
+      const sessionId = localStorage.getItem("session_id");
 
       if (!sessionId) {
         console.log("No session ID found");
@@ -68,18 +74,40 @@ const CustomizeDetails = () => {
     }
   };
 
-  useEffect(() => {
-    console.log("Current config in CustomizeDetails:", config);
-  }, [config]);
-
   const handleOpenModal = () => {
     // Open the modal with current config
     setIsModalOpen(true);
   };
 
-  const handleOnSave = (updatedConfig) => {
+  const handleOnSave = async (updatedConfig) => {
     // Update the local state
     setConfig(updatedConfig);
+
+    const sessionId = localStorage.getItem("session_id");
+
+    const dataCreate = {
+      sessionId,
+      modelId: customizeId,
+      colorConfig: JSON.stringify(updatedConfig),
+    };
+
+    const imageDesign = await captureModelImageFromURL(
+      `http://localhost:8080${customizeModel?.modelPath}`,
+      updatedConfig
+    );
+
+    const formDataToSend = new FormData();
+
+    formDataToSend.append(
+      "design",
+      new Blob([JSON.stringify(dataCreate)], {
+        type: "application/json",
+      })
+    );
+
+    formDataToSend.append("image", imageDesign);
+
+    const data = await createModelDesign(formDataToSend);
 
     // After saving the design, refresh the user designs
     fetchUserDesigns();
@@ -100,7 +128,44 @@ const CustomizeDetails = () => {
     // Refresh user designs after closing modal
     fetchUserDesigns();
   };
-  // We've integrated the loading functionality directly in the onClick handler
+
+  const handleDesignClick = (design) => {
+    setSelectedDesign(design);
+  };
+
+  // Add handler for opening share modal
+  const handleOpenShareModal = () => {
+    if (selectedDesign) {
+      setIsShareModalOpen(true);
+    }
+  };
+
+  // Add handler for closing share modal
+  const handleCloseShareModal = () => {
+    setIsShareModalOpen(false);
+  };
+
+  // Add handler for deleting a design
+  const handleDeleteDesign = async (e, designId) => {
+    e.stopPropagation(); // Prevent triggering design selection
+
+    if (window.confirm("Are you sure you want to delete this design?")) {
+      try {
+        await deleteModelDesign(designId);
+
+        if (selectedDesign && selectedDesign.id === designId) {
+          setSelectedDesign(null);
+        }
+
+        fetchUserDesigns();
+
+        toast.success("Delete design success!");
+      } catch (err) {
+        console.error("Error deleting design:", err);
+        toast.error("Failed to delete design. Please try again.");
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -140,8 +205,11 @@ const CustomizeDetails = () => {
           <div className="product-image-container">
             <img
               src={
-                `http://localhost:8080${customizeModel.imagePath}` ||
-                "/placeholder-image.jpg"
+                `http://localhost:8080${
+                  selectedDesign
+                    ? selectedDesign.imagePath
+                    : customizeModel.imagePath
+                }` || "/placeholder-image.jpg"
               }
               alt={customizeModel.name}
               className="product-image"
@@ -170,21 +238,24 @@ const CustomizeDetails = () => {
                   {userDesigns.map((design) => (
                     <div
                       key={design.id}
-                      className="design-thumbnail"
-                      onClick={() => {
-                        try {
-                          const designConfig = JSON.parse(design.colorConfig);
-                          setConfig(designConfig);
-                          setIsModalOpen(true);
-                        } catch (error) {
-                          console.error("Error parsing design config:", error);
-                        }
-                      }}
+                      className={`design-thumbnail ${
+                        selectedDesign && selectedDesign.id === design.id
+                          ? "selected-design"
+                          : ""
+                      }`}
+                      onClick={() => handleDesignClick(design)}
                     >
                       <img
                         src={`http://localhost:8080${design.imagePath}`}
                         alt="Custom design"
                       />
+                      <button
+                        className="delete-design"
+                        onClick={(e) => handleDeleteDesign(e, design.id)}
+                        title="Delete design"
+                      >
+                        ×
+                      </button>
                       <span className="design-date-small">
                         {new Date(design.createdAt).toLocaleDateString()}
                       </span>
@@ -195,6 +266,28 @@ const CustomizeDetails = () => {
                 <p className="no-designs-text">No custom designs yet</p>
               )}
             </div>
+
+            {/* Share button - only show when a design is selected */}
+            {selectedDesign && (
+              <button
+                onClick={handleOpenShareModal}
+                className="share-design-btn"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.12548 15.0077 5.24917 15.0227 5.37069L8.08264 9.19118C7.54305 8.46078 6.7548 8 5.85714 8C4.27853 8 3 9.34315 3 11C3 12.6569 4.27853 14 5.85714 14C6.7548 14 7.54305 13.5392 8.08264 12.8088L15.0227 16.6293C15.0077 16.7508 15 16.8745 15 17C15 18.6569 16.3431 20 18 20C19.6569 20 21 18.6569 21 17C21 15.3431 19.6569 14 18 14C17.1023 14 16.3141 14.4608 15.7745 15.1912L8.83443 11.3707C8.84949 11.2492 8.85714 11.1255 8.85714 11C8.85714 10.8745 8.84949 10.7508 8.83443 10.6293L15.7745 6.80882C16.3141 7.53922 17.1023 8 18 8Z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Share Design
+              </button>
+            )}
 
             <button onClick={handleOpenModal} className="customize-button">
               Customize This Model
@@ -212,6 +305,16 @@ const CustomizeDetails = () => {
           modelUrl={`http://localhost:8080${customizeModel.modelPath}`}
           setConfig={setConfig}
           config={config}
+        />
+      )}
+
+      {/* Share Design Modal */}
+      {selectedDesign && (
+        <ShareDesignModal
+          isOpen={isShareModalOpen}
+          onClose={handleCloseShareModal}
+          design={selectedDesign}
+          modelName={customizeModel.name}
         />
       )}
     </div>

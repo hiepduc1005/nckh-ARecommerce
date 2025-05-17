@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import { captureModelImage } from "../utils/ultils";
 
 const CreateModelCustomizeForm = ({
   onCreateModel,
@@ -86,141 +87,6 @@ const CreateModelCustomizeForm = ({
     setFormData({
       ...formData,
       [name]: value,
-    });
-  };
-
-  // Hàm để chụp ảnh từ model 3D
-  const captureModelImage = async (modelFile) => {
-    return new Promise((resolve, reject) => {
-      try {
-        // Tạo một canvas tạm thời
-        const canvas = document.createElement("canvas");
-        canvas.width = 400;
-        canvas.height = 400;
-        const renderer = new THREE.WebGLRenderer({
-          canvas,
-          antialias: true,
-          alpha: true,
-        });
-        renderer.setClearColor(0xf5f5f5, 1);
-
-        // Tạo cảnh và camera
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-        camera.position.set(0, 0, 5);
-
-        // Thêm ánh sáng
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(0, 1, 2);
-        scene.add(directionalLight);
-
-        // Xác định loại file
-        const fileExtension = modelFile.name.split(".").pop().toLowerCase();
-
-        // Tạo URL blob để load model
-        const objectUrl = URL.createObjectURL(modelFile);
-
-        // Xử lý tùy theo loại file
-        if (fileExtension === "obj") {
-          const loader = new OBJLoader();
-          loader.load(
-            objectUrl,
-            (object) => {
-              // Xử lý model đã load
-              processLoadedModel(object, scene, camera, renderer, resolve);
-            },
-            (xhr) => {
-              // Progress callback nếu cần
-            },
-            (error) => {
-              console.error("Lỗi khi load OBJ:", error);
-              reject(error);
-            }
-          );
-        } else if (fileExtension === "glb" || fileExtension === "gltf") {
-          const loader = new GLTFLoader();
-          loader.load(
-            objectUrl,
-            (gltf) => {
-              // Với GLTF, chúng ta cần lấy scene
-              processLoadedModel(gltf.scene, scene, camera, renderer, resolve);
-            },
-            (xhr) => {
-              // Progress callback nếu cần
-            },
-            (error) => {
-              console.error("Lỗi khi load GLTF/GLB:", error);
-              reject(error);
-            }
-          );
-        } else if (fileExtension === "fbx") {
-          const loader = new FBXLoader();
-          loader.load(
-            objectUrl,
-            (object) => {
-              // Xử lý model đã load
-              processLoadedModel(object, scene, camera, renderer, resolve);
-            },
-            (xhr) => {
-              // Progress callback nếu cần
-            },
-            (error) => {
-              console.error("Lỗi khi load FBX:", error);
-              reject(error);
-            }
-          );
-        } else {
-          reject(new Error("Định dạng file không được hỗ trợ"));
-        }
-
-        // Hàm xử lý model sau khi đã load
-        function processLoadedModel(model, scene, camera, renderer, resolve) {
-          // Tự động điều chỉnh kích thước và vị trí của model
-          const box = new THREE.Box3().setFromObject(model);
-          const size = box.getSize(new THREE.Vector3());
-          const center = box.getCenter(new THREE.Vector3());
-
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const scale = 3 / maxDim;
-          model.scale.set(scale, scale, scale);
-
-          model.position.x = -center.x * scale;
-          model.position.y = -center.y * scale;
-          model.position.z = -center.z * scale;
-
-          // Xoay model để có góc nhìn tốt hơn
-          model.rotation.x = Math.PI / 8;
-
-          scene.add(model);
-
-          // Render và chụp ảnh
-          renderer.render(scene, camera);
-
-          // Chuyển đổi canvas thành file ảnh
-          canvas.toBlob(
-            (blob) => {
-              const imageFile = new File(
-                [blob],
-                `${modelFile.name.split(".")[0]}-preview.png`,
-                { type: "image/png" }
-              );
-
-              // Giải phóng bộ nhớ
-              URL.revokeObjectURL(objectUrl);
-
-              resolve(imageFile);
-            },
-            "image/png",
-            0.95
-          );
-        }
-      } catch (error) {
-        console.error("Lỗi khi chụp ảnh model:", error);
-        reject(error);
-      }
     });
   };
 

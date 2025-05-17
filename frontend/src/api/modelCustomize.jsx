@@ -16,14 +16,24 @@ export const createModelCustomize = async (data, token) => {
   }
 };
 
-export const createModelDesign = async (data, token) => {
+export const createModelDesign = async (data) => {
   try {
-    const res = await axiosInstance.post("api/v1/model-customize", data, {
+    const res = await axiosInstance.post("api/v1/model-design", data, {
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
       },
     });
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const cloneModelDesign = async (data) => {
+  try {
+    const res = await axiosInstance.post("api/v1/model-design/clone", data);
 
     return res.data;
   } catch (error) {
@@ -79,6 +89,17 @@ export const deleteModelCustomize = async (token, modelId) => {
         },
       }
     );
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const deleteModelDesign = async (modelId) => {
+  try {
+    const res = await axiosInstance.delete(`api/v1/model-design/${modelId}`);
 
     return res.data;
   } catch (error) {

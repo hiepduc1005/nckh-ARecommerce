@@ -42,6 +42,7 @@ import BrandPage from "../pages/BrandPage";
 import OrderManagement from "../pages/OrderManagement";
 import AdminModelCustomize from "../pages/AdminModelCustomize";
 import CustomzieDetails from "../pages/CustomzieDetails";
+import ShareDesign from "../pages/ShareDesign";
 
 const AppRoutes = () => {
   return (
@@ -58,6 +59,8 @@ const AppRoutes = () => {
         <Route path="customize/shoes" element={<ShoesCustomize />} />
         <Route path="customize/:customizeId" element={<CustomzieDetails />} />
       </Route>
+
+      <Route path="/share-design/:designId" element={<ShareDesign />} />
 
       <Route path="/cart" element={<CartLayout />}></Route>
 
