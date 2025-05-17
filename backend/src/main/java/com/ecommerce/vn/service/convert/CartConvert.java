@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.vn.dto.cart.CartItemResponse;
 import com.ecommerce.vn.dto.cart.CartResponse;
@@ -12,6 +13,7 @@ import com.ecommerce.vn.entity.cart.Cart;
 
 
 @Service
+@Transactional
 public class CartConvert {
 	
 	@Autowired
@@ -20,6 +22,7 @@ public class CartConvert {
 	@Autowired
 	private CartItemConvert cartItemConvert;
 
+	@Transactional
 	public CartResponse cartConvertToCartResponse(Cart cart) {
 		CartResponse cartResponse = new CartResponse();
 		cartResponse.setId(cart.getId());

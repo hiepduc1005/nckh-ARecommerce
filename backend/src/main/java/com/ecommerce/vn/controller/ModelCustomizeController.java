@@ -73,16 +73,19 @@ public class ModelCustomizeController {
             @RequestParam("size") int size,
             @RequestParam(value ="type" , required = false, defaultValue = "") String type) {
     	
+    	Page<ModelCustomize> models;
     	if(type.isEmpty()) {
-    		throw new RuntimeException("Type must be shoe or glasses");
+    		models = modelCustomizeService.getModelsPagiante(page, size);
+    	}else {
+    		 models = modelCustomizeService.getModelByType(ItemType.valueOf(type),page, size);
     	}
     	
-    	
-    	Page<ModelCustomize> models = modelCustomizeService.getModelByType(ItemType.valueOf(type),page, size);
         
     	Page<ModelCustomizeResponse> modelsResponse = models.map(model -> modelCustomizeConvert.convertToResponse(model));
     	return new ResponseEntity<>(modelsResponse, HttpStatus.OK);
     }
+    
+    
     
     @GetMapping("/{modelId}")
     public ResponseEntity<ModelCustomizeResponse> findModelCustomieById(@PathVariable("modelId") UUID modelId){

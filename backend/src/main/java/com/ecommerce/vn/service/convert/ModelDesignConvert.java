@@ -26,7 +26,7 @@ public class ModelDesignConvert {
 		modelDesign.setColorConfig(createRequest.getColorConfig());
 		modelDesign.setSessionId(createRequest.getSessionId());
 		modelDesign.setModel(model);
-		
+		modelDesign.setImagePath(createRequest.getImagePath());
 		return modelDesign;
 	}
 	
@@ -36,7 +36,7 @@ public class ModelDesignConvert {
 		response.setId(modelDesign.getId());
 		response.setCreatedAt(modelDesign.getCreatedAt());
 		response.setSessionId(modelDesign.getSessionId());
-		
+		response.setImagePath(modelDesign.getImagePath());
 		ModelCustomizeResponse customizeResponse = modelCustomizeConvert.convertToResponse(modelDesign.getModel());
 		response.setModelCustomizeResponse(customizeResponse);
 		

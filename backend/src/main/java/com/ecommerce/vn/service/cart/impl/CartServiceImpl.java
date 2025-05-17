@@ -37,7 +37,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public Cart getCartByUserId(UUID userId) {
-        return cartRepository.findByUserId(userId);
+    	Cart cart =  cartRepository.findByUserId(userId);
+    	cart.getCartItems();
+        return cart;
     }
 
     @Override
@@ -139,7 +141,8 @@ public class CartServiceImpl implements CartService {
 	@Override
 	@Transactional
 	public Cart getCartByEmail(String email) {
-		System.out.println(email);
-		return cartRepository.findByUser_Email(email).get();
+		Cart cart =  cartRepository.getCartByUserEmail(email).get();
+    	cart.getCartItems();
+		return cart;
 	}
 }

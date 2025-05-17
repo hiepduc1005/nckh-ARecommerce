@@ -37,6 +37,7 @@ public class ModelCustomizeServiceImpl implements ModelCustomizeService{
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<ModelCustomize> getModelByType(ItemType itemType, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		return modelRepository.getModelByType(itemType, pageable);
@@ -56,6 +57,13 @@ public class ModelCustomizeServiceImpl implements ModelCustomizeService{
 		ModelCustomize model = modelRepository.findById(modelId)
 				.orElseThrow(() -> new RuntimeException("Cant not found model with id: " + modelId));
 		return model;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<ModelCustomize> getModelsPagiante(int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return modelRepository.findAll(pageable);
 	}
 
 }

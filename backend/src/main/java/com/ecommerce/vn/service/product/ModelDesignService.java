@@ -14,4 +14,5 @@ public interface ModelDesignService{
 	Page<ModelDesign>  getModelDesignBySessionId(String sessionId, int page, int size);
 	void deleteModelDesign (UUID modelDesignId);
 	
+	ModelDesign cloneModel(UUID modelDesignId, String sessionId);
 }

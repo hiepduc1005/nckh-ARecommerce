@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,6 +36,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID>{
     @Query("SELECT p FROM Product p WHERE p.active = true")
     List<Product> findProductsActive();
     
+    @EntityGraph(attributePaths = "categories")
     Page<Product> findAll(Pageable pageable);
     
     @Query("SELECT DISTINCT p FROM Product p "

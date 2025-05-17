@@ -1,5 +1,6 @@
 package com.ecommerce.vn.service.product.impl;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,36 @@ public class ModelDesignServiceImpl implements ModelDesignService{
 				.orElseThrow(() -> new RuntimeException("Cant not found model design with id: " + id));
 		return model;
 
+	}
+	
+	@Override
+	public ModelDesign cloneModel(UUID modelDesignId, String sessionId) {
+		if(sessionId == null || sessionId.isEmpty()) {
+			throw new RuntimeException("Not found session id");
+		}
+		
+		if(modelDesignId == null) {
+			throw new RuntimeException("Model design id must not null");
+		}
+		
+		Optional<ModelDesign> modelDesignCloned = modelDesignRepository.getModelDesignByCloneAndSessionId(sessionId, modelDesignId); 
+		Boolean isModelDesignCloned = modelDesignCloned.isPresent();
+		
+		if(isModelDesignCloned) {
+			return modelDesignCloned.get();
+		}
+		
+		ModelDesign modelDesign = getModelDesignById(modelDesignId);
+		
+		ModelDesign modelDesignClone = new ModelDesign();
+		modelDesignClone.setColorConfig(modelDesign.getColorConfig());
+		modelDesignClone.setSessionId(sessionId);
+		modelDesignClone.setImagePath(modelDesign.getImagePath());
+		modelDesignClone.setModel(modelDesign.getModel());
+		modelDesignClone.setCloneFrom(modelDesignId);
+		
+		
+		return createModelDesign(modelDesignClone);
 	}
 
 }

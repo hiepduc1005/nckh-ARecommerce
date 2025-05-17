@@ -9,7 +9,15 @@ public class ModelDesignResponse {
 	private String sessionId;
 	private ModelCustomizeResponse modelCustomizeResponse;
 	private String colorConfig;
+	private String imagePath;
     private LocalDateTime createdAt;
+    
+	public String getImagePath() {
+		return imagePath;
+	}
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
 	public UUID getId() {
 		return id;
 	}

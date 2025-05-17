@@ -57,6 +57,7 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 	@Override
+	@Transactional(readOnly = true )
 	public List<Product> searchProducts(String keyword) {
 		return productRepository.findByKeywordProducts(keyword);
 	}
@@ -69,6 +70,7 @@ public class ProductServiceImpl implements ProductService{
 
 
 	@Override
+	@Transactional(readOnly = true )
 	public Page<Product> getProductsWithPaginationAndSorting(int page, int size, String sortBy) {
 		Pageable pageable = PageRequest.of(page, size);
 		return productRepository.findAll(pageable);
@@ -137,6 +139,7 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 	@Override
+	@Transactional(readOnly = true )
 	public List<ProductWithScore> getRelatedProducts(UUID productId) {	
 		if(isProductExist(productId)) {
 			List<ProductWithScore> relatedProducts = productRepository.findRelatedProducts(productId);			

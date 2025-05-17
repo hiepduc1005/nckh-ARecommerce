@@ -15,6 +15,6 @@ import com.ecommerce.vn.entity.product.ModelCustomize;
 @Repository
 public interface ModelCustomizeRepository extends JpaRepository<ModelCustomize, UUID>{
 
-	@Query("SELECT m FROM Model WHERE m.itemType = :type")
+	@Query("SELECT m FROM ModelCustomize m WHERE m.itemType = :type")
 	Page<ModelCustomize> getModelByType(@Param("type") ItemType type, Pageable pageable);
 }

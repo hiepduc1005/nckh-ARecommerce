@@ -1,5 +1,6 @@
 package com.ecommerce.vn.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -16,4 +17,7 @@ public interface ModelDesignRepository extends JpaRepository<ModelDesign, UUID>{
 
 	@Query("SELECT md FROM ModelDesign md WHERE md.sessionId = :sessionId ORDER BY md.createdAt")
 	Page<ModelDesign> getModelDesignsBySessionId(@Param("sessionId") String sessionId, Pageable pageable);
+	
+	@Query("SELECT md FROM ModelDesign md WHERE md.sessionId = :sessionId AND md.cloneFrom = :cloneFrom")
+	Optional<ModelDesign> getModelDesignByCloneAndSessionId(@Param("sessionId") String sessionId,@Param("cloneFrom") UUID cloneFrom);
 }

@@ -14,6 +14,7 @@ public interface ModelCustomizeService {
 	ModelCustomize updateModel(ModelCustomize modelUpdate);
 	ModelCustomize getModelById(UUID modelId);
 	Page<ModelCustomize> getModelByType(ItemType itemType,int page, int size);
-	
+	Page<ModelCustomize> getModelsPagiante(int page, int size);
+
 	void deleteModel(UUID modelId);
 }
