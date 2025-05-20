@@ -5,8 +5,8 @@ import "../assets/styles/pages/CustomizeDetails.scss";
 import {
   createModelDesign,
   getModelCustomizeById,
-  getModelsDesignBySessionId,
   deleteModelDesign,
+  getModelsDesignBySessionIdAndCustomizeId,
 } from "../api/modelCustomize";
 import { captureModelImage, captureModelImageFromURL } from "../utils/ultils";
 import ShareDesignModal from "../components/modal/ShareDesignModal";
@@ -63,7 +63,12 @@ const CustomizeDetails = () => {
         return;
       }
 
-      const response = await getModelsDesignBySessionId(0, 10, sessionId);
+      const response = await getModelsDesignBySessionIdAndCustomizeId(
+        0,
+        10,
+        sessionId,
+        customizeId
+      );
       if (response && response.content) {
         setUserDesigns(response.content);
       }
@@ -80,7 +85,12 @@ const CustomizeDetails = () => {
   };
 
   const handleOnSave = async (updatedConfig) => {
-    // Update the local state
+    if (userDesigns.length >= 10) {
+      toast.error(
+        "Bạn đã đạt giới hạn tối đa thiết kế. Vui lòng xóa thiết kế cũ trước khi tạo mới."
+      );
+      return;
+    }
     setConfig(updatedConfig);
 
     const sessionId = localStorage.getItem("session_id");
@@ -109,11 +119,12 @@ const CustomizeDetails = () => {
 
     const data = await createModelDesign(formDataToSend);
 
+    setIsModalOpen(false);
+    setConfig(null);
     // After saving the design, refresh the user designs
     fetchUserDesigns();
 
     // Close the modal
-    setIsModalOpen(false);
   };
 
   const handleCloseModal = (updatedConfig) => {
@@ -124,6 +135,7 @@ const CustomizeDetails = () => {
 
     // Close the modal
     setIsModalOpen(false);
+    setConfig(null);
 
     // Refresh user designs after closing modal
     fetchUserDesigns();
@@ -148,22 +160,19 @@ const CustomizeDetails = () => {
   // Add handler for deleting a design
   const handleDeleteDesign = async (e, designId) => {
     e.stopPropagation(); // Prevent triggering design selection
+    try {
+      await deleteModelDesign(designId);
 
-    if (window.confirm("Are you sure you want to delete this design?")) {
-      try {
-        await deleteModelDesign(designId);
-
-        if (selectedDesign && selectedDesign.id === designId) {
-          setSelectedDesign(null);
-        }
-
-        fetchUserDesigns();
-
-        toast.success("Delete design success!");
-      } catch (err) {
-        console.error("Error deleting design:", err);
-        toast.error("Failed to delete design. Please try again.");
+      if (selectedDesign && selectedDesign.id === designId) {
+        setSelectedDesign(null);
       }
+
+      fetchUserDesigns();
+
+      toast.success("Delete design success!");
+    } catch (err) {
+      console.error("Error deleting design:", err);
+      toast.error("Failed to delete design. Please try again.");
     }
   };
 

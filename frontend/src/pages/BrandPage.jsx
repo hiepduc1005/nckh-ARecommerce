@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../assets/styles/pages/BrandPage.scss";
+import { getAllBrands } from "../api/brandApi";
+import { toast } from "react-toastify";
 
 const BrandPage = () => {
   const [brands, setBrands] = useState([]);
@@ -9,86 +11,19 @@ const BrandPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState(null);
 
-  // Mock data cho các thương hiệu
-  useEffect(() => {
-    // Giả lập API call
-    setTimeout(() => {
-      const mockBrands = [
-        {
-          id: 1,
-          name: "Nike",
-          logo: "/api/placeholder/150/80",
-          category: "shoes",
-          description:
-            "Thương hiệu giày và quần áo thể thao hàng đầu thế giới.",
-          featured: true,
-          products: 120,
-          country: "USA",
-          year: 1964,
-        },
-        {
-          id: 2,
-          name: "Adidas",
-          logo: "/api/placeholder/150/80",
-          category: "shoes",
-          description:
-            "Nhà sản xuất dụng cụ thể thao, quần áo và giày nổi tiếng.",
-          featured: true,
-          products: 98,
-          country: "Germany",
-          year: 1949,
-        },
-        {
-          id: 3,
-          name: "Zara",
-          logo: "/api/placeholder/150/80",
-          category: "fashion",
-          description: "Thương hiệu thời trang nhanh với xu hướng mới nhất.",
-          featured: false,
-          products: 245,
-          country: "Spain",
-          year: 1975,
-        },
-        {
-          id: 4,
-          name: "H&M",
-          logo: "/api/placeholder/150/80",
-          category: "fashion",
-          description: "Công ty thời trang bình dân được yêu thích toàn cầu.",
-          featured: true,
-          products: 187,
-          country: "Sweden",
-          year: 1947,
-        },
-        {
-          id: 5,
-          name: "Samsung",
-          logo: "/api/placeholder/150/80",
-          category: "electronics",
-          description: "Tập đoàn điện tử đa quốc gia hàng đầu thế giới.",
-          featured: true,
-          products: 76,
-          country: "South Korea",
-          year: 1938,
-        },
-        {
-          id: 6,
-          name: "Apple",
-          logo: "/api/placeholder/150/80",
-          category: "electronics",
-          description:
-            "Công ty công nghệ chuyên sản xuất điện thoại, máy tính và phần mềm.",
-          featured: true,
-          products: 52,
-          country: "USA",
-          year: 1976,
-        },
-      ];
+  const fetchBrands = async () => {
+    const data = await getAllBrands();
 
-      setBrands(mockBrands);
-      setFilteredBrands(mockBrands);
+    if (data) {
+      setBrands(data);
       setIsLoading(false);
-    }, 1000);
+    } else {
+      toast.error("Có lỗi xảy ra!");
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchBrands();
   }, []);
 
   // Lọc thương hiệu dựa trên từ khóa tìm kiếm và danh mục
@@ -127,9 +62,8 @@ const BrandPage = () => {
 
   const categories = [
     { value: "all", label: "Tất cả" },
-    { value: "shoes", label: "Giày dép" },
-    { value: "fashion", label: "Thời trang" },
-    { value: "electronics", label: "Điện tử" },
+    { value: "SHOES", label: "Giày dép" },
+    { value: "GLASSES", label: "Kính" },
   ];
 
   return (
@@ -180,11 +114,14 @@ const BrandPage = () => {
               {filteredBrands.map((brand) => (
                 <div
                   key={brand.id}
-                  className={`brand-card ${brand.featured ? "featured" : ""}`}
+                  className={`brand-card ${true ? "featured" : ""}`}
                   onClick={() => handleBrandClick(brand)}
                 >
                   <div className="brand-logo">
-                    <img src={brand.logo} alt={brand.name} />
+                    <img
+                      src={`http://localhost:8080${brand?.imagePath}`}
+                      alt={brand.name}
+                    />
                   </div>
                   <div className="brand-info">
                     <h3>{brand.name}</h3>
@@ -223,15 +160,15 @@ const BrandPage = () => {
             </span>
             <div className="brand-detail-header">
               <img
-                src={selectedBrand.logo}
+                src={`http://localhost:8080${selectedBrand?.imagePath}`}
                 alt={selectedBrand.name}
                 className="detail-logo"
               />
               <div className="detail-header-info">
                 <h2>{selectedBrand.name}</h2>
                 <p className="origin">
-                  Xuất xứ: {selectedBrand.country} • Thành lập:{" "}
-                  {selectedBrand.year}
+                  Xuất xứ: {selectedBrand.origin} • Thành lập:{" "}
+                  {selectedBrand.establish}
                 </p>
               </div>
             </div>
@@ -251,7 +188,7 @@ const BrandPage = () => {
               </div>
               <div className="detail-section">
                 <h3>Số lượng sản phẩm</h3>
-                <p>{selectedBrand.products} sản phẩm</p>
+                <p>{selectedBrand.totalProducts} sản phẩm</p>
               </div>
             </div>
             <div className="brand-detail-footer">
@@ -265,14 +202,17 @@ const BrandPage = () => {
         <h2>Thương hiệu nổi bật</h2>
         <div className="featured-brands-list">
           {brands
-            .filter((brand) => brand.featured)
+            .filter((brand) => true)
             .map((brand) => (
               <div
                 key={brand.id}
                 className="featured-brand-item"
                 onClick={() => handleBrandClick(brand)}
               >
-                <img src={brand.logo} alt={brand.name} />
+                <img
+                  src={`http://localhost:8080${brand?.imagePath}`}
+                  alt={brand.name}
+                />
               </div>
             ))}
         </div>

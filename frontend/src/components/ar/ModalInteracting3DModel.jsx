@@ -66,7 +66,6 @@ const ModalInteracting3DModel = ({
   };
 
   const handleClearConfig = () => {
-    // Clear the color configuration
     setColorConfig({});
     setHasChanges(false);
   };
@@ -89,7 +88,7 @@ const ModalInteracting3DModel = ({
                 </button>
               </>
             )}
-            <button className="close-button" onClick={handleOnClose}>
+            <button className="close-btn" onClick={handleOnClose}>
               Close
             </button>
           </div>

@@ -68,6 +68,24 @@ export const getModelsDesignBySessionId = async (page, size, sessionId) => {
   }
 };
 
+export const getModelsDesignBySessionIdAndCustomizeId = async (
+  page,
+  size,
+  sessionId,
+  customizeId
+) => {
+  try {
+    const res = await axiosInstance.get(
+      `api/v1/model-design/customzie/${customizeId}?page=${page}&size=${size}&sessionId=${sessionId}`
+    );
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
 export const getModelCustomizeById = async (modelId) => {
   try {
     const res = await axiosInstance.get(`api/v1/model-customize/${modelId}`);

@@ -26,6 +26,8 @@ const AdminBrand = () => {
     status: "active",
     image: null,
     imagePreview: "",
+    origin: "",
+    establish: "",
   });
 
   const { token } = useAuth();
@@ -71,6 +73,8 @@ const AdminBrand = () => {
       name: formData.brandName,
       description: formData.brandDescription,
       category: formData.category,
+      establish: formData.establish,
+      origin: formData.origin,
     };
 
     const imageCreateRequest = formData.image;
@@ -103,6 +107,8 @@ const AdminBrand = () => {
       name: formData.brandName,
       description: formData.brandDescription,
       category: formData.category,
+      establish: formData.establish,
+      origin: formData.origin,
     };
 
     const imageUpdateRequest = formData.image;
@@ -214,6 +220,8 @@ const AdminBrand = () => {
                 <th>Name</th>
                 <th>Image</th>
                 <th>Description</th>
+                <th>Origin</th>
+                <th>Establish</th>
                 <th>Category</th>
                 <th>Products</th>
                 <th>Created Date</th>
@@ -244,6 +252,10 @@ const AdminBrand = () => {
                   </td>
                   <td className="brand-description truncate">
                     {brand.description}
+                  </td>
+                  <td className="brand-description truncate">{brand.origin}</td>
+                  <td className="brand-description truncate">
+                    {brand.establish}
                   </td>
                   <td className="brand-description truncate">
                     {brand.category}

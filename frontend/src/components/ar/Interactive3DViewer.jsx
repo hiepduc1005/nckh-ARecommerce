@@ -28,6 +28,7 @@ export default function Interactive3DViewer({
   const [parts, setParts] = useState([]);
   const [originalParts, setOriginalParts] = useState([]);
   const [isColorConfigApplied, setIsColorConfigApplied] = useState(false);
+  const modelVersionRef = useRef(Date.now()); // Tạo ID duy nhất cho mỗi lần load model
 
   // Listen to loading progress
   const { progress, errors, active } = useProgress();
@@ -35,6 +36,44 @@ export default function Interactive3DViewer({
 
   const canvasRef = useRef();
   const cameraRef = useRef();
+
+  // Khởi tạo reference để lưu trữ vật liệu gốc
+  const originalMaterialsMapRef = useRef({});
+
+  // Reset state khi modelUrl thay đổi
+  useEffect(() => {
+    modelVersionRef.current = Date.now(); // Cập nhật ID phiên bản model
+
+    setIsLoaded(false);
+    setSelectedPart(null);
+    setOriginalMaterials({});
+    setParts([]);
+    setOriginalParts([]);
+    setIsColorConfigApplied(false);
+
+    // Reset colorConfig nếu cần
+    if (setColorConfig) {
+      setColorConfig({});
+    }
+
+    // Đảm bảo originalMaterialsMap được tạo mới
+    originalMaterialsMapRef.current = {};
+    window.originalMaterialsMap = {};
+
+    return () => {
+      setIsLoaded(false);
+      setSelectedPart(null);
+      setOriginalMaterials({});
+      setParts([]);
+      setOriginalParts([]);
+      setIsColorConfigApplied(false);
+      setColorConfig({});
+    };
+  }, [modelUrl, setColorConfig]);
+
+  useEffect(() => {
+    console.log(colorConfig);
+  }, [colorConfig]);
 
   // Set the loaded state when progress reaches 100%
   useEffect(() => {
@@ -74,6 +113,14 @@ export default function Interactive3DViewer({
       Object.keys(colorConfig).length > 0 &&
       !isColorConfigApplied
     ) {
+      // Đảm bảo chúng ta có một bản sao của originalMaterialsMap
+      if (
+        !window.originalMaterialsMap ||
+        Object.keys(window.originalMaterialsMap).length === 0
+      ) {
+        window.originalMaterialsMap = { ...originalMaterialsMapRef.current };
+      }
+
       // For each part that has a saved color configuration
       Object.keys(colorConfig).forEach((partName) => {
         // Find the matching part in the loaded model
@@ -97,23 +144,26 @@ export default function Interactive3DViewer({
     }
   }, [parts, colorConfig, isColorConfigApplied]);
 
-  const handleSelectPart = (part) => {
-    setSelectedPart(part);
+  // Hàm lưu trữ vật liệu gốc của một phần
+  const saveOriginalMaterial = (part) => {
+    if (!part || originalMaterialsMapRef.current[part.uuid]) return;
 
-    // Store the original material of the selected part
-    if (part && !originalMaterials[part.uuid]) {
-      if (Array.isArray(part.material)) {
-        setOriginalMaterials((prev) => ({
-          ...prev,
-          [part.uuid]: part.material.map((mat) => mat.clone()),
-        }));
-      } else {
-        setOriginalMaterials((prev) => ({
-          ...prev,
-          [part.uuid]: part.material.clone(),
-        }));
-      }
+    if (Array.isArray(part.material)) {
+      originalMaterialsMapRef.current[part.uuid] = part.material.map((mat) =>
+        mat.clone()
+      );
+    } else if (part.material) {
+      originalMaterialsMapRef.current[part.uuid] = part.material.clone();
     }
+
+    // Đồng bộ với window object để các hàm khác có thể truy cập
+    window.originalMaterialsMap = { ...originalMaterialsMapRef.current };
+  };
+
+  const handleSelectPart = (part) => {
+    // Lưu vật liệu gốc trước khi thay đổi
+    saveOriginalMaterial(part);
+    setSelectedPart(part);
   };
 
   const resetAllParts = () => {
@@ -125,12 +175,11 @@ export default function Interactive3DViewer({
     // Lặp qua tất cả các phần tử trong mô hình
     parts.forEach((part) => {
       // Kiểm tra xem có material gốc cho phần tử này không
-      if (
-        window.originalMaterialsMap &&
-        window.originalMaterialsMap[part.uuid]
-      ) {
-        const originalMaterial = window.originalMaterialsMap[part.uuid];
+      const originalMaterial =
+        originalMaterialsMapRef.current[part.uuid] ||
+        (window.originalMaterialsMap && window.originalMaterialsMap[part.uuid]);
 
+      if (originalMaterial) {
         // Áp dụng material gốc trực tiếp vào mesh
         if (Array.isArray(originalMaterial)) {
           // Cho đối tượng multi-material
@@ -151,12 +200,14 @@ export default function Interactive3DViewer({
       }
     });
 
+    // Reset colorConfig state
     if (setColorConfig) {
       setColorConfig({});
     }
 
     // Reset the application flag
     setIsColorConfigApplied(false);
+
     // Cập nhật state để kích hoạt re-render
     setParts([...parts]);
 
@@ -169,23 +220,20 @@ export default function Interactive3DViewer({
   const handleColorChange = (color, resetAll = false) => {
     if (resetAll) {
       resetAllParts();
-
-      if (setColorConfig) {
-        setColorConfig({});
-      }
       return;
     }
+
     if (!selectedPart) return;
 
     // If reset was clicked, restore original material
     if (color === "reset") {
       // Use the global material map that was stored during initialization
-      if (
-        window.originalMaterialsMap &&
-        window.originalMaterialsMap[selectedPart.uuid]
-      ) {
-        const originalMaterial = window.originalMaterialsMap[selectedPart.uuid];
+      const originalMaterial =
+        originalMaterialsMapRef.current[selectedPart.uuid] ||
+        (window.originalMaterialsMap &&
+          window.originalMaterialsMap[selectedPart.uuid]);
 
+      if (originalMaterial) {
         // Apply original material DIRECTLY to the mesh
         if (Array.isArray(originalMaterial)) {
           // For multi-material objects
@@ -196,14 +244,20 @@ export default function Interactive3DViewer({
         }
 
         // Make sure material updates are applied
-        selectedPart.material.needsUpdate = true;
+        if (Array.isArray(selectedPart.material)) {
+          selectedPart.material.forEach((mat) => (mat.needsUpdate = true));
+        } else {
+          selectedPart.material.needsUpdate = true;
+        }
 
         // Force state update to trigger a re-render
         setSelectedPart({ ...selectedPart });
+
+        // Cập nhật colorConfig
         if (setColorConfig) {
           setColorConfig((prevConfig) => {
             const newConfig = { ...prevConfig };
-            delete newConfig[selectedPart.uuid];
+            delete newConfig[selectedPart.name];
             return newConfig;
           });
         }
@@ -225,6 +279,8 @@ export default function Interactive3DViewer({
 
     // Force state update
     setSelectedPart({ ...selectedPart });
+
+    // Cập nhật colorConfig
     if (setColorConfig) {
       setColorConfig((prevConfig) => ({
         ...prevConfig,
@@ -234,6 +290,7 @@ export default function Interactive3DViewer({
         },
       }));
     }
+
     // Log for debugging
     console.log(`Changed color of ${selectedPart.name} to ${color}`);
   };
@@ -289,8 +346,27 @@ export default function Interactive3DViewer({
 
   // Preload the model
   useEffect(() => {
+    // Clear cached GLTFs when model changes
+    useGLTF.clear();
     useGLTF.preload(modelUrl);
+
+    return () => {
+      // Clean up when component unmounts
+      useGLTF.clear();
+    };
   }, [modelUrl]);
+
+  // Component để lưu trữ vật liệu gốc khi model được tải xong
+  const ModelInitializer = ({ parts }) => {
+    useEffect(() => {
+      if (parts.length > 0) {
+        // Lưu trữ vật liệu gốc cho tất cả các phần
+        parts.forEach(saveOriginalMaterial);
+      }
+    }, [parts]);
+
+    return null; // Component này không render gì cả
+  };
 
   return (
     <div
@@ -316,6 +392,7 @@ export default function Interactive3DViewer({
         }}
         dpr={[1, 2]} // Responsive DPR for better performance on different devices
         style={{ visibility: isLoaded ? "visible" : "hidden" }}
+        key={`canvas-${modelVersionRef.current}`} // Đảm bảo Canvas được tạo mới khi model thay đổi
       >
         <color attach="background" args={["#f7f7f7"]} />
         <Suspense fallback={null}>
@@ -328,7 +405,9 @@ export default function Interactive3DViewer({
               onDragEnd={() => setIsDragging(false)}
               setParts={setParts}
               setOriginalParts={setOriginalParts}
+              key={`model-${modelVersionRef.current}`} // Đảm bảo model được tải lại
             />
+            {parts.length > 0 && <ModelInitializer parts={parts} />}
           </Stage>
           <SceneControls isDragging={isDragging} />
         </Suspense>

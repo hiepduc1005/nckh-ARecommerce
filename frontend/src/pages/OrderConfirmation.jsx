@@ -95,7 +95,10 @@ const OrderConfirmation = () => {
               <p className="order-confirmation__order-code">
                 Mã đơn hàng: {orderData.code}
               </p>
-              <button className="order-confirmation__button order-confirmation__button--error">
+              <button
+                onClick={() => navigate("/products")}
+                className="order-confirmation__button order-confirmation__button--error"
+              >
                 Thử lại
               </button>
             </div>

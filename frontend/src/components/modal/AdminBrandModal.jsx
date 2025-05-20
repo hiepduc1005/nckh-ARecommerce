@@ -17,6 +17,8 @@ const AdminBrandModal = ({
         brandDescription: editingBrand.description || "",
         image: editingBrand.imagePath,
         category: editingBrand.category || "",
+        establish: editingBrand.establish || "",
+        origin: editingBrand.origin || "",
       });
     }
   }, [editingBrand, setFormData]);
@@ -50,6 +52,8 @@ const AdminBrandModal = ({
     onClose();
     setFormData({
       brandName: "",
+      establish: "",
+      origin: "",
       brandDescription: "",
       image: null,
       category: "",
@@ -73,6 +77,28 @@ const AdminBrandModal = ({
               id="brandName"
               name="brandName"
               value={formData.brandName}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="establish">Year of establishment</label>
+            <input
+              type="text"
+              id="establish"
+              name="establish"
+              value={formData.establish}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="origin">Origin</label>
+            <input
+              type="text"
+              id="origin"
+              name="origin"
+              value={formData.origin}
               onChange={handleInputChange}
               required
             />

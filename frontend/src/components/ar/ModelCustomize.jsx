@@ -33,6 +33,7 @@ const ModelCustomize = ({ url, onSelectPart, setParts, setOriginalParts }) => {
 
     setParts(parts);
     setOriginalParts(parts);
+    setOriginalMaterials(origMaterials);
     setMaterialMap(origMaterials);
 
     // Make materials map available to parent component
@@ -42,7 +43,50 @@ const ModelCustomize = ({ url, onSelectPart, setParts, setOriginalParts }) => {
 
     console.log("All parts:", parts);
     console.log("Original materials stored:", origMaterials);
+
+    return () => useGLTF.clear(url);
   }, [scene, setParts, setOriginalParts]);
+
+  // Reset model to original state
+  const resetModelChanges = () => {
+    console.log("Resetting model to original state");
+
+    scene.traverse((child) => {
+      if (child.isMesh && originalMaterials[child.uuid]) {
+        // Restore original material
+        if (Array.isArray(originalMaterials[child.uuid])) {
+          child.material = originalMaterials[child.uuid].map((mat) =>
+            mat.clone()
+          );
+        } else {
+          child.material = originalMaterials[child.uuid].clone();
+        }
+      }
+    });
+
+    // Deselect current part
+    setSelectedPart(null);
+    onSelectPart(null);
+
+    // Notify that model was reset
+    if (typeof window !== "undefined" && window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent("modelReset"));
+    }
+  };
+
+  // Make reset function available globally
+  useEffect(() => {
+    if (window) {
+      window.resetModelChanges = resetModelChanges;
+    }
+
+    return () => {
+      // Cleanup
+      if (window) {
+        delete window.resetModelChanges;
+      }
+    };
+  }, [originalMaterials]);
 
   // Update cursor only when hovering over the model
   useEffect(() => {
