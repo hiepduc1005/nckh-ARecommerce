@@ -100,6 +100,24 @@ public class ModelDesignController {
 
 	}
 	
+	@GetMapping("/customzie/{customizeId}")
+	public ResponseEntity<Page<ModelDesignResponse>> getModelDesignBySessionIdAndCustomizeId(
+			@PathVariable("customizeId") UUID customizeId,
+			@RequestParam(name = "sessionId",required = true) String sessionId,
+			@RequestParam(value = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(value = "size", defaultValue = "8", required = false) int size
+			){
+		
+		Page<ModelDesign> modelDesigns = modelDesignService.getModelDesignBySessionIdAndCustomizeId(sessionId, page, size,customizeId);
+	
+    	Page<ModelDesignResponse> modelDesignResponses = modelDesigns.map(model -> modelDesignConvert.modelConvertToResponse(model));
+
+
+        return ResponseEntity.ok(modelDesignResponses);
+
+	}
+	
+	
 	
 	@DeleteMapping("/{modelId}")
 	public ResponseEntity<?> deleteModelDesignById(@PathVariable("modelId") UUID modelId){

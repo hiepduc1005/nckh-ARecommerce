@@ -20,4 +20,7 @@ public interface ModelDesignRepository extends JpaRepository<ModelDesign, UUID>{
 	
 	@Query("SELECT md FROM ModelDesign md WHERE md.sessionId = :sessionId AND md.cloneFrom = :cloneFrom")
 	Optional<ModelDesign> getModelDesignByCloneAndSessionId(@Param("sessionId") String sessionId,@Param("cloneFrom") UUID cloneFrom);
+
+	@Query("SELECT md FROM ModelDesign md WHERE md.sessionId = :sessionId AND md.model.id = :customizeId ORDER BY md.createdAt")
+	Page<ModelDesign> getModelDesignsBySessionIdAndCustomizeId(@Param("customizeId") UUID customizeId,@Param("sessionId") String sessionId, Pageable pageable);
 }

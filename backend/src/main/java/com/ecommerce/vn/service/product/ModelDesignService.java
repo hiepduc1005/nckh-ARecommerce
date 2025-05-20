@@ -13,6 +13,7 @@ public interface ModelDesignService{
 	ModelDesign getModelDesignById(UUID id);
 	Page<ModelDesign>  getModelDesignBySessionId(String sessionId, int page, int size);
 	void deleteModelDesign (UUID modelDesignId);
-	
+	Page<ModelDesign>  getModelDesignBySessionIdAndCustomizeId(String sessionId, int page, int size, UUID customizeId);
+
 	ModelDesign cloneModel(UUID modelDesignId, String sessionId);
 }

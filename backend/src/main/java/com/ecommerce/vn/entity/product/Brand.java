@@ -33,6 +33,10 @@ public class Brand {
 	
 	private String description;
 	
+	private String origin;
+	
+	private String establish;
+	
 	private String slug;
 	
 	private String imagePath;
@@ -129,6 +133,22 @@ public class Brand {
 
 	public void setUpdateAt(LocalDateTime updateAt) {
 		this.updateAt = updateAt;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	public String getEstablish() {
+		return establish;
+	}
+
+	public void setEstablish(String establish) {
+		this.establish = establish;
 	}
 	
 	

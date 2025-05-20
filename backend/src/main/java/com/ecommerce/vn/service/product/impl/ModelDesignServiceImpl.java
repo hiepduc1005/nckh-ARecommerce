@@ -90,4 +90,11 @@ public class ModelDesignServiceImpl implements ModelDesignService{
 		return createModelDesign(modelDesignClone);
 	}
 
+	@Override
+	public Page<ModelDesign> getModelDesignBySessionIdAndCustomizeId(String sessionId, int page, int size,
+			UUID customizeId) {
+		Pageable pageable = PageRequest.of(page, size);
+		return modelDesignRepository.getModelDesignsBySessionIdAndCustomizeId(customizeId,sessionId, pageable);
+	}
+
 }
