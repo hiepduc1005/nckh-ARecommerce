@@ -64,7 +64,7 @@ const ProductFormModal = ({
         if (data) {
           const options = data.map((category) => ({
             value: category.id,
-            label: category.categoryName,
+            label: category.name,
           }));
           setCategoryOptions(options);
         }
@@ -126,7 +126,7 @@ const ProductFormModal = ({
       const productCategoriesSelected = product?.categories?.map(
         (category) => ({
           value: category.id,
-          label: category.categoryName,
+          label: category.name,
         })
       );
       const productAttributesSelected = product?.attributeResponses?.map(

@@ -43,6 +43,7 @@ import OrderManagement from "../pages/OrderManagement";
 import AdminModelCustomize from "../pages/AdminModelCustomize";
 import CustomzieDetails from "../pages/CustomzieDetails";
 import ShareDesign from "../pages/ShareDesign";
+import GlassesCustomize from "../pages/GlassesCustomize";
 
 const AppRoutes = () => {
   return (
@@ -57,6 +58,7 @@ const AppRoutes = () => {
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
         <Route path="test" element={<Interactive3DViewer />} />
         <Route path="customize/shoes" element={<ShoesCustomize />} />
+        <Route path="customize/glasses" element={<GlassesCustomize />} />
         <Route path="customize/:customizeId" element={<CustomzieDetails />} />
       </Route>
 

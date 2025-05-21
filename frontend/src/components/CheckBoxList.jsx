@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../assets/styles/components/CheckBoxList.scss";
 const CheckBoxList = ({
   title,
@@ -25,7 +25,7 @@ const CheckBoxList = ({
         <label key={index} className="checkbox-item">
           <input
             type="checkbox"
-            checked={selected?.some((item) => item.name === checkbox.name)}
+            checked={selected?.some((item) => item.id === checkbox.id)}
             onChange={(e) => handleSelect(checkbox)}
             disabled={loading}
           />

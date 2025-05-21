@@ -15,6 +15,8 @@ import {
 import ReactStars from "react-stars";
 import { getProductsFilter } from "../api/productApi";
 import useLoading from "../hooks/UseLoading";
+import { getAllBrands } from "../api/brandApi";
+import { getAllCategories } from "../api/categoryApi";
 
 const selectOptions = [
   { value: "latest", label: "Mới nhất" },
@@ -23,28 +25,6 @@ const selectOptions = [
   { value: "rating-desc", label: "Đánh giá giảm dần" },
   { value: "price-asc", label: "Giá tăng dần" },
   { value: "price-desc", label: "Giá giảm dần" },
-];
-
-const categories = [
-  { id: 1, name: "Kính râm" },
-  { id: 2, name: "Kính thời trang" },
-  { id: 3, name: "Kính cận" },
-  { id: 4, name: "Kính viễn" },
-  { id: 5, name: "Kính lão" },
-  { id: 6, name: "Giày thể thao" },
-  { id: 7, name: "Giày thời trang" },
-  { id: 8, name: "Giày du lịch" },
-];
-
-const brands = [
-  { id: 1, name: "Cyxus" },
-  { id: 2, name: "JINS" },
-  { id: 3, name: "Lenskart" },
-  { id: 4, name: "Oakley" },
-  { id: 5, name: "Persol" },
-  { id: 6, name: "Gucci" },
-  { id: 7, name: "Dior" },
-  { id: 8, name: "Gentle Monster" },
 ];
 
 const priceRanges = [
@@ -65,6 +45,9 @@ const SearchPage = () => {
   const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
   const [sortOption, setSortOption] = useState(selectOptions[0]);
 
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const [filterProducts, setFilterProducts] = useState([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -72,6 +55,74 @@ const SearchPage = () => {
   const { loading, setLoading } = useLoading();
 
   const navigate = useNavigate();
+
+  const fetchBrands = async () => {
+    const data = await getAllBrands();
+
+    if (data) {
+      setBrands(data);
+
+      const brandsString = searchParams.get("brands") || "";
+      if (brandsString) {
+        const selectedBrandNames = brandsString.split(",");
+        const newSelectedBrands = data.filter((brand) =>
+          selectedBrandNames.includes(brand.name)
+        );
+        setSelectedBrands(newSelectedBrands);
+      }
+    } else {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
+
+  const fetchCategories = async () => {
+    const data = await getAllCategories();
+
+    if (data) {
+      setCategories(data);
+      const categoriesString = searchParams.get("categories") || "";
+      if (categoriesString) {
+        const selectedCategoryNames = categoriesString.split(",");
+        const newSelectedCategories = data.filter((category) =>
+          selectedCategoryNames.includes(category.name)
+        );
+        setSelectedCategories(newSelectedCategories);
+      }
+    } else {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
+
+  useEffect(() => {
+    fetchBrands();
+    fetchCategories();
+
+    const viewModeParam = searchParams.get("view-mode") || "grid";
+    setViewMode(viewModeParam);
+
+    const pricesString = searchParams.get("priceRange") || "";
+
+    if (pricesString) {
+      const selectedPriceNames = pricesString.split(",");
+      const newSelectedPrices = priceRanges.filter((price) =>
+        selectedPriceNames.includes(price.name)
+      );
+      setSelectedPriceRange(newSelectedPrices);
+
+      // Cập nhật minPrice và maxPrice dựa trên khoảng giá đã chọn
+      if (newSelectedPrices.length > 0) {
+        const minValue = Math.min(...newSelectedPrices.map((p) => p.min));
+        const maxValues = newSelectedPrices
+          .map((p) => p.max)
+          .filter((p) => p !== null);
+        const maxValue =
+          maxValues.length > 0 ? Math.max(...maxValues) : 1000000000;
+
+        setMinPrice(minValue);
+        setMaxPrice(maxValue);
+      }
+    }
+  }, []);
 
   const handleProductClick = (productId) => {
     navigate(`${productId}`);
@@ -96,6 +147,7 @@ const SearchPage = () => {
   };
 
   const fetchFilterProduct = async (newFilters) => {
+    console.log("test");
     setLoading(true);
     const data = await getProductsFilter(newFilters);
 
@@ -110,33 +162,7 @@ const SearchPage = () => {
   useEffect(() => {
     const categoriesString = searchParams.get("categories") || "";
     const brandsString = searchParams.get("brands") || "";
-    const pricesString = searchParams.get("priceRange") || "";
     const search = searchParams.get("s") || "";
-    const viewModeParam = searchParams.get("view-mode") || "grid";
-
-    setViewMode(viewModeParam);
-
-    if (categoriesString) {
-      setSelectedCategories(() =>
-        categories.filter((item) =>
-          categoriesString.split(",").includes(item.name)
-        )
-      );
-    }
-
-    if (brandsString) {
-      setSelectedBrands(() =>
-        brands.filter((item) => brandsString.split(",").includes(item.name))
-      );
-    }
-
-    if (pricesString) {
-      setSelectedPriceRange(() =>
-        priceRanges.filter((item) =>
-          pricesString.split(",").includes(item.name)
-        )
-      );
-    }
 
     const newFilters = {
       size: 8,

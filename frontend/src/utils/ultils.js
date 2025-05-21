@@ -6,7 +6,64 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 
 const SECRET_KEY = "1005";
-export const LOCATIONIQ = "pk.faf3d66fd55714f726b3656386e724e2" 
+export const LOCATIONIQ = "pk.faf3d66fd55714f726b3656386e724e2"
+const shopLat = 21.057141432971815;
+const shopLon = 105.76381039101452;
+
+export function calculateShippingFee(distance) {
+  if (distance <= 2) {
+      return 15000;
+  } else if (distance <= 5) {
+      return 30000;
+  } else if (distance <= 10) {
+      return 40000;
+  } else {
+      return 50000;
+  }
+}
+
+export function convertToVNDFormat(amount, options = {}) {
+  const {
+    locale = 'vi-VN',
+    currency = 'VND',
+    useGrouping = true
+  } = options;
+  
+  // Sử dụng API Intl.NumberFormat để định dạng số theo chuẩn quốc tế
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+    useGrouping: useGrouping,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+
+export function calculateDistance(lat, lon) {
+  const r = 6371; // Bán kính Trái Đất tính bằng kilômét
+
+  // Hàm phụ để chuyển đổi độ sang radian
+  const toRadians = (degrees) => degrees * Math.PI / 180;
+
+  // Chuyển đổi vĩ độ và kinh độ sang radian
+  const lat1Rad = toRadians(shopLat);
+  const lon1Rad = toRadians(shopLon);
+  const lat2Rad = toRadians(lat);
+  const lon2Rad = toRadians(lon);
+
+  // Tính chênh lệch vĩ độ và kinh độ
+  const dLat = lat2Rad - lat1Rad;
+  const dLon = lon2Rad - lon1Rad;
+
+  // Công thức Haversine
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  // Khoảng cách tính bằng kilômét
+  const distance = r * c;
+  return distance.toFixed(2);
+}
+
 const isLeapYear = (year) => {
     if(+year % 400 === 0 || (+year % 4 === 0 && +year % 100 !== 0)){
         return true;

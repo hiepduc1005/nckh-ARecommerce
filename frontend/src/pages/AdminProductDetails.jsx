@@ -176,10 +176,10 @@ const AdminProductDetails = () => {
                         {product.categories?.length ? (
                           product.categories.map((cat) => (
                             <span
-                              key={cat.categoryName}
+                              key={cat.name}
                               className="badge badge-category"
                             >
-                              {cat.categoryName}
+                              {cat.name}
                             </span>
                           ))
                         ) : (

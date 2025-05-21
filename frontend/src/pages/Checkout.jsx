@@ -8,7 +8,13 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import useQuery from "../hooks/useQuery";
-import { decryptData, isValidEmail, isValidPhoneNum } from "../utils/ultils";
+import {
+  calculateShippingFee,
+  convertToVNDFormat,
+  decryptData,
+  isValidEmail,
+  isValidPhoneNum,
+} from "../utils/ultils";
 import { getVariantsById, getVariantsByIds } from "../api/variantApi";
 import useAuth from "../hooks/UseAuth";
 import SelectPlace from "../components/SelectPlace";
@@ -30,6 +36,15 @@ const Checkout = () => {
   const [customerNote, setCustomerNote] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [coupon, setCoupon] = useState(null);
+  const [distance, setDistance] = useState(0);
+  const [shippingFee, setShippingFee] = useState(0);
+
+  useEffect(() => {
+    const shipFee = calculateShippingFee(distance);
+    if (shipFee) {
+      setShippingFee(shipFee);
+    }
+  }, [distance]);
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.variant.discountPrice * item.quantity,
@@ -49,8 +64,7 @@ const Checkout = () => {
   };
 
   const discountAmount = calculateDiscount();
-  const shippingCost = 4.99;
-  const total = subtotal - discountAmount + shippingCost; // Adding shipping, subtracting discount
+  const total = subtotal - discountAmount + shippingFee; // Adding shipping, subtracting discount
 
   const { user } = useAuth();
   const { removeItem } = useCart();
@@ -125,7 +139,9 @@ const Checkout = () => {
 
       if (data.minimumOrderAmount && subtotal < data.minimumOrderAmount) {
         toast.error(
-          `Đơn hàng phải từ $${data.minimumOrderAmount} để sử dụng mã này!`
+          `Đơn hàng phải từ ${convertToVNDFormat(
+            data.minimumOrderAmount
+          )} để sử dụng mã này!`
         );
         return;
       }
@@ -264,6 +280,7 @@ const Checkout = () => {
               <SelectPlace
                 defaultValue={specificAddress}
                 onChange={setSpecificAddress}
+                setDistance={setDistance}
               />
 
               <textarea
@@ -310,17 +327,18 @@ const Checkout = () => {
                   <span className="quantity">x{item.quantity}</span>
                 </div>
                 <span className="price">
-                  $
-                  {item?.variant?.discountPrice
-                    ? (item?.variant?.discountPrice).toFixed(2)
-                    : (item?.variant?.price).toFixed(2)}
+                  {convertToVNDFormat(
+                    item?.variant?.discountPrice
+                      ? item?.variant?.discountPrice
+                      : item?.variant?.price
+                  )}
                 </span>
               </div>
             ))}
             <div className="cart-totals">
               <div className="subtotal">
                 <span>Tổng phụ</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>{convertToVNDFormat(subtotal.toFixed(2))}</span>
               </div>
               {discountAmount > 0 && (
                 <div className="discount">
@@ -330,16 +348,20 @@ const Checkout = () => {
                       ? ` (${coupon.discountValue}%)`
                       : ""}
                   </span>
-                  <span>-${discountAmount.toFixed(2)}</span>
+                  <span>-{convertToVNDFormat(discountAmount.toFixed(2))}</span>
                 </div>
               )}
               <div className="shipping">
+                <span>Khoảng cách</span>
+                <span>{distance} km</span>
+              </div>
+              <div className="shipping">
                 <span>Phí vận chuyển</span>
-                <span>$4.99</span>
+                <span>{convertToVNDFormat(shippingFee)}</span>
               </div>
               <div className="total">
                 <span>Tổng cộng</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{convertToVNDFormat(total.toFixed(2))}</span>
               </div>
             </div>
           </div>

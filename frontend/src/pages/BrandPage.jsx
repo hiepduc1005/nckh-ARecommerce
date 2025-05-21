@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../assets/styles/pages/BrandPage.scss";
 import { getAllBrands } from "../api/brandApi";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const BrandPage = () => {
   const [brands, setBrands] = useState([]);
@@ -10,6 +11,8 @@ const BrandPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState(null);
+
+  const navigate = useNavigate();
 
   const fetchBrands = async () => {
     const data = await getAllBrands();
@@ -58,6 +61,10 @@ const BrandPage = () => {
   // Đóng modal chi tiết thương hiệu
   const closeBrandDetail = () => {
     setSelectedBrand(null);
+  };
+
+  const handleNavigateProduct = (category) => {
+    navigate(`/products?brands=${category}`);
   };
 
   const categories = [
@@ -192,7 +199,12 @@ const BrandPage = () => {
               </div>
             </div>
             <div className="brand-detail-footer">
-              <button className="view-products-btn">Xem tất cả sản phẩm</button>
+              <button
+                className="view-products-btn"
+                onClick={() => handleNavigateProduct(selectedBrand.name)}
+              >
+                Xem tất cả sản phẩm
+              </button>
             </div>
           </div>
         </div>

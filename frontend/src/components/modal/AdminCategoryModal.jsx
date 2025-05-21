@@ -8,7 +8,7 @@ const AdminCategoryModal = ({ editingCategory, onClose,formData,setFormData, han
   useEffect(() => {
     if (editingCategory) {
       setFormData({
-        categoryName: editingCategory.categoryName || '',
+        name: editingCategory.name || '',
         categoryDescription: editingCategory.categoryDescription || '',
         status: editingCategory.status || true,
         image: editingCategory.imagePath
@@ -44,7 +44,7 @@ const AdminCategoryModal = ({ editingCategory, onClose,formData,setFormData, han
 
     onClose();
     setFormData({
-      categoryName:  '',
+      name:  '',
       categoryDescription: '',
       status:  true,
       image: null
@@ -60,12 +60,12 @@ const AdminCategoryModal = ({ editingCategory, onClose,formData,setFormData, han
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="categoryName">Category Name</label>
+            <label htmlFor="name">Category Name</label>
             <input
               type="text"
-              id="categoryName"
-              name="categoryName"
-              value={formData.categoryName}
+              id="name"
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
               required
             />

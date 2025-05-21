@@ -1,18 +1,26 @@
-import React from 'react'
-import AdressFooter from '../components/AdressFooter'
-import Footer from './footer/Footer'
-import Header from './header/Header'
-import CartPage from '../pages/CartPage'
+import React, { useEffect, useRef } from "react";
+import AdressFooter from "../components/AdressFooter";
+import Footer from "./footer/Footer";
+import Header from "./header/Header";
+import CartPage from "../pages/CartPage";
+import { useLocation } from "react-router-dom";
 
 const CartLayout = () => {
-  return (
-    <div>
-        <Header></Header>
-        <CartPage/>
-        <Footer></Footer>
-        <AdressFooter></AdressFooter>
-    </div>
-  )
-}
+  const topRef = useRef(null);
 
-export default CartLayout
+  useEffect(() => {
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+  return (
+    <div ref={topRef}>
+      <Header></Header>
+      <CartPage />
+      <Footer></Footer>
+      <AdressFooter></AdressFooter>
+    </div>
+  );
+};
+
+export default CartLayout;
