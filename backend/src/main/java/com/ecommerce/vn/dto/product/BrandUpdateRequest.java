@@ -12,7 +12,28 @@ public class BrandUpdateRequest {
 	
 	private String description;
 	
+	private String origin;
+	 
+	private String establish;
 	
+	
+	
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	public String getEstablish() {
+		return establish;
+	}
+
+	public void setEstablish(String establish) {
+		this.establish = establish;
+	}
 
 	public String getCategory() {
 		return category;

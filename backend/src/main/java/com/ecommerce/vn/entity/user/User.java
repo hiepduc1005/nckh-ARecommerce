@@ -82,6 +82,7 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
+    
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.EAGER)
     @JoinTable(
@@ -271,4 +272,7 @@ public class User {
     public User(UUID userId) {
         this.id = userId;
     }
+
+	
+    
 }

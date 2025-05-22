@@ -10,7 +10,7 @@ public class CategoryResponse {
 	
 	private UUID id;
 	
-	private String categoryName;
+	private String name;
 	
 	private String categoryDescription;
 	
@@ -58,11 +58,17 @@ public class CategoryResponse {
 	}
 
 	public String getCategoryName() {
-		return categoryName;
+		return name;
 	}
 
-	public void setCategoryName(String categoryName) {
-		this.categoryName = categoryName;
+	
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getCategoryDescription() {
@@ -124,7 +130,7 @@ public class CategoryResponse {
 	public CategoryResponse(UUID id, String categoryName, String categoryDescription, String imagePath, Boolean active,
 			LocalDateTime createdAt, LocalDateTime updateAt, UUID createdBy, UUID updatedBy) {
 		this.id = id;
-		this.categoryName = categoryName;
+		this.name = categoryName;
 		this.categoryDescription = categoryDescription;
 		this.imagePath = imagePath;
 		this.active = active;
@@ -137,7 +143,7 @@ public class CategoryResponse {
 	public CategoryResponse(UUID id, String categoryName, String categoryDescription, String imagePath, String slug,
 			Boolean active, LocalDateTime createdAt, LocalDateTime updateAt, UUID createdBy, UUID updatedBy) {
 		this.id = id;
-		this.categoryName = categoryName;
+		this.name = categoryName;
 		this.categoryDescription = categoryDescription;
 		this.imagePath = imagePath;
 		this.slug = slug;

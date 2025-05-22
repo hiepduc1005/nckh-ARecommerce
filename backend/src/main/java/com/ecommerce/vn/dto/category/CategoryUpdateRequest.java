@@ -9,7 +9,7 @@ public class CategoryUpdateRequest {
 	
 	private UUID id;
 	
-	private String categoryName;
+	private String name;
 	
 	private String categoryDescription;
 	
@@ -21,7 +21,7 @@ public class CategoryUpdateRequest {
 
 	@Override
 	public String toString() {
-		return "CategoryUpdateRequest [id=" + id + ", categoryName=" + categoryName + ", categoryDescription="
+		return "CategoryUpdateRequest [id=" + id + ", categoryName=" + name + ", categoryDescription="
 				+ categoryDescription + ", active=" + active + "]";
 	}
 
@@ -34,11 +34,11 @@ public class CategoryUpdateRequest {
 	}
 
 	public String getCategoryName() {
-		return categoryName;
+		return name;
 	}
 
 	public void setCategoryName(String categoryName) {
-		this.categoryName = categoryName;
+		this.name = categoryName;
 	}
 
 	public String getCategoryDescription() {

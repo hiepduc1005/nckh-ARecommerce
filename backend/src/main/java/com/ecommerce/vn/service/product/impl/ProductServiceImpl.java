@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -78,8 +79,45 @@ public class ProductServiceImpl implements ProductService{
 	
 	@Override
 	public Page<Product> filterProducts(List<String> categories, List<String> brands, BigDecimal minPrice,
-			BigDecimal maxPrice, String keyword, int page, int size) {
-		Pageable pageable = PageRequest.of(page, size);
+			BigDecimal maxPrice, String keyword, int page, int size,String sort) {
+		Pageable pageable;
+		
+		// Apply sorting based on the sort parameter
+		if(sort != null && !sort.isEmpty()) {
+			Sort pageSort = null;
+			
+			switch(sort) {
+				case "latest":
+					pageSort = Sort.by(Sort.Direction.DESC, "createdAt");
+					break;
+				case "oldest":
+					pageSort = Sort.by(Sort.Direction.ASC, "createdAt");
+					break;
+				case "rating-asc":
+					// If you have a rating field or calculated average in the Product entity
+					pageSort = Sort.by(Sort.Direction.ASC, "ratings.value"); 
+					break;
+				case "rating-desc":
+					pageSort = Sort.by(Sort.Direction.DESC, "ratings.value");
+					break;
+				case "price-asc":
+					// Assuming you want to sort by the minimum price of variants
+					pageSort = Sort.by(Sort.Direction.ASC, "variants.price");
+					break;
+				case "price-desc":
+					pageSort = Sort.by(Sort.Direction.DESC, "variants.price");
+					break;
+				default:
+					// Default sort if none specified
+					pageSort = Sort.by(Sort.Direction.ASC, "createdAt");
+			}
+			
+			pageable = PageRequest.of(page, size).withSort(pageSort);
+		} else {
+			// Default sort if sort parameter is empty
+			pageable = PageRequest.of(page, size).withSort(Sort.by(Sort.Direction.DESC, "createdAt"));
+		}
+		
 		return productRepository.filterProducts(categories, brands, minPrice, maxPrice, keyword , pageable);
 	}
 

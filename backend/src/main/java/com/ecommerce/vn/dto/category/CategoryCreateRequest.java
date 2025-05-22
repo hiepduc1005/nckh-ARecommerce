@@ -2,7 +2,7 @@ package com.ecommerce.vn.dto.category;
 
 
 public class CategoryCreateRequest {
-	private String categoryName;
+	private String name;
 	
 	private String categoryDescription;
 	
@@ -11,16 +11,16 @@ public class CategoryCreateRequest {
 
 	@Override
 	public String toString() {
-		return "CategoryCreateRequest [categoryName=" + categoryName + ", categoryDescription=" + categoryDescription
+		return "CategoryCreateRequest [categoryName=" + name + ", categoryDescription=" + categoryDescription
 				+ "]";
 	}
 
 	public String getCategoryName() {
-		return categoryName;
+		return name;
 	}
 
 	public void setCategoryName(String categoryName) {
-		this.categoryName = categoryName;
+		this.name = categoryName;
 	}
 
 	public String getCategoryDescription() {

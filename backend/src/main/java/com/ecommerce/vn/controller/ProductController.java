@@ -160,7 +160,8 @@ public class ProductController {
             @RequestParam(value = "brands", required = false, defaultValue = "") String brands,
             @RequestParam(value = "minPrice", required = false) BigDecimal minPrice,
             @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice,
-            @RequestParam(value = "keyword", required = false) String keyword) {
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "sort", required = false) String sort) {
         
     
 
@@ -168,7 +169,7 @@ public class ProductController {
     	List<String> listBrand = brands.isEmpty() ? null : Arrays.asList(brands.split(","));
 
 
-        Page<Product> products = productService.filterProducts(listCategory, listBrand, minPrice, maxPrice, keyword, page, size);
+        Page<Product> products = productService.filterProducts(listCategory, listBrand, minPrice, maxPrice, keyword, page, size,sort);
         
         List<ProductResponse> productResponses = products.getContent().stream()
                 .map(productConvert::productConvertToProductResponse)
