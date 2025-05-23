@@ -162,8 +162,8 @@ const CreateModelCustomizeForm = ({
         }
 
         // Kiểm tra kích thước file (max 20MB)
-        if (file.size > 20 * 1024 * 1024) {
-          toast.error("Kích thước model không được vượt quá 20MB");
+        if (file.size > 150 * 1024 * 1024) {
+          toast.error("Kích thước model không được vượt quá 150MB");
           return;
         }
 

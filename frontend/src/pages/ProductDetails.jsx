@@ -389,6 +389,11 @@ const ProductDetails = () => {
         <VTOGlassModal
           isOpen={showModalVTO}
           onClose={() => setShowModalVTO(false)}
+          modelUrl={
+            product.modelPath
+              ? `http://localhost:8080${product.modelPath}`
+              : null
+          }
         />
       ) : (
         ""
@@ -398,7 +403,11 @@ const ProductDetails = () => {
         <Modal3DView
           isOpen={showModal3DView}
           onClose={() => setShowModal3DView(false)}
-          modelUrl={"/models/tim_nhat_837479.glb"}
+          modelUrl={
+            product.modelPath
+              ? `http://localhost:8080${product.modelPath}`
+              : null
+          }
           colorConfig={colorConfig ? JSON.parse(colorConfig) : {}}
         />
       ) : (

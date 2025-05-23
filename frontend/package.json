@@ -32,6 +32,7 @@
     "bootstrap": "^5.3.3",
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
+    "facefilter": "^3.3.6",
     "file-saver": "^2.0.5",
     "gsap": "^3.12.7",
     "leaflet": "^1.9.4",

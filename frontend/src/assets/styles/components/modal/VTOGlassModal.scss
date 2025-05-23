@@ -1,162 +1,256 @@
-// VTOGlassModal.scss
-
-// Variables
-$primary-color: #13856b;
-$secondary-color: #e9f5f2;
-$dark-text: #333;
-$light-text: #fff;
-$modal-radius: 12px;
-$shadow-color: rgba(0, 0, 0, 0.25);
-$transition-speed: 0.3s;
-
-.vto-modal-overlay {
+// VTOGlassesModal.scss
+.vto-glasses-modal {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100000;
-  backdrop-filter: blur(8px);
-  animation: fadeIn 0.2s ease-out;
-}
-
-.vto-modal-container {
-  width: 95%;
-  max-width: 900px;
-  max-height: 95vh;
-  display: flex;
-  justify-content: center;
-  perspective: 1000px;
-}
-
-.vto-modal-content {
-  background-color: white;
-  border-radius: $modal-radius;
   width: 100%;
-  overflow: hidden;
-  box-shadow: 0 8px 32px $shadow-color;
-  transform-origin: center;
-  animation: modalEnter 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-}
-
-.vto-modal-header {
-  background-color: $primary-color;
-  padding: 15px 25px;
-  border-top-left-radius: $modal-radius;
-  border-top-right-radius: $modal-radius;
-  
-  h1 {
-    margin: 0;
-    font-size: 18px;
-    color: $light-text;
-    font-weight: 500;
-    text-align: center;
-  }
-}
-
-.vto-modal-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  height: 28px;
-  width: 28px;
-  border-radius: 50%;
+  height: 100%;
+  z-index: 999999;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background $transition-speed;
-  z-index: 10;
-  
-  svg {
-    color: $light-text;
-    font-size: 16px;
-  }
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.4);
-  }
-}
 
-.vto-modal-body {
-  padding: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.vto-main-content {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0;
-}
-
-.vto-title {
-  color: $primary-color;
-  font-size: 28px;
-  font-weight: 600;
-  margin: 25px 0;
-  text-align: center;
-  line-height: 1.3;
-}
-
-.vto-camera-container {
-  width: 100%;
-  max-width: 640px;
-  padding: 0 20px 30px;
-  
-  video, canvas {
+  // Overlay
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    cursor: pointer;
   }
-}
 
-// Animations
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes modalEnter {
-  from { 
-    opacity: 0;
-    transform: translateY(15px) scale(0.98);
+  // Main container
+  &__container {
+    position: relative;
+    width: 90vmin;
+    height: 90vmin;
+    max-width: 600px;
+    max-height: 600px;
+    background: #000;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    
+    // Mobile responsive
+    @media (max-width: 768px) {
+      width: 95vw;
+      height: 80vh;
+      border-radius: 15px;
+    }
   }
-  to { 
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
 
-// Responsive adjustments
-@media (max-width: 768px) {
-  .vto-title {
+  // Close button
+  &__close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    color: white;
     font-size: 24px;
-    margin: 20px 0;
-  }
-  
-  .vto-camera-container {
-    padding: 0 15px 25px;
-  }
-}
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
 
-@media (max-width: 480px) {
-  .vto-modal-header h1 {
-    font-size: 16px;
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    span {
+      line-height: 1;
+      transform: translateY(-1px);
+    }
   }
-  
-  .vto-title {
-    font-size: 20px;
-    margin: 15px 0;
+
+  // Status indicator
+  &__status {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+
+    &.detected {
+      background: rgba(34, 197, 94, 0.9);
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+    }
+
+    &.not-detected {
+      background: rgba(239, 68, 68, 0.9);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+    }
+  }
+
+  // Content area
+  &__content {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  // Canvas styles
+  &__canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    &--video {
+      z-index: 1;
+    }
+
+    &--ar {
+      z-index: 2;
+    }
+
+    // Mirror effect for front camera
+    &.mirrorX {
+      transform: scaleX(-1);
+    }
+  }
+
+  // Action buttons
+  &__actions {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 10;
+  }
+
+  // Button styles
+  &__btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+
+    &--capture {
+      background: rgba(59, 130, 246, 0.9);
+      color: white;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+
+      &:hover {
+        background: rgba(59, 130, 246, 1);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    &--switch {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  // Loading state
+  &--loading {
+    .vto-glasses-modal__content::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 5;
+    }
+  }
+
+  // Animations
+  @keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  // Modal entrance animation
+  animation: modalEnter 0.3s ease-out;
+
+  @keyframes modalEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  // Dark mode compatibility
+  @media (prefers-color-scheme: dark) {
+    &__container {
+      background: #111;
+    }
+  }
+
+  // High contrast mode
+  @media (prefers-contrast: high) {
+    &__close,
+    &__btn {
+      border: 2px solid white;
+    }
+  }
+
+  // Reduced motion
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    &__close,
+    &__btn,
+    &__status {
+      animation: none;
+      transition: none;
+    }
   }
 }

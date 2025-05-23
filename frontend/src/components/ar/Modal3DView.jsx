@@ -1,4 +1,10 @@
-import React, { useState, useRef, Suspense, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  Suspense,
+  useEffect,
+  useCallback,
+} from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -31,67 +37,132 @@ function Loader() {
   );
 }
 
-// Model component with optimized material handling and camera adjustment
+// Model component with optimized material handling and memory management
 function Model({ url, colorConfig }) {
-  const { scene } = useGLTF(url);
+  const { scene, materials, animations, ...gltf } = useGLTF(url);
   const { camera } = useThree();
+  const originalMaterials = useRef(new Map());
+
+  // Clean up function for materials
+  const cleanupMaterials = useCallback(() => {
+    originalMaterials.current.forEach((material) => {
+      if (material.map) material.map.dispose();
+      if (material.normalMap) material.normalMap.dispose();
+      if (material.roughnessMap) material.roughnessMap.dispose();
+      if (material.metalnessMap) material.metalnessMap.dispose();
+      if (material.aoMap) material.aoMap.dispose();
+      if (material.emissiveMap) material.emissiveMap.dispose();
+      material.dispose();
+    });
+    originalMaterials.current.clear();
+  }, []);
 
   useEffect(() => {
-    console.log(colorConfig);
-    scene.traverse((node) => {
+    if (!scene) return;
+
+    console.log("Color config:", colorConfig);
+
+    // Clone scene to avoid modifying the original
+    const clonedScene = scene.clone();
+
+    clonedScene.traverse((node) => {
       if (!node.material) return;
 
       const partName = node.name;
       const config = colorConfig?.[partName];
 
-      console.log(config);
+      // Store original materials for cleanup
+      const materials = Array.isArray(node.material)
+        ? node.material
+        : [node.material];
+      materials.forEach((mat, index) => {
+        const key = `${node.uuid}_${index}`;
+        if (!originalMaterials.current.has(key)) {
+          originalMaterials.current.set(key, mat.clone());
+        }
+      });
 
+      // Apply color configuration
       if (config && node.material) {
         const materials = Array.isArray(node.material)
           ? node.material
           : [node.material];
         materials.forEach((mat) => {
           if (mat.color) {
-            mat.color.set(config.color);
-            mat.needsUpdate = true;
+            try {
+              mat.color.set(config.color);
+              mat.needsUpdate = true;
+            } catch (error) {
+              console.warn("Failed to set color:", error);
+            }
           }
         });
       }
 
-      const materials = Array.isArray(node.material)
-        ? node.material
-        : [node.material];
+      // Handle mirror materials
       materials.forEach((mat) => {
-        if (mat.name.toLowerCase().includes("mirror")) {
+        if (mat.name && mat.name.toLowerCase().includes("mirror")) {
           mat.transparent = true;
           mat.opacity = 0.2;
+          mat.needsUpdate = true;
         }
       });
     });
 
-    // Tính toán box để chuẩn hóa kích thước
-    const box = new THREE.Box3().setFromObject(scene);
+    // Calculate bounding box for normalization
+    const box = new THREE.Box3().setFromObject(clonedScene);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
 
-    // Đặt lại vị trí của model để center ở gốc tọa độ
-    scene.position.x = -center.x;
-    scene.position.y = -center.y;
-    scene.position.z = -center.z;
+    // Center the model
+    clonedScene.position.x = -center.x;
+    clonedScene.position.y = -center.y;
+    clonedScene.position.z = -center.z;
 
-    // Tính toán scale để chuẩn hóa kích thước
+    // Normalize scale
     const maxDim = Math.max(size.x, size.y, size.z);
-    const targetSize = 2; // Kích thước chuẩn mong muốn
-    const scale = targetSize / maxDim;
+    const targetSize = 2;
+    const scale = maxDim > 0 ? targetSize / maxDim : 1;
 
-    // Áp dụng scale chuẩn hóa
-    scene.scale.set(scale, scale, scale);
+    clonedScene.scale.set(scale, scale, scale);
 
-    // Đặt camera ở vị trí cố định, đảm bảo nhìn thấy toàn bộ model
+    // Set camera position
     camera.position.set(0, 0, 3);
     camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
-  }, [scene, camera]);
+
+    // Cleanup function
+    return () => {
+      cleanupMaterials();
+      // Dispose cloned scene
+      clonedScene.traverse((node) => {
+        if (node.geometry) {
+          node.geometry.dispose();
+        }
+        if (node.material) {
+          const materials = Array.isArray(node.material)
+            ? node.material
+            : [node.material];
+          materials.forEach((mat) => {
+            if (mat.map) mat.map.dispose();
+            if (mat.normalMap) mat.normalMap.dispose();
+            if (mat.roughnessMap) mat.roughnessMap.dispose();
+            if (mat.metalnessMap) mat.metalnessMap.dispose();
+            if (mat.aoMap) mat.aoMap.dispose();
+            if (mat.emissiveMap) mat.emissiveMap.dispose();
+            mat.dispose();
+          });
+        }
+      });
+    };
+  }, [scene, camera, colorConfig, cleanupMaterials]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanupMaterials();
+    };
+  }, [cleanupMaterials]);
 
   return (
     <primitive object={scene} scale={1} position={[0, 0, 0]} dispose={null} />
@@ -114,19 +185,39 @@ function Notification({ status, message }) {
 function Modal3DView({
   isOpen,
   onClose,
-  modelUrl = "/path/to/glasses.glb",
+  modelUrl = "/models/xanh_lam_2D4A82FF.glb",
   colorConfig,
 }) {
-  const [copyStatus, setCopyStatus] = useState("idle"); // idle, copying, success, error
+  const [copyStatus, setCopyStatus] = useState("idle");
   const [showThumbnail, setShowThumbnail] = useState(false);
   const canvasRef = useRef(null);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
-
   const [sessionStart, setSessionStart] = useState(null);
+  const timeoutRefs = useRef([]);
+
+  // Clear all timeouts helper
+  const clearAllTimeouts = useCallback(() => {
+    timeoutRefs.current.forEach(clearTimeout);
+    timeoutRefs.current = [];
+  }, []);
+
+  // Safe setTimeout that tracks timeout IDs
+  const safeSetTimeout = useCallback((callback, delay) => {
+    const timeoutId = setTimeout(() => {
+      callback();
+      // Remove completed timeout from tracking
+      timeoutRefs.current = timeoutRefs.current.filter(
+        (id) => id !== timeoutId
+      );
+    }, delay);
+    timeoutRefs.current.push(timeoutId);
+    return timeoutId;
+  }, []);
 
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (!isOpen) return;
+
     setSessionStart(Date.now());
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = "hidden";
@@ -136,20 +227,29 @@ function Modal3DView({
     };
   }, [isOpen]);
 
-  const handleClose = () => {
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      clearAllTimeouts();
+      if (thumbnailUrl) {
+        URL.revokeObjectURL(thumbnailUrl);
+      }
+    };
+  }, [clearAllTimeouts, thumbnailUrl]);
+
+  const handleClose = useCallback(() => {
     if (sessionStart) {
       const duration = parseFloat(
         ((Date.now() - sessionStart) / 1000).toFixed(2)
       );
       trackARSessionEnd(duration);
     }
+    clearAllTimeouts();
     onClose();
-  };
-
-  if (!isOpen) return null;
+  }, [sessionStart, clearAllTimeouts, onClose]);
 
   // Capture canvas and copy to clipboard
-  const captureCanvasAndCopy = async () => {
+  const captureCanvasAndCopy = useCallback(async () => {
     if (!canvasRef.current) return;
     setCopyStatus("copying");
 
@@ -157,7 +257,7 @@ function Modal3DView({
       const canvas = canvasRef.current.querySelector("canvas");
       if (!canvas) throw new Error("Canvas not found");
 
-      // Đợi 1 frame trước khi chụp ảnh để đảm bảo nội dung đã render xong
+      // Wait for next frame to ensure content is rendered
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
       const thumbnailCanvas = document.createElement("canvas");
@@ -166,8 +266,11 @@ function Modal3DView({
       thumbnailCanvas.width = 300;
       thumbnailCanvas.height = 200;
 
+      // Fill white background
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, thumbnailCanvas.width, thumbnailCanvas.height);
+
+      // Draw the 3D canvas content
       ctx.drawImage(
         canvas,
         5,
@@ -176,12 +279,18 @@ function Modal3DView({
         thumbnailCanvas.height - 10
       );
 
-      const dataUrl = thumbnailCanvas.toDataURL("image/png");
+      const dataUrl = thumbnailCanvas.toDataURL("image/png", 0.9);
+
+      // Clean up old thumbnail URL
+      if (thumbnailUrl) {
+        URL.revokeObjectURL(thumbnailUrl);
+      }
+
       setThumbnailUrl(dataUrl);
       setShowThumbnail(true);
 
       const blob = await new Promise((resolve) =>
-        thumbnailCanvas.toBlob(resolve, "image/png")
+        thumbnailCanvas.toBlob(resolve, "image/png", 0.9)
       );
 
       if (navigator.clipboard && navigator.clipboard.write) {
@@ -189,17 +298,25 @@ function Modal3DView({
           new ClipboardItem({ "image/png": blob }),
         ]);
         setCopyStatus("success");
-        setShowThumbnail(true);
-        setTimeout(() => setCopyStatus("idle"), 2000);
-        setTimeout(() => setShowThumbnail(false), 4000);
+
+        safeSetTimeout(() => setCopyStatus("idle"), 2000);
+        safeSetTimeout(() => setShowThumbnail(false), 4000);
+      } else {
+        throw new Error("Clipboard API not supported");
       }
+
+      // Clean up canvas
+      thumbnailCanvas.width = 0;
+      thumbnailCanvas.height = 0;
     } catch (error) {
       console.error("Error copying to clipboard:", error);
       setCopyStatus("error");
-      setTimeout(() => setCopyStatus("idle"), 2000);
-      setTimeout(() => setShowThumbnail(false), 4000);
+      safeSetTimeout(() => setCopyStatus("idle"), 2000);
+      safeSetTimeout(() => setShowThumbnail(false), 4000);
     }
-  };
+  }, [thumbnailUrl, safeSetTimeout]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="model-viewer-modal" onClick={(e) => e.stopPropagation()}>
@@ -235,7 +352,7 @@ function Modal3DView({
         )}
 
         {/* Thumbnail Preview */}
-        {showThumbnail && (
+        {showThumbnail && thumbnailUrl && (
           <div className="thumbnail-container">
             <img
               className="thumbnail-preview"
@@ -266,8 +383,16 @@ function Modal3DView({
               antialias: true,
               preserveDrawingBuffer: true,
               alpha: true,
+              powerPreference: "high-performance",
             }}
             shadows
+            onCreated={({ gl }) => {
+              // Optimize renderer settings
+              gl.physicallyCorrectLights = true;
+              gl.outputEncoding = THREE.sRGBEncoding;
+              gl.toneMapping = THREE.ACESFilmicToneMapping;
+              gl.toneMappingExposure = 1.0;
+            }}
           >
             <color attach="background" args={["#e6e6e6"]} />
 
@@ -279,10 +404,20 @@ function Modal3DView({
                 penumbra={1}
                 intensity={1}
                 castShadow
+                shadow-mapSize-width={1024}
+                shadow-mapSize-height={1024}
               />
 
               <Model url={modelUrl} colorConfig={colorConfig || {}} />
-              <Environment files="/hdr/studio_small_03_1k.hdr" />
+
+              {/* Only load environment if file exists */}
+              <Environment
+                files="/hdr/studio_small_03_1k.hdr"
+                background={false}
+                onError={(error) => {
+                  console.warn("Environment texture failed to load:", error);
+                }}
+              />
             </Suspense>
 
             <ContactShadows
@@ -302,6 +437,8 @@ function Modal3DView({
               dampingFactor={0.05}
               rotateSpeed={0.5}
               enableDamping={true}
+              maxDistance={10}
+              minDistance={1}
             />
           </Canvas>
         </div>
@@ -309,5 +446,16 @@ function Modal3DView({
     </div>
   );
 }
+
+// Preload the GLTF model to avoid loading issues
+useGLTF.preload = (url) => {
+  return new Promise((resolve, reject) => {
+    const loader = new THREE.GLTFLoader();
+    loader.load(url, resolve, undefined, (error) => {
+      console.error("Failed to preload GLTF:", error);
+      reject(error);
+    });
+  });
+};
 
 export default Modal3DView;

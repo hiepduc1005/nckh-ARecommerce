@@ -1,364 +1,296 @@
-import React, { useRef, useState, useEffect, Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
-import {
-  useGLTF,
-  Stage,
-  useProgress,
-  Stats,
-  Environment,
-} from "@react-three/drei";
+import React, { useState, useEffect, useRef, Suspense } from "react";
+import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as THREE from "three";
-import { EffectComposer, Outline } from "@react-three/postprocessing";
-import LoadingScreen from "../components/ar/LoadingScreen";
-import ModelCustomize from "../components/ar/ModelCustomize";
-import { saveAs } from "file-saver";
-import ColorControls from "../components/ar/ColorControls";
-import ScreenshotHelper from "../components/helper/ScreenshotHelper";
-import SceneControls from "../components/ar/SceneControls";
-import { trackEvent } from "../utils/analytics";
+// import main script and neural network model from Jeeliz FaceFilter NPM package
+import { JEELIZFACEFILTER, NN_4EXPR } from "facefilter";
+import { JeelizThreeFiberHelper } from "../components/ar/JeelizThreeFiberHelper";
 
-export default function Interactive3DViewer({
-  modelUrl = "/models/tim_nhat_837479.glb",
-}) {
-  const [selectedPart, setSelectedPart] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [originalMaterials, setOriginalMaterials] = useState({});
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [parts, setParts] = useState([]);
-  const [originalParts, setOriginalParts] = useState([]);
+// import THREE.js helper for VTO glasses
 
-  // Listen to loading progress
-  const { progress, errors, active } = useProgress();
-  const loadStart = useRef(null);
+const _maxFacesDetected = 1; // max number of detected faces
+const _faceFollowers = new Array(_maxFacesDetected);
 
-  const canvasRef = useRef();
-  const cameraRef = useRef();
+// Loading component
+const LoadingFallback = () => (
+  <mesh>
+    <boxGeometry args={[0.1, 0.1, 0.1]} />
+    <meshBasicMaterial color="gray" />
+  </mesh>
+);
 
-  // Set the loaded state when progress reaches 100%
-  useEffect(() => {
-    if (progress === 100) {
-      // Add a small delay to ensure everything is rendered properly
-      const timer = setTimeout(() => {
-        setIsLoaded(true);
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [progress]);
+// Glasses component that loads and displays the GLB model
+const GlassesModel = ({
+  url,
+  scale = 1,
+  rotation = [0, 0, 0],
+  position = [0, 0, 0],
+}) => {
+  const gltf = useLoader(GLTFLoader, url);
 
   useEffect(() => {
-    if (active && !loadStart.current) {
-      loadStart.current = Date.now();
-    }
+    if (gltf.scene) {
+      // Optimize materials for real-time rendering
+      gltf.scene.traverse((child) => {
+        if (child.isMesh) {
+          // Enable shadows if needed
+          child.castShadow = true;
+          child.receiveShadow = true;
 
-    if (!active && loadStart.current) {
-      const duration = Date.now() - loadStart.current;
-
-      trackEvent({
-        category: "AR",
-        action: "model_loaded",
-        value: duration,
+          // Optimize material properties for glasses
+          if (child.material) {
+            child.material.needsUpdate = true;
+          }
+        }
       });
-
-      loadStart.current = null; // reset
     }
-  }, [active]);
-
-  const handleSelectPart = (part) => {
-    setSelectedPart(part);
-
-    // Store the original material of the selected part
-    if (part && !originalMaterials[part.uuid]) {
-      if (Array.isArray(part.material)) {
-        setOriginalMaterials((prev) => ({
-          ...prev,
-          [part.uuid]: part.material.map((mat) => mat.clone()),
-        }));
-      } else {
-        setOriginalMaterials((prev) => ({
-          ...prev,
-          [part.uuid]: part.material.clone(),
-        }));
-      }
-    }
-  };
-
-  const resetAllParts = () => {
-    // Chỉ thực hiện nếu có phần tử trong parts
-    if (parts.length === 0) return;
-
-    console.log("Resetting all parts to original materials");
-
-    // Lặp qua tất cả các phần tử trong mô hình
-    parts.forEach((part) => {
-      // Kiểm tra xem có material gốc cho phần tử này không
-      if (
-        window.originalMaterialsMap &&
-        window.originalMaterialsMap[part.uuid]
-      ) {
-        const originalMaterial = window.originalMaterialsMap[part.uuid];
-
-        // Áp dụng material gốc trực tiếp vào mesh
-        if (Array.isArray(originalMaterial)) {
-          // Cho đối tượng multi-material
-          part.material = originalMaterial.map((mat) => mat.clone());
-        } else {
-          // Cho đối tượng single material
-          part.material = originalMaterial.clone();
-        }
-
-        // Đảm bảo material được cập nhật
-        if (Array.isArray(part.material)) {
-          part.material.forEach((mat) => (mat.needsUpdate = true));
-        } else {
-          part.material.needsUpdate = true;
-        }
-
-        console.log(`Reset material for ${part.name}`);
-      }
-    });
-
-    // Cập nhật state để kích hoạt re-render
-    setParts([...parts]);
-
-    // Nếu đang có phần tử được chọn, cập nhật lại nó
-    if (selectedPart) {
-      setSelectedPart({ ...selectedPart });
-    }
-  };
-
-  const handleColorChange = (color, resetAll = false) => {
-    if (resetAll) {
-      resetAllParts();
-      return;
-    }
-    if (!selectedPart) return;
-
-    // If reset was clicked, restore original material
-    if (color === "reset") {
-      // Use the global material map that was stored during initialization
-      if (
-        window.originalMaterialsMap &&
-        window.originalMaterialsMap[selectedPart.uuid]
-      ) {
-        const originalMaterial = window.originalMaterialsMap[selectedPart.uuid];
-
-        // Apply original material DIRECTLY to the mesh
-        if (Array.isArray(originalMaterial)) {
-          // For multi-material objects
-          selectedPart.material = originalMaterial.map((mat) => mat.clone());
-        } else {
-          // For single material objects
-          selectedPart.material = originalMaterial.clone();
-        }
-
-        // Make sure material updates are applied
-        selectedPart.material.needsUpdate = true;
-
-        // Force state update to trigger a re-render
-        setSelectedPart({ ...selectedPart });
-
-        console.log("Reset material for", selectedPart.name);
-      } else {
-        console.warn("Original material not found for", selectedPart.uuid);
-      }
-      return;
-    }
-
-    // Handle different material types for color change
-    if (Array.isArray(selectedPart.material)) {
-      selectedPart.material.forEach((mat) => {
-        applyColorToMaterial(mat, color);
-      });
-    } else {
-      applyColorToMaterial(selectedPart.material, color);
-    }
-
-    // Force state update
-    setSelectedPart({ ...selectedPart });
-
-    // Log for debugging
-    console.log(`Changed color of ${selectedPart.name} to ${color}`);
-  };
-
-  // Helper function to apply color to different material types
-  const applyColorToMaterial = (material, colorHex) => {
-    const color = new THREE.Color(colorHex);
-
-    // Handle different material types
-    if (
-      material.type === "MeshStandardMaterial" ||
-      material.type === "MeshPhysicalMaterial" ||
-      material.type === "MeshLambertMaterial"
-    ) {
-      material.color.set(color);
-    }
-
-    // For glass/mirror materials, try different approaches
-    if (
-      (material.name && material.name.toLowerCase().includes("mirror")) ||
-      (material.name && material.name.toLowerCase().includes("glass"))
-    ) {
-      material.color.set(color);
-      material.emissive.set(color);
-      material.emissiveIntensity = 0.5;
-
-      // Adjust transparency for glass
-      if (material.name.toLowerCase().includes("mirror")) {
-        material.transparent = true;
-        material.opacity = 0.2;
-      }
-    }
-
-    // For reflective materials, update reflection properties
-    if (material.metalness !== undefined) {
-      material.metalness = 0.8;
-      material.roughness = 0.2;
-    }
-
-    // For special shader materials
-    if (
-      material.type === "ShaderMaterial" ||
-      material.type === "RawShaderMaterial"
-    ) {
-      if (material.uniforms.color) {
-        material.uniforms.color.value.set(color);
-      }
-    }
-
-    // Ensure material update flag is set
-    material.needsUpdate = true;
-  };
-
-  // Preload the model
-  useEffect(() => {
-    useGLTF.preload(modelUrl);
-  }, [modelUrl]);
+  }, [gltf]);
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100vh",
-        position: "relative",
-        background: "#f7f7f7",
-      }}
-    >
-      {!isLoaded && <LoadingScreen />}
+    <primitive
+      object={gltf.scene}
+      rotation={rotation}
+      scale={scale}
+      position={position}
+    />
+  );
+};
 
-      <Canvas
-        ref={canvasRef}
-        shadows
-        camera={{ position: [0, 0, 10], fov: 50 }}
-        onPointerMissed={() => setSelectedPart(null)}
-        gl={{
-          antialias: true, // Enable antialiasing for smoother rendering
-          powerPreference: "high-performance", // Request high performance GPU
+// Occluder component - invisible but writes to depth buffer
+const OccluderModel = ({
+  url,
+  scale = 1,
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+}) => {
+  const gltf = useLoader(GLTFLoader, url);
+
+  useEffect(() => {
+    if (gltf.scene) {
+      gltf.scene.traverse((child) => {
+        if (child.isMesh) {
+          // Create proper occluder material that writes to depth buffer
+          const occluderMesh = JeelizThreeFiberHelper.create_occluder(
+            child.geometry
+          );
+          child.material = occluderMesh.material;
+          child.renderOrder = -10; // Render before glasses
+        }
+      });
+    }
+  }, [gltf]);
+
+  return (
+    <primitive
+      object={gltf.scene}
+      scale={scale}
+      rotation={rotation}
+      position={position}
+    />
+  );
+};
+
+// This component follows the face and contains the glasses
+const GlassesFollower = (props) => {
+  const objRef = useRef();
+
+  useEffect(() => {
+    const threeObject3D = objRef.current;
+    _faceFollowers[props.faceIndex] = threeObject3D;
+  }, [props.faceIndex]);
+
+  console.log("RENDER GlassesFollower component");
+
+  return (
+    <object3D ref={objRef}>
+      {/* Occluder - invisible but blocks rendering behind face */}
+      <Suspense fallback={<LoadingFallback />}>
+        <OccluderModel
+          url="/models/face.glb"
+          scale={props.scale || 4.5}
+          position={[0, 0.15, -0.37]}
+          rotation={[0.45, 0, 0]}
+        />
+      </Suspense>
+
+      {/* Load glasses model với vị trí tốt hơn */}
+      <Suspense fallback={<LoadingFallback />}>
+        <GlassesModel
+          url="/models/xanh_lam_2D4A82FF.glb"
+          scale={4.5}
+          position={[0, 0.06, 0.01]}
+          rotation={[-0.02, 0, 0]}
+        />
+      </Suspense>
+    </object3D>
+  );
+};
+
+// Component to grab Three.js camera and renderer
+let _threeFiber = null;
+const ThreeGrabber = (props) => {
+  _threeFiber = useThree();
+  useFrame(() => {
+    JeelizThreeFiberHelper.update_camera(props.sizing, _threeFiber.camera);
+  });
+  return null;
+};
+
+const compute_sizing = () => {
+  // compute size of the canvas:
+  const height = window.innerHeight;
+  const wWidth = window.innerWidth;
+  const width = Math.min(wWidth, height);
+
+  // compute position of the canvas:
+  const top = 0;
+  const left = (wWidth - width) / 2;
+  return { width, height, top, left };
+};
+
+const VTOGlassesApp = () => {
+  const [sizing, setSizing] = useState(compute_sizing());
+  const [isInitialized] = useState(true);
+  const [isDetected, setIsDetected] = useState(false);
+
+  let _timerResize = null;
+
+  const handle_resize = () => {
+    // do not resize too often:
+    if (_timerResize) {
+      clearTimeout(_timerResize);
+    }
+    _timerResize = setTimeout(do_resize, 200);
+  };
+
+  const do_resize = () => {
+    _timerResize = null;
+    const newSizing = compute_sizing();
+    setSizing(newSizing);
+  };
+
+  useEffect(() => {
+    if (!_timerResize) {
+      JEELIZFACEFILTER.resize();
+    }
+  }, [sizing]);
+
+  const callbackReady = (errCode, spec) => {
+    if (errCode) {
+      console.log("AN ERROR HAPPENS. ERR =", errCode);
+      return;
+    }
+
+    console.log("INFO: JEELIZFACEFILTER IS READY");
+    JeelizThreeFiberHelper.init(spec, _faceFollowers, callbackDetect);
+  };
+
+  const callbackTrack = (detectStatesArg) => {
+    // if 1 face detection, wrap in an array:
+    const detectStates = detectStatesArg.length
+      ? detectStatesArg
+      : [detectStatesArg];
+
+    // update video and THREE faceFollowers poses:
+    JeelizThreeFiberHelper.update(detectStates, _threeFiber.camera);
+
+    // render the video texture on the faceFilter canvas:
+    JEELIZFACEFILTER.render_video();
+  };
+
+  const callbackDetect = (faceIndex, detected) => {
+    setIsDetected(detected);
+    if (detected) {
+      console.log("FACE DETECTED - Glasses ON");
+    } else {
+      console.log("FACE LOST - Glasses OFF");
+    }
+  };
+
+  const faceFilterCanvasRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => handle_resize();
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+
+    JEELIZFACEFILTER.init({
+      canvas: faceFilterCanvasRef.current,
+      NNC: NN_4EXPR,
+      maxFacesDetected: 1,
+      followZRot: true,
+      callbackReady,
+      callbackTrack,
+    });
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+      JEELIZFACEFILTER.destroy();
+    };
+  }, [isInitialized]);
+
+  console.log("RENDER VTOGlassesApp component");
+
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100vh" }}>
+      {/* Detection status indicator */}
+      <div
+        style={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+          zIndex: 10,
+          padding: "10px 15px",
+          backgroundColor: isDetected
+            ? "rgba(0, 255, 0, 0.8)"
+            : "rgba(255, 0, 0, 0.8)",
+          color: "white",
+          borderRadius: "5px",
+          fontFamily: "Arial, sans-serif",
+          fontSize: "14px",
         }}
-        onCreated={({ camera }) => {
-          cameraRef.current = camera;
-        }}
-        dpr={[1, 2]} // Responsive DPR for better performance on different devices
-        style={{ visibility: isLoaded ? "visible" : "hidden" }}
       >
-        <color attach="background" args={["#f7f7f7"]} />
-        <Suspense fallback={null}>
-          <Stage intensity={0.5}>
-            <Environment files="/hdr/studio_small_03_1k.hdr" />
-            <ModelCustomize
-              url={modelUrl}
-              onSelectPart={handleSelectPart}
-              onDragStart={() => setIsDragging(true)}
-              onDragEnd={() => setIsDragging(false)}
-              setParts={setParts}
-              setOriginalParts={setOriginalParts}
-            />
-          </Stage>
-          <SceneControls isDragging={isDragging} />
-        </Suspense>
+        {isDetected ? "👓 Glasses ON" : "❌ No Face Detected"}
+      </div>
 
-        {selectedPart && (
-          <EffectComposer multisampling={8} autoClear={false}>
-            <Outline
-              selection={[selectedPart]}
-              edgeStrength={5}
-              pulseSpeed={0.5}
-              visibleEdgeColor="#ffffff"
-              hiddenEdgeColor="#000000"
-              blur
-              width={500}
-            />
-          </EffectComposer>
-        )}
-        <Stats />
-        <ScreenshotHelper cameraRef={cameraRef} />
+      {/* Canvas managed by three fiber, for AR glasses: */}
+      <Canvas
+        className="mirrorX"
+        style={{
+          position: "fixed",
+          zIndex: 2,
+          ...sizing,
+        }}
+        gl={{
+          preserveDrawingBuffer: true, // allow image capture
+          antialias: true,
+          alpha: true,
+        }}
+        updateDefaultCamera={false}
+      >
+        <ThreeGrabber sizing={sizing} />
+        {/* Add lighting for better glasses rendering */}
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[0, 1, 1]} intensity={0.8} castShadow />
+        <GlassesFollower faceIndex={0} scale={5.5} />
       </Canvas>
 
-      {/* Navigation bar at top */}
-      <div
+      {/* Canvas managed by FaceFilter, displaying the video */}
+      <canvas
+        className="mirrorX"
+        ref={faceFilterCanvasRef}
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          padding: "15px 20px",
-          display: "flex",
-          justifyContent: "space-between",
-          backgroundColor: "#ffffff",
-          boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          visibility: isLoaded ? "visible" : "hidden",
-          zIndex: 1000,
+          position: "fixed",
+          zIndex: 1,
+          ...sizing,
         }}
-      >
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <h2 style={{ fontSize: "18px", fontWeight: "bold", margin: 0 }}>
-            Custom 3D Model Viewer
-          </h2>
-        </div>
-        <button
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#000",
-            color: "#fff",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-        >
-          Done
-        </button>
-      </div>
-
-      {/* Model controls panel */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "20px",
-          left: "20px",
-          right: "20px",
-          backgroundColor: "#ffffff",
-          padding: "20px",
-          borderRadius: "8px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-          maxWidth: "800px",
-          margin: "0 auto",
-          visibility: isLoaded ? "visible" : "hidden",
-        }}
-      >
-        <ColorControls
-          selectedPart={selectedPart}
-          onColorChange={(color, resetAll = false) => {
-            if (resetAll) {
-              resetAllParts(); // Gọi hàm resetAllParts() đã định nghĩa ở trên
-            } else {
-              handleColorChange(color); // Gọi hàm xử lý màu sắc thông thường
-            }
-          }}
-          parts={parts}
-          setSelectedPart={setSelectedPart}
-        />
-      </div>
+        width={sizing.width}
+        height={sizing.height}
+      />
     </div>
   );
-}
+};
+
+export default VTOGlassesApp;
