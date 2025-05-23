@@ -6,6 +6,7 @@ import RegisterToRecive from "../components/RegisterToRecive";
 import AdressFooter from "../components/AdressFooter";
 import EnsureSafety from "../components/EnsureSafety";
 import UserRate from "../components/UserRate";
+import AIChatbox from "../components/AIChatBox,";
 
 const DefaultLayout = () => {
   const topRef = useRef(null);
@@ -17,6 +18,8 @@ const DefaultLayout = () => {
   }, [location.pathname]);
   return (
     <div ref={topRef}>
+      <AIChatbox />
+
       <Header></Header>
       <Outlet></Outlet>
       <UserRate />

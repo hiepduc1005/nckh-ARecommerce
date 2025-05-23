@@ -6,6 +6,7 @@ import EnsureSafety from "../components/EnsureSafety";
 import RegisterToRecive from "../components/RegisterToRecive";
 import Footer from "./footer/Footer";
 import AdressFooter from "../components/AdressFooter";
+import AIChatbox from "../components/AIChatBox,";
 
 const ProductLayout = () => {
   const topRef = useRef(null);
@@ -18,6 +19,8 @@ const ProductLayout = () => {
 
   return (
     <div ref={topRef}>
+      <AIChatbox />
+
       <Header />
       <Outlet />
       <EnsureSafety />
