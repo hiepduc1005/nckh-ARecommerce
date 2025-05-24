@@ -44,6 +44,7 @@ import AdminModelCustomize from "../pages/AdminModelCustomize";
 import CustomzieDetails from "../pages/CustomzieDetails";
 import ShareDesign from "../pages/ShareDesign";
 import GlassesCustomize from "../pages/GlassesCustomize";
+import NotificationsPage from "../pages/NotificationsPage";
 
 const AppRoutes = () => {
   return (
@@ -71,6 +72,8 @@ const AppRoutes = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="address" element={<UserAddress />} />
         <Route path="purchase" element={<Purchase />} />
+        <Route path="notifications" element={<NotificationsPage />} />
+
         <Route
           path="purchase/progress/:orderCode"
           element={<PurchaseProgress />}

@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import "../assets/styles/pages/UserAddress.scss";
-import useAuth from '../hooks/UseAuth';
-import { createUserAddress, deleteUserAddress, getUserAddressByUserId } from '../api/userAddressApi';
-import useLoading from '../hooks/UseLoading';
-import SelectPlace from '../components/SelectPlace';
+import useAuth from "../hooks/UseAuth";
+import {
+  createUserAddress,
+  deleteUserAddress,
+  getUserAddressByUserId,
+} from "../api/userAddressApi";
+import useLoading from "../hooks/UseLoading";
+import SelectPlace from "../components/SelectPlace";
 
 const UserAddress = () => {
   const [addresses, setAddresses] = useState([]);
+  const [distance, setDistance] = useState(0);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newAddress, setNewAddress] = useState({
@@ -14,67 +19,62 @@ const UserAddress = () => {
     phone: "",
     address: "",
     specificAddress: "",
-    isDefault: false
+    isDefault: false,
   });
-  const {user,token} = useAuth();
-  const {setLoading} = useLoading();
+  const { user, token } = useAuth();
+  const { setLoading } = useLoading();
 
-  useEffect(() => {
-
-    const fetchUserAddress = async () => {
-      setLoading(true)
-      if(user && token){
-        const data = await getUserAddressByUserId(user.id , token);      
-        if(data){
-          setAddresses(data)
-        }
+  const fetchUserAddress = async () => {
+    setLoading(true);
+    if (user && token) {
+      const data = await getUserAddressByUserId(user.id, token);
+      if (data) {
+        setAddresses(data);
       }
-
-      setLoading(false)
     }
 
+    setLoading(false);
+  };
+  useEffect(() => {
     fetchUserAddress();
-    console.log(addresses)
-  },[ user , token])
-
+  }, [user, token]);
 
   const handleDeleteUserAddress = async (userAddressId) => {
-    setLoading(true)
+    setLoading(true);
 
-    await deleteUserAddress(userAddressId,token)
-    setAddresses((prev) => prev.filter(item => item.id !== userAddressId))
+    await deleteUserAddress(userAddressId, token);
+    setAddresses((prev) => prev.filter((item) => item.id !== userAddressId));
 
-    setLoading(false)
-  }
-
+    setLoading(false);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewAddress({
       ...newAddress,
-      [name]: value
+      [name]: value,
     });
   };
 
   const handleAddressChange = (address) => {
-    console.log(address)
+    console.log(address);
     setNewAddress({
       ...newAddress,
       specificAddress: address,
       address: address,
     });
-  }
+  };
 
   const handleCheckboxChange = (e) => {
     setNewAddress({
       ...newAddress,
-      isDefault: e.target.checked
+      isDefault: e.target.checked,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    setLoading(true);
     const data = {
       userId: user.id,
       phone: newAddress.phone,
@@ -82,32 +82,32 @@ const UserAddress = () => {
       specificAddress: newAddress.specificAddress,
       isDefault: newAddress.isDefault,
       name: newAddress.name,
+    };
+
+    const newUserAddress = await createUserAddress(data, token);
+    if (newUserAddress) {
+      fetchUserAddress();
     }
 
-    const newUserAddress = await createUserAddress(data,token);
-    if(newUserAddress){
-      setAddresses((prevAddresses) => [...prevAddresses, newUserAddress]);
-    }
-    
     // Reset form
     setNewAddress({
       name: "",
       phone: "",
       address: "",
       specificAddress: "",
-      isDefault: false
+      isDefault: false,
     });
-    
+
     // Hide form
     setShowAddForm(false);
-    setLoading(false)
+    setLoading(false);
   };
 
   return (
-    <div className='user-address-container'>
+    <div className="user-address-container">
       <div className="address-header">
         <h2>Địa chỉ của tôi</h2>
-        <button 
+        <button
           className="add-address-btn"
           onClick={() => setShowAddForm(true)}
         >
@@ -144,11 +144,14 @@ const UserAddress = () => {
                 />
               </div>
             </div>
-            
+
             <div className="form-group">
-             <SelectPlace onChange={handleAddressChange}/> 
+              <SelectPlace
+                onChange={handleAddressChange}
+                setDistance={setDistance}
+              />
             </div>
-            
+
             <div className="form-group checkbox">
               <input
                 type="checkbox"
@@ -159,9 +162,13 @@ const UserAddress = () => {
               />
               <label htmlFor="isDefault">Đặt làm địa chỉ mặc định</label>
             </div>
-            
+
             <div className="form-actions">
-              <button type="button" className="cancel-btn" onClick={() => setShowAddForm(false)}>
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => setShowAddForm(false)}
+              >
                 Hủy
               </button>
               <button type="submit" className="submit-btn">
@@ -177,7 +184,7 @@ const UserAddress = () => {
           <span>Địa chỉ</span>
         </div>
 
-        {addresses.map(address => (
+        {addresses.map((address) => (
           <div key={address.id} className="address-item">
             <div className="address-info">
               <div className="address-name-phone">
@@ -195,7 +202,12 @@ const UserAddress = () => {
             </div>
             <div className="address-actions">
               <button className="update-btn">Cập nhật</button>
-              <button className="delete-btn" onClick={() => handleDeleteUserAddress(address.id)}>Xóa</button>
+              <button
+                className="delete-btn"
+                onClick={() => handleDeleteUserAddress(address.id)}
+              >
+                Xóa
+              </button>
               {!address.isDefault && (
                 <button className="default-btn">Thiết lập mặc định</button>
               )}

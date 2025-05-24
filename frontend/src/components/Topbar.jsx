@@ -14,7 +14,8 @@ import { Link, useNavigate } from "react-router-dom";
 import useLoading from "../hooks/UseLoading";
 
 import AccountPopper from "./AccountPopper";
-const Topbar = ({ user, isAuthenticated, logout }) => {
+import NotificationDropdown from "./NotificationDropdown";
+const Topbar = ({ user, isAuthenticated, logout, notifications = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const naviate = useNavigate();
@@ -31,6 +32,27 @@ const Topbar = ({ user, isAuthenticated, logout }) => {
 
     naviate("/login");
     setLoading(false);
+  };
+
+  // Xử lý đánh dấu đã đọc một thông báo
+  const handleMarkAsRead = (notificationId) => {
+    // Gọi API để đánh dấu thông báo đã đọc
+    console.log("Mark as read:", notificationId);
+    // TODO: Implement API call
+  };
+
+  // Xử lý đánh dấu tất cả đã đọc
+  const handleMarkAllAsRead = () => {
+    // Gọi API để đánh dấu tất cả thông báo đã đọc
+    console.log("Mark all as read");
+    // TODO: Implement API call
+  };
+
+  // Xử lý xóa thông báo
+  const handleDeleteNotification = (notificationId) => {
+    // Gọi API để xóa thông báo
+    console.log("Delete notification:", notificationId);
+    // TODO: Implement API call
   };
   return (
     <div className="topbar-container">
@@ -62,10 +84,12 @@ const Topbar = ({ user, isAuthenticated, logout }) => {
         </div>
       </div>
       <div className="right">
-        <Link className="notification-icon">
-          <FontAwesomeIcon size="lg" color="#207355" icon={faBell} />
-          <span>Thông báo</span>
-        </Link>
+        <NotificationDropdown
+          notifications={notifications}
+          onMarkAsRead={handleMarkAsRead}
+          onMarkAllAsRead={handleMarkAllAsRead}
+          onDeleteNotification={handleDeleteNotification}
+        />
         <Link className="support-icon" to={"/"}>
           <FontAwesomeIcon size="lg" color="#207355" icon={faCircleQuestion} />
           <span>Hỗ trợ</span>

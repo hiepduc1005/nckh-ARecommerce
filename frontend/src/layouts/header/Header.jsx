@@ -33,9 +33,26 @@ const Header = () => {
         "http://localhost:8080/uploads/8d2bbbec-d731-4855-a270-e94c4f554eef_giaoducqp.jpg", // Thay bằng ảnh thực tế
     },
   ];
+
+  const notifications = [
+    {
+      id: "uuid-1",
+      title: "Đơn hàng mới",
+      message: "Bạn có một đơn hàng mới cần xử lý",
+      isRead: false,
+      createAt: "2024-01-20T10:30:00",
+      userId: "user-uuid",
+    },
+  ];
+
   return (
     <>
-      <Topbar user={user} logout={logout} isAuthenticated={isAuthenticated} />
+      <Topbar
+        user={user}
+        logout={logout}
+        isAuthenticated={isAuthenticated}
+        notifications={notifications}
+      />
       <header className="header-container">
         <div className="header-left">
           <Link to={"/"} className="webicon-container">
