@@ -283,14 +283,6 @@ const NotificationsPage = () => {
           </div>
         )}
 
-        {/* Loading */}
-        {loading && (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <span>Đang tải...</span>
-          </div>
-        )}
-
         {/* Notifications Content */}
         <div className="notifications-content">
           {!loading && notifications.length === 0 ? (

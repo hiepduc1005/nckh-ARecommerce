@@ -45,6 +45,7 @@ import CustomzieDetails from "../pages/CustomzieDetails";
 import ShareDesign from "../pages/ShareDesign";
 import GlassesCustomize from "../pages/GlassesCustomize";
 import NotificationsPage from "../pages/NotificationsPage";
+import ChangePassword from "../pages/ChangePassword";
 
 const AppRoutes = () => {
   return (
@@ -73,6 +74,7 @@ const AppRoutes = () => {
         <Route path="address" element={<UserAddress />} />
         <Route path="purchase" element={<Purchase />} />
         <Route path="notifications" element={<NotificationsPage />} />
+        <Route path="change-password" element={<ChangePassword />} />
 
         <Route
           path="purchase/progress/:orderCode"
