@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,6 +133,28 @@ public class UserServiceImpl implements UserService{
 	public List<User> getActiveUser() {
 		// TODO Auto-generated method stub
 		return userRepository.findActiveUser();
+	}
+
+	@Override
+	public User changePassword(String currentPassword,String newPassword, String confirmPassword) {
+		if(!newPassword.equals(confirmPassword)) {
+			throw new RuntimeException("Mật khẩu xác nhận và mật khẩu mới không khớp!");
+		}
+		
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		User user = findUserByEmail(email);
+		
+		String hashPassword = user.getPassword();
+		
+		if(!passwordEncoder.matches(currentPassword, hashPassword)) {
+			throw new RuntimeException("Mật khẩu hiện tại không chính xác!");
+		}
+		String hashNewPassword = passwordEncoder.encode(newPassword);
+
+		user.setPassword(hashNewPassword);
+		
+		
+		return updateUser(user);
 	}
 
 	

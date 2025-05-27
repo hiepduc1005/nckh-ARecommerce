@@ -24,6 +24,8 @@ public interface NotificationService {
     List<Notification> markAllAsRead(List<Notification> notifications);
     
     List<Notification> markAllAsReadIds(List<UUID> ids);
+    
+    void markAllAsReadByUser(UUID userId);
 
     
     CompletableFuture<Void> sendCancelOrderNotification(String orderId, UUID userId);
@@ -35,5 +37,5 @@ public interface NotificationService {
     CompletableFuture<Void> sendPaidOrderNotification(String orderId, UUID userId);
 
     void deleteNotifi(UUID notificationId);
-    
+    void deleteAllNotifi(List<UUID> ids);
 }

@@ -93,11 +93,26 @@ public class NotificationController {
 		return ResponseEntity.ok("Chuyển tất cả thông báo sang đã đọc thanh công!");
 	}
 	
+	@PutMapping("/user/{userId}/read")
+	public ResponseEntity<?> markAsReadAll(@PathVariable UUID userId){
+		
+		notificationService.markAllAsReadByUser(userId);
+		
+		return ResponseEntity.ok("Chuyển tất cả thông báo sang đã đọc thanh công!");
+	}
+	
 	@DeleteMapping("/{notificationId}")
 	public ResponseEntity<String> deleteNotification(@PathVariable UUID notificationId){
 		notificationService.deleteNotifi(notificationId);
 		
 		return ResponseEntity.ok("Xóa thông báo thành công!");
+	}
+	
+	@DeleteMapping("/delete")
+	public ResponseEntity<String> deleteAllNotification(@RequestBody List<UUID> ids){
+		notificationService.deleteAllNotifi(ids);
+		
+		return ResponseEntity.ok("Xóa tất cả thông báo thành công!");
 	}
 	
 	@GetMapping("/test")

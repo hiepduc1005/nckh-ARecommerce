@@ -262,4 +262,14 @@ public class NotificationServiceImpl implements NotificationService {
 				
 	}
 
+	@Override
+	public void deleteAllNotifi(List<UUID> ids) {
+		notificationRepository.deleteAllById(ids);
+	}
+
+	@Override
+	public void markAllAsReadByUser(UUID userId) {
+		notificationRepository.markAllAsRead(userId);
+	}
+
 }

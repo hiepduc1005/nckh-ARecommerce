@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ecommerce.vn.dto.user.UserChangePassword;
 import com.ecommerce.vn.dto.user.UserCreateRequest;
 import com.ecommerce.vn.dto.user.UserForgetPasswordRequest;
 import com.ecommerce.vn.dto.user.UserForgotPasswordVerify;
@@ -97,6 +98,15 @@ public class UserController {
 		user.setPassword(hashPassword);
 		
 		userService.updateUser(user);
+		
+		return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công"));
+
+    }
+	
+	@PutMapping("/change-password")
+	public ResponseEntity<?> changePassword(@RequestBody UserChangePassword request) throws IOException{
+       
+		userService.changePassword(request.getCurrentPassword(),request.getNewPassword(),request.getConfirmPassword());
 		
 		return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công"));
 

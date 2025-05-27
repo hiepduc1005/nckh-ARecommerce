@@ -31,6 +31,6 @@ public interface UserService {
 	
 	List<User> getActiveUser();
 	
-	
+	User changePassword(String currentPassword,String newPassword,String confirmPassword);
 
 }
