@@ -30,6 +30,7 @@ import com.ecommerce.vn.exception.InvalidCouponException;
 import com.ecommerce.vn.repository.OrderRepository;
 import com.ecommerce.vn.service.EmailService;
 import com.ecommerce.vn.service.coupon.CouponService;
+import com.ecommerce.vn.service.notification.NotificationService;
 import com.ecommerce.vn.service.order.OrderService;
 import com.ecommerce.vn.service.user.UserService;
 
@@ -49,6 +50,9 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Autowired
 	private EmailService emailService;
+	
+	@Autowired
+	private NotificationService notificationService;
 
 	@Override
 	@Transactional
@@ -178,6 +182,7 @@ public class OrderServiceImpl implements OrderService {
 			order.setOrderStatus(orderStatus);
 			updateOrder(order);
 			try {
+				sendNotificationByStatus(orderStatus,order);
 				sendEmailByStatus(orderStatus,order);
 			} catch (IOException e) {
 				
@@ -229,6 +234,28 @@ public class OrderServiceImpl implements OrderService {
 	        	description = "Quà xin lỗi";
 	        	Coupon c = couponService.createGiftCoupon(15.0,description);
 	        	emailService.sendCancelOrderEmail(order.getEmail(), order.getEmail(), order, c);
+	        	break;
+	        default:
+	    }
+	}
+	
+	private void sendNotificationByStatus(OrderStatus status, Order order) throws IOException {
+		switch (status) {
+	        case PENDING:
+	        	break;
+	        case PAID:
+	        	notificationService.sendPaidOrderNotification(order.getCode(), order.getUser().getId());
+	        	break;
+	        case PROCESSING:
+	        	break;
+	        case SHIPPED:
+	        	notificationService.sendShippedOrderNotification(order.getCode(), order.getUser().getId());
+	        	break;
+	        case DELIVERED:
+	        	notificationService.sendDeliveredOrderNotification(order.getCode(), order.getUser().getId());
+	        	break;
+	        case CANCELLED:
+	        	notificationService.sendCancelOrderNotification(order.getCode(), order.getUser().getId());
 	        	break;
 	        default:
 	    }

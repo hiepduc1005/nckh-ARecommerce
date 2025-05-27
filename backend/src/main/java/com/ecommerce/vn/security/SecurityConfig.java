@@ -3,6 +3,7 @@ package com.ecommerce.vn.security;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
 @EnableWebSecurity
@@ -66,7 +69,7 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 	    CorsConfiguration configuration = new CorsConfiguration();
-	    configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Cho phép React
+	    configuration.setAllowedOrigins(List.of("http://localhost:5173","http://127.0.0.1:5500")); // Cho phép React
 	    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	    configuration.setAllowedHeaders(List.of("*"));
 	    configuration.setAllowCredentials(true);
@@ -75,6 +78,7 @@ public class SecurityConfig {
 	    source.registerCorsConfiguration("/**", configuration);
 	    return source;
 	}
+	
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

@@ -27,6 +27,10 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    
+    @Column(name = "title", nullable = false)
+    private String title;
+
 
     @Column(name = "message", nullable = false)
     private String message;
@@ -42,8 +46,36 @@ public class Notification {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+    
+    private String url;
+    
+    
 
-    public UUID getId() {
+    public boolean isRead() {
+		return isRead;
+	}
+
+	public void setRead(boolean isRead) {
+		this.isRead = isRead;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public UUID getId() {
         return id;
     }
 
@@ -75,13 +107,7 @@ public class Notification {
         this.createdAt = createdAt;
     }
 
-	public boolean isRead() {
-		return isRead;
-	}
-
-	public void setRead(boolean isRead) {
-		this.isRead = isRead;
-	}
+	
 
 	public User getUser() {
 		return user;
