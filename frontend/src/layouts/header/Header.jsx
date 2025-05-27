@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import webicon from "../../assets/icons/webicon.png";
 import searchIcon from "../../assets/icons/search-icon.png";
 
@@ -11,8 +11,11 @@ import { faCartShopping, faHeart } from "@fortawesome/free-solid-svg-icons";
 import CartPopper from "../../components/CartPopper";
 import WishListPopper from "../../components/WishListPopper";
 import useCart from "../../hooks/UseCart";
+import { useStompSocket } from "../../hooks/UseStompSocket";
+import { toast } from "react-toastify";
+import { getNotificationsByUser } from "../../api/notificationApi";
 const Header = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, token } = useAuth();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishListOpen, setIsWishListOpen] = useState(false);
 
@@ -34,16 +37,44 @@ const Header = () => {
     },
   ];
 
-  const notifications = [
-    {
-      id: "uuid-1",
-      title: "Đơn hàng mới",
-      message: "Bạn có một đơn hàng mới cần xử lý",
-      isRead: false,
-      createAt: "2024-01-20T10:30:00",
-      userId: "user-uuid",
-    },
-  ];
+  const [notifications, setNotifications] = useState([]);
+  const { client, connected } = useStompSocket();
+
+  useEffect(() => {
+    if (connected && client && user) {
+      const subscription = client.subscribe(`/topic/${user.id}`, (message) => {
+        console.log(`Received: ${message.body}`);
+        const body = JSON.parse(message.body);
+        setNotifications((prevNotifs) => {
+          const exists = prevNotifs.some((notif) => notif.id === body.id);
+          if (exists) return prevNotifs;
+          return [body, ...prevNotifs];
+        });
+        toast.info("Bạn có 1 thông báo mới!");
+      });
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [connected, client, user]);
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await getNotificationsByUser(user?.id, 1, 5, token);
+      if (response) {
+        setNotifications(response.content || []);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      setNotifications([]);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchNotifications();
+    }
+  }, [token]);
 
   return (
     <>

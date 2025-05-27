@@ -2,71 +2,86 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
-  faSearch,
-  faFilter,
   faTrash,
   faCheck,
   faCheckDouble,
-  faCircle,
   faArrowLeft,
-  faCalendarAlt,
-  faSortAmountDown,
-  faSortAmountUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import {
+  deleteAllNotifi,
+  deleteNotification,
+  getNotificationsByUser,
+  markAllAsRead,
+  markAsRead,
+  markAsReadByUserId,
+} from "../api/notificationApi"; // Adjust import path as needed
 import "../assets/styles/pages/NotificationsPage.scss";
+import useAuth from "../hooks/UseAuth";
+import { useStompSocket } from "../hooks/UseStompSocket";
+import { toast } from "react-toastify";
 
-const NotificationsPage = ({
-  notifications = [],
-  onMarkAsRead,
-  onMarkAllAsRead,
-  onDeleteNotification,
-  onDeleteMultiple,
-}) => {
-  const [filteredNotifications, setFilteredNotifications] =
-    useState(notifications);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("all"); // all, read, unread
-  const [sortType, setSortType] = useState("newest"); // newest, oldest
+const NotificationsPage = () => {
+  const [notifications, setNotifications] = useState([]);
   const [selectedNotifications, setSelectedNotifications] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showFilters, setShowFilters] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   const navigate = useNavigate();
   const itemsPerPage = 10;
 
+  const { user, token } = useAuth();
+  const { client, connected } = useStompSocket();
+
   useEffect(() => {
-    filterAndSortNotifications();
-  }, [notifications, searchTerm, filterType, sortType]);
-
-  const filterAndSortNotifications = () => {
-    let filtered = [...notifications];
-
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (notification) =>
-          notification.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          notification.message.toLowerCase().includes(searchTerm.toLowerCase())
+    if (connected && client && user) {
+      const subscription = client.subscribe(
+        `/user/${user?.id}/queue/notification`,
+        (message) => {
+          const body = JSON.parse(message.body);
+          setNotifications((prevNotifs) => {
+            const exists = prevNotifs.some((notif) => notif.id === body.id);
+            if (exists) return prevNotifs;
+            return [body, ...prevNotifs];
+          });
+          setTotalElements((total) => total + 1);
+          console.log("Nhận thông báo:", body);
+        }
       );
+      return () => {
+        subscription.unsubscribe();
+      };
     }
+  }, [connected, client, user]);
 
-    // Filter by read status
-    if (filterType === "read") {
-      filtered = filtered.filter((notification) => notification.isRead);
-    } else if (filterType === "unread") {
-      filtered = filtered.filter((notification) => !notification.isRead);
+  useEffect(() => {
+    if (user && token) {
+      fetchNotifications();
     }
+  }, [currentPage, user, token]);
 
-    // Sort notifications
-    filtered.sort((a, b) => {
-      const dateA = new Date(a.createAt);
-      const dateB = new Date(b.createAt);
-      return sortType === "newest" ? dateB - dateA : dateA - dateB;
-    });
-
-    setFilteredNotifications(filtered);
-    setCurrentPage(1);
+  const fetchNotifications = async () => {
+    setLoading(true);
+    try {
+      const response = await getNotificationsByUser(
+        user?.id,
+        currentPage,
+        itemsPerPage,
+        token
+      );
+      if (response) {
+        setNotifications(response.content || []);
+        setTotalPages(response.totalPages || 0);
+        setTotalElements(response.totalElements || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      setNotifications([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatTime = (dateTime) => {
@@ -101,52 +116,123 @@ const NotificationsPage = ({
   };
 
   const handleSelectAll = () => {
-    const currentPageNotifications = getCurrentPageNotifications();
-    const allSelected = currentPageNotifications.every((n) =>
+    const allSelected = notifications.every((n) =>
       selectedNotifications.includes(n.id)
     );
 
     if (allSelected) {
-      setSelectedNotifications((prev) =>
-        prev.filter((id) => !currentPageNotifications.some((n) => n.id === id))
-      );
+      setSelectedNotifications([]);
     } else {
-      setSelectedNotifications((prev) => [
-        ...prev,
-        ...currentPageNotifications
-          .filter((n) => !prev.includes(n.id))
-          .map((n) => n.id),
-      ]);
+      setSelectedNotifications(notifications.map((n) => n.id));
     }
   };
 
-  const handleMarkSelectedAsRead = () => {
-    selectedNotifications.forEach((id) => {
-      const notification = notifications.find((n) => n.id === id);
-      if (notification && !notification.isRead && onMarkAsRead) {
-        onMarkAsRead(id);
-      }
-    });
-    setSelectedNotifications([]);
-  };
-
-  const handleDeleteSelected = () => {
-    if (onDeleteMultiple) {
-      onDeleteMultiple(selectedNotifications);
-    } else if (onDeleteNotification) {
-      selectedNotifications.forEach((id) => onDeleteNotification(id));
+  const handleMarkAsRead = async (notificationId) => {
+    if (!token || !user) {
+      return;
     }
-    setSelectedNotifications([]);
+
+    try {
+      await markAsRead(notificationId, token);
+
+      // Update local state
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification.id === notificationId
+            ? { ...notification, read: true }
+            : notification
+        )
+      );
+      toast.success("Cập thông báo đã đọc thành công!");
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
   };
 
-  const getCurrentPageNotifications = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredNotifications.slice(startIndex, endIndex);
+  const handleMarkAllAsRead = async () => {
+    if (!token || !user) {
+      return;
+    }
+
+    try {
+      await markAsReadByUserId(user.id, token);
+
+      // Update local state
+      setNotifications((prev) =>
+        prev.map((notification) => ({ ...notification, read: true }))
+      );
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+    }
   };
 
-  const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const handleMarkSelectedAsRead = async () => {
+    if (!token || !user) {
+      return;
+    }
+    try {
+      await markAllAsRead(selectedNotifications, token);
+
+      // Update local state
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          selectedNotifications.includes(notification.id)
+            ? { ...notification, read: true }
+            : notification
+        )
+      );
+      setSelectedNotifications([]);
+      toast.success("Cập thông báo đã đọc thành công!");
+    } catch (error) {
+      console.error("Error marking selected notifications as read:", error);
+    }
+  };
+
+  const handleDeleteNotification = async (notificationId) => {
+    if (!token || !user) {
+      return;
+    }
+
+    try {
+      await deleteNotification(notificationId, token);
+
+      // Update local state
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+      setSelectedNotifications((prev) =>
+        prev.filter((id) => id !== notificationId)
+      );
+
+      toast.success("Xóa thông báo thành công!");
+    } catch (error) {
+      toast.error("Có lỗi xảy ra vui lòng thử lại!");
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (!token || !user) {
+      return;
+    }
+
+    try {
+      await deleteAllNotifi(selectedNotifications, token);
+
+      // Update local state
+      setNotifications((prev) =>
+        prev.filter((n) => !selectedNotifications.includes(n.id))
+      );
+      setSelectedNotifications([]);
+      toast.success("Xóa thông báo đã chọn thành công!");
+    } catch (error) {
+      toast.error("Có lỗi xảy ra vui lòng thử lại!");
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    setSelectedNotifications([]); // Clear selections when changing page
+  };
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <div className="notifications-page">
@@ -154,16 +240,16 @@ const NotificationsPage = ({
         {/* Quick Actions Bar */}
         <div className="quick-actions-bar">
           <button
-            onClick={() => onMarkAllAsRead && onMarkAllAsRead()}
+            onClick={handleMarkAllAsRead}
             className="quick-action-btn"
-            disabled={unreadCount === 0}
+            disabled={unreadCount === 0 || loading}
           >
             <FontAwesomeIcon icon={faCheckDouble} />
             <span>Đánh dấu tất cả đã đọc</span>
           </button>
 
           <div className="notifications-stats">
-            <span>{filteredNotifications.length} thông báo</span>
+            <span>{notifications.length} thông báo</span>
             {unreadCount > 0 && (
               <span className="unread-text">• {unreadCount} chưa đọc</span>
             )}
@@ -180,11 +266,16 @@ const NotificationsPage = ({
               <button
                 onClick={handleMarkSelectedAsRead}
                 className="mark-read-btn"
+                disabled={loading}
               >
                 <FontAwesomeIcon icon={faCheck} />
                 <span>Đánh dấu đã đọc</span>
               </button>
-              <button onClick={handleDeleteSelected} className="delete-btn">
+              <button
+                onClick={handleDeleteSelected}
+                className="delete-btn"
+                disabled={loading}
+              >
                 <FontAwesomeIcon icon={faTrash} />
                 <span>Xóa</span>
               </button>
@@ -192,138 +283,147 @@ const NotificationsPage = ({
           </div>
         )}
 
+        {/* Loading */}
+        {loading && (
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <span>Đang tải...</span>
+          </div>
+        )}
+
         {/* Notifications Content */}
         <div className="notifications-content">
-          {filteredNotifications.length === 0 ? (
+          {!loading && notifications.length === 0 ? (
             <div className="no-notifications">
               <div className="empty-icon">
                 <FontAwesomeIcon icon={faBell} />
               </div>
               <h3>Không có thông báo nào</h3>
-              <p>
-                {searchTerm || filterType !== "all"
-                  ? "Không tìm thấy thông báo phù hợp với bộ lọc"
-                  : "Bạn chưa có thông báo nào"}
-              </p>
+              <p>Bạn chưa có thông báo nào</p>
             </div>
           ) : (
-            <>
-              {/* Select All */}
-              <div className="select-all-row">
-                <label className="checkbox-container">
-                  <input
-                    type="checkbox"
-                    checked={getCurrentPageNotifications().every((n) =>
-                      selectedNotifications.includes(n.id)
-                    )}
-                    onChange={handleSelectAll}
-                  />
-                  <span className="checkmark"></span>
-                  <span>Chọn tất cả trang này</span>
-                </label>
-              </div>
+            !loading && (
+              <>
+                {/* Select All */}
+                <div className="select-all-row">
+                  <label className="checkbox-container">
+                    <input
+                      type="checkbox"
+                      checked={
+                        notifications.length > 0 &&
+                        notifications.every((n) =>
+                          selectedNotifications.includes(n.id)
+                        )
+                      }
+                      onChange={handleSelectAll}
+                    />
+                    <span className="checkmark"></span>
+                    <span>Chọn tất cả trang này</span>
+                  </label>
+                </div>
 
-              {/* Notification Items */}
-              <div className="notifications-list">
-                {getCurrentPageNotifications().map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`notification-item ${
-                      !notification.isRead ? "unread" : ""
-                    } ${
-                      selectedNotifications.includes(notification.id)
-                        ? "selected"
-                        : ""
-                    }`}
-                  >
-                    <label className="checkbox-container">
-                      <input
-                        type="checkbox"
-                        checked={selectedNotifications.includes(
-                          notification.id
-                        )}
-                        onChange={() =>
-                          handleSelectNotification(notification.id)
-                        }
-                      />
-                      <span className="checkmark"></span>
-                    </label>
-
-                    <div className="notification-icon">
-                      <FontAwesomeIcon icon={faBell} />
-                    </div>
-
+                {/* Notification Items */}
+                <div className="notifications-list">
+                  {notifications.map((notification) => (
                     <div
-                      className="notification-content"
-                      onClick={() => {
-                        if (!notification.isRead && onMarkAsRead) {
-                          onMarkAsRead(notification.id);
-                        }
-                      }}
+                      key={notification.id}
+                      className={`notification-item ${
+                        !notification.read ? "unread" : ""
+                      } ${
+                        selectedNotifications.includes(notification.id)
+                          ? "selected"
+                          : ""
+                      }`}
                     >
-                      <div className="notification-header">
-                        <div className="notification-title">
-                          <h3>{notification.title}</h3>
-                          {!notification.isRead && (
-                            <span className="unread-dot"></span>
+                      <label className="checkbox-container">
+                        <input
+                          type="checkbox"
+                          checked={selectedNotifications.includes(
+                            notification.id
                           )}
-                        </div>
-                        <div className="notification-time">
-                          {formatTime(notification.createAt)}
-                        </div>
+                          onChange={() =>
+                            handleSelectNotification(notification.id)
+                          }
+                        />
+                        <span className="checkmark"></span>
+                      </label>
+
+                      <div className="notification-icon">
+                        <FontAwesomeIcon icon={faBell} />
                       </div>
 
-                      <p className="notification-message">
-                        {notification.message}
-                      </p>
+                      <div
+                        className="notification-content"
+                        onClick={() => {
+                          if (!notification.read) {
+                            handleMarkAsRead(notification.id);
+                          }
+                        }}
+                      >
+                        <div className="notification-header">
+                          <div className="notification-title">
+                            <h3>{notification.title}</h3>
+                            {!notification.read && (
+                              <span className="unread-dot"></span>
+                            )}
+                          </div>
+                          <div className="notification-time">
+                            {formatTime(notification.createAt)}
+                          </div>
+                        </div>
+
+                        <p className="notification-message">
+                          {notification.message}
+                        </p>
+                      </div>
+
+                      <button
+                        className="delete-single-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteNotification(notification.id);
+                        }}
+                        title="Xóa thông báo"
+                        disabled={loading}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="pagination">
+                    <button
+                      onClick={() =>
+                        handlePageChange(Math.max(currentPage - 1, 1))
+                      }
+                      disabled={currentPage === 1 || loading}
+                      className="pagination-btn"
+                    >
+                      Trước
+                    </button>
+
+                    <div className="pagination-info">
+                      <span>
+                        Trang {currentPage} / {totalPages}
+                      </span>
                     </div>
 
                     <button
-                      className="delete-single-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteNotification &&
-                          onDeleteNotification(notification.id);
-                      }}
-                      title="Xóa thông báo"
+                      onClick={() =>
+                        handlePageChange(Math.min(currentPage + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages || loading}
+                      className="pagination-btn"
                     >
-                      <FontAwesomeIcon icon={faTrash} />
+                      Tiếp
                     </button>
                   </div>
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="pagination">
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    className="pagination-btn"
-                  >
-                    Trước
-                  </button>
-
-                  <div className="pagination-info">
-                    <span>
-                      Trang {currentPage} / {totalPages}
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                    className="pagination-btn"
-                  >
-                    Tiếp
-                  </button>
-                </div>
-              )}
-            </>
+                )}
+              </>
+            )
           )}
         </div>
       </div>

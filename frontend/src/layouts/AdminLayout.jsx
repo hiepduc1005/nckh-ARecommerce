@@ -12,14 +12,23 @@ const AdminLayout = () => {
     if (isAuthenticated !== undefined && isAuthenticated === false) {
       navigate("/login");
     } else if (isAuthenticated) {
-      if (!user?.roles?.some((role) => role.roleName === "ADMIN")) {
+      if (
+        !user?.roles?.some(
+          (role) =>
+            role.roleName === "ADMIN" ||
+            role.roleName === "LOGISTICS_COODINATOR"
+        )
+      ) {
         navigate("/");
       }
     }
   }, [isAuthenticated, navigate]);
 
   return isAuthenticated &&
-    user?.roles?.some((role) => role.roleName === "ADMIN") ? (
+    user?.roles?.some(
+      (role) =>
+        role.roleName === "ADMIN" || role.roleName === "LOGISTICS_COODINATOR"
+    ) ? (
     <div className="admin-layout">
       <AdminSidebar />
       <main className="admin-content">

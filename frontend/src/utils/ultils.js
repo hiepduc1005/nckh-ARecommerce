@@ -10,6 +10,8 @@ export const LOCATIONIQ = "pk.faf3d66fd55714f726b3656386e724e2"
 const shopLat = 21.057141432971815;
 const shopLon = 105.76381039101452;
 
+export const SOCKET_URL = "http://localhost:8080/chat"
+
 export function calculateShippingFee(distance) {
   if (distance <= 2) {
       return 15000;

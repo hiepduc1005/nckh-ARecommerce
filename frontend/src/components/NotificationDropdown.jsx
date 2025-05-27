@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faTimes, faCircle } from "@fortawesome/free-solid-svg-icons";
 import "../assets/styles/components/NotificationDropdown.scss";
+import { useNavigate } from "react-router-dom";
 
 const NotificationDropdown = ({
   notifications = [],
@@ -11,6 +12,8 @@ const NotificationDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const navigate = useNavigate();
 
   // Đóng dropdown khi click bên ngoài
   useEffect(() => {
@@ -28,7 +31,7 @@ const NotificationDropdown = ({
 
   // Đếm số thông báo chưa đọc
   const unreadCount = notifications.filter(
-    (notification) => !notification.isRead
+    (notification) => !notification.read
   ).length;
 
   // Format thời gian
@@ -50,7 +53,7 @@ const NotificationDropdown = ({
   };
 
   const handleNotificationClick = (notification) => {
-    if (!notification.isRead && onMarkAsRead) {
+    if (!notification.read && onMarkAsRead) {
       onMarkAsRead(notification.id);
     }
   };
@@ -97,13 +100,13 @@ const NotificationDropdown = ({
                 <div
                   key={notification.id}
                   className={`notification-item ${
-                    !notification.isRead ? "unread" : ""
+                    !notification.read ? "unread" : ""
                   }`}
                   onClick={() => handleNotificationClick(notification)}
                 >
                   <div className="notification-content">
                     <div className="notification-title">
-                      {!notification.isRead && (
+                      {!notification.read && (
                         <FontAwesomeIcon
                           icon={faCircle}
                           size="xs"
@@ -135,7 +138,10 @@ const NotificationDropdown = ({
           </div>
 
           {notifications.length > 0 && (
-            <div className="notification-footer">
+            <div
+              className="notification-footer"
+              onClick={() => navigate("/user/notifications")}
+            >
               <button className="view-all-btn">Xem tất cả thông báo</button>
             </div>
           )}
