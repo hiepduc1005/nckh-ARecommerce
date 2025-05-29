@@ -210,13 +210,12 @@ public class NotificationServiceImpl implements NotificationService {
         try {
             NotificationResponse response = convert.notificationConvertToNotificationResponse(notification);
             
-            messagingTemplate.convertAndSendToUser(
-                notification.getUser().getId().toString(),
+            messagingTemplate.convertAndSend(
                 "/topic/" + notification.getUser().getId(),
                 response
             );
             
-            logger.debug("Real-time notification sent to user: {}", notification.getUser().getId());
+            logger.info("Real-time notification sent to user: {}", notification.getUser().getId());
             
         } catch (Exception e) {
             logger.error("Error sending real-time notification: {}", e.getMessage(), e);

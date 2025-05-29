@@ -121,7 +121,7 @@ public class NotificationController {
 		
 		messagingTemplate.convertAndSendToUser("fd2d52b5-069a-4cf1-9ebc-f72b52fbf5ae", "/queue/notifications", "HELLO");
 
-		messagingTemplate.convertAndSend("/topic/fd2d52b5-069a-4cf1-9ebc-f72b52fbf5ae", "Broadcast test message");
+		messagingTemplate.convertAndSend("/topic/020030f1-a58d-46c0-91f8-6a0a0805decc", "Broadcast test message");
 		return ResponseEntity.ok("Ok");
 	}
 	

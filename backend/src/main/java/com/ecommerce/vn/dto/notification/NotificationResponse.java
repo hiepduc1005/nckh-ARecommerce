@@ -9,12 +9,22 @@ public class NotificationResponse {
 	private UUID id;
 	private String title;
 	private String message;
+	private String url;
 	private boolean isRead;
 	
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createAt;
     
 	private UUID userId;
+	
+	
+	
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
 	public UUID getId() {
 		return id;
 	}
@@ -51,6 +61,7 @@ public class NotificationResponse {
 	public void setUserId(UUID userId) {
 		this.userId = userId;
 	}
+	
 	
 	
 	

@@ -32,7 +32,7 @@ public class NotificationConvert {
 		notificationResponse.setTitle(notification.getTitle());
 		notificationResponse.setCreateAt(notification.getCreatedAt());
 		notificationResponse.setUserId(notification.getUser().getId());
-		
+		notificationResponse.setUrl(notification.getUrl());
 		return notificationResponse;
 	}
 

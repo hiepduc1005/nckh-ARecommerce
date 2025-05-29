@@ -2,8 +2,10 @@ package com.ecommerce.vn.entity.order;
 
 import java.util.UUID;
 
+import com.ecommerce.vn.entity.product.ModelCustomize;
 import com.ecommerce.vn.entity.product.Variant;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +26,13 @@ public class OrderItem {
 	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "variant_id", nullable = false)
 	private Variant variant;	
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "customize_id")
+	private ModelCustomize customize;
+	 
+	@Column(name = "is_customized", nullable = false)
+	private Boolean isCustomized = false;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "order_id")
