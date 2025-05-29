@@ -15,10 +15,13 @@ import useLoading from "../hooks/UseLoading";
 
 import AccountPopper from "./AccountPopper";
 import NotificationDropdown from "./NotificationDropdown";
+import { markAsRead } from "../api/notificationApi";
+import useAuth from "../hooks/UseAuth";
 const Topbar = ({ user, isAuthenticated, logout, notifications = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const naviate = useNavigate();
+  const { token } = useAuth();
   const { setLoading } = useLoading();
 
   const handleClickUser = () => {
@@ -35,10 +38,26 @@ const Topbar = ({ user, isAuthenticated, logout, notifications = [] }) => {
   };
 
   // Xử lý đánh dấu đã đọc một thông báo
-  const handleMarkAsRead = (notificationId) => {
-    // Gọi API để đánh dấu thông báo đã đọc
-    console.log("Mark as read:", notificationId);
-    // TODO: Implement API call
+
+  const handleMarkAsRead = async (notificationId) => {
+    if (!token || !user) {
+      return;
+    }
+
+    try {
+      await markAsRead(notificationId, token);
+
+      // Update local state
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification.id === notificationId
+            ? { ...notification, read: true }
+            : notification
+        )
+      );
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
   };
 
   // Xử lý đánh dấu tất cả đã đọc
@@ -90,7 +109,7 @@ const Topbar = ({ user, isAuthenticated, logout, notifications = [] }) => {
           onMarkAllAsRead={handleMarkAllAsRead}
           onDeleteNotification={handleDeleteNotification}
         />
-        <Link className="support-icon" to={"/"}>
+        <Link className="support-icon" to={"/support"}>
           <FontAwesomeIcon size="lg" color="#207355" icon={faCircleQuestion} />
           <span>Hỗ trợ</span>
         </Link>

@@ -30,6 +30,7 @@ import { encryptData } from "../utils/ultils";
 import VTOGlassModal from "../components/ar/VTOGlassModal";
 import Modal3DView from "../components/ar/Modal3DView";
 import { trackARViewStart } from "../utils/analytics";
+import useAuth from "../hooks/UseAuth";
 
 const products = [
   {
@@ -99,6 +100,7 @@ const ProductDetails = () => {
   const { slug } = useParams();
   const { setLoading } = useLoading();
   const { addItem } = useCart();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
 
   const handleShowModel3D = () => {
@@ -166,6 +168,11 @@ const ProductDetails = () => {
   };
 
   const handleClickOrder = () => {
+    if (!user || !token) {
+      navigate("/login");
+      return;
+    }
+
     if (!selectedVariants) {
       toast.warning("Bạn chưa chọn biến thể!");
       return;

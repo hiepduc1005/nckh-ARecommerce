@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import { createPayment } from "../api/paymentApi";
 import useCart from "../hooks/UseCart";
 import { getCouponByCode } from "../api/couponApi";
+import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
   const [email, setEmail] = useState("");
@@ -66,8 +67,9 @@ const Checkout = () => {
   const discountAmount = calculateDiscount();
   const total = subtotal - discountAmount + shippingFee; // Adding shipping, subtracting discount
 
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { removeItem } = useCart();
+  const navigate = useNavigate();
   const query = useQuery();
   const encrd = query.get("encrd");
 
@@ -112,6 +114,11 @@ const Checkout = () => {
   }, [user]);
 
   const handleApplyCoupon = async () => {
+    if (!user || !token) {
+      navigate("/login");
+      return;
+    }
+
     if (coupon && coupon.code === couponCode) {
       return;
     }
@@ -160,6 +167,11 @@ const Checkout = () => {
   };
 
   const handleSubmit = async () => {
+    if (!user || !token) {
+      navigate("/login");
+      return;
+    }
+
     if (!isValidPhoneNum(phone)) {
       toast.error("Số điện thoại không hợp lệ!");
       return;

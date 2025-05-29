@@ -350,6 +350,7 @@ const NotificationsPage = () => {
                           if (!notification.read) {
                             handleMarkAsRead(notification.id);
                           }
+                          navigate(`${notification.url}`);
                         }}
                       >
                         <div className="notification-header">

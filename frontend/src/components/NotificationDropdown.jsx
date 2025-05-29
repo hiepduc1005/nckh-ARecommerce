@@ -56,6 +56,8 @@ const NotificationDropdown = ({
     if (!notification.read && onMarkAsRead) {
       onMarkAsRead(notification.id);
     }
+
+    navigate(`${notification.url}`);
   };
 
   const handleDeleteNotification = (e, notificationId) => {

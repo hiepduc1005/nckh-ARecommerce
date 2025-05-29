@@ -22,7 +22,6 @@ const DefaultLayout = () => {
 
       <Header></Header>
       <Outlet></Outlet>
-      <UserRate />
       <EnsureSafety />
       <RegisterToRecive />
       <Footer></Footer>

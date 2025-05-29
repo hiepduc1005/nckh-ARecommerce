@@ -46,6 +46,7 @@ import ShareDesign from "../pages/ShareDesign";
 import GlassesCustomize from "../pages/GlassesCustomize";
 import NotificationsPage from "../pages/NotificationsPage";
 import ChangePassword from "../pages/ChangePassword";
+import SupportPage from "../pages/SupportPage";
 
 const AppRoutes = () => {
   return (
@@ -62,6 +63,7 @@ const AppRoutes = () => {
         <Route path="customize/shoes" element={<ShoesCustomize />} />
         <Route path="customize/glasses" element={<GlassesCustomize />} />
         <Route path="customize/:customizeId" element={<CustomzieDetails />} />
+        <Route path="support" element={<SupportPage />} />
       </Route>
 
       <Route path="/share-design/:designId" element={<ShareDesign />} />

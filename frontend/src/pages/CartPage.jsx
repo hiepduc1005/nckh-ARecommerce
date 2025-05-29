@@ -25,6 +25,7 @@ const CartPage = () => {
   const [coupon, setCoupon] = useState(null);
   const [discountAmount, setDiscountAmount] = useState(0);
   const navigate = useNavigate();
+  const { user, token } = useAuth();
 
   const handleQuantityChange = (variantId, newQuantity) => {
     if (newQuantity > 0) {
@@ -131,6 +132,11 @@ const CartPage = () => {
   };
 
   const handleCheckOut = () => {
+    if (!user || !token) {
+      navigate("/login");
+      return;
+    }
+
     const data = cart.cartItemResponses.map((cartItem) => ({
       quantity: cartItem.quantity,
       variant: cartItem.variantResponse.id,
