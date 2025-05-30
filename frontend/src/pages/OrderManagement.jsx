@@ -43,6 +43,7 @@ const OrderManagement = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [debounceSearchTerm, setDebouncedSearchTerm] = useState("");
   const { token } = useAuth();
 
   // Status options for filters and dropdowns
@@ -57,40 +58,75 @@ const OrderManagement = () => {
     })),
   ];
 
-  const fetchOrder = async () => {
-    const data = await getOrdersPaginate(token, currentPage);
-    if (data) {
-      setOrders(data.content);
-      setTotalPages(data.totalPages);
+  // Thay thế phần useEffect cũ bằng logic này:
+
+  useEffect(() => {
+    fetchOrders();
+  }, [currentPage, statusFilter, debounceSearchTerm]);
+
+  // Tạo một function duy nhất để fetch orders
+  const fetchOrders = async () => {
+    try {
+      let data;
+
+      if (statusFilter === "ALL" && !searchTerm) {
+        // Lấy tất cả orders không có filter
+        data = await getOrdersPaginate(token, currentPage);
+      } else {
+        // Sử dụng API với filter status và search
+        const status = statusFilter === "ALL" ? "ALL" : statusFilter;
+        data = await getOrdersByStatus(token, status, searchTerm, currentPage);
+      }
+
+      if (data) {
+        setOrders(data.content);
+        setTotalPages(data.totalPages);
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      toast.error("Không thể tải danh sách đơn hàng");
     }
+  };
+
+  // Xóa bỏ các useEffect cũ và các function fetchOrderByStatus, fetchOrderBysearch
+
+  // Sửa lại handleFilterChange
+  const handleFilterChange = async (status) => {
+    setStatusFilter(status);
+    setCurrentPage(1); // Reset về trang đầu khi filter
+  };
+
+  // Thêm debounce cho search
+  const [searchTimeout, setSearchTimeout] = useState(null);
+
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset về trang đầu khi search
+
+    // Clear timeout cũ
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Set timeout mới
+    const newTimeout = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    setSearchTimeout(newTimeout);
   };
 
   useEffect(() => {
-    if (statusFilter) {
-      fetchOrderByStatus(statusFilter);
-    }
-  }, [currentPage, statusFilter]);
-
-  const fetchOrderByStatus = async (status) => {
-    if (status === "ALL") {
-      const data = await getOrdersPaginate(token, currentPage);
-      if (data) {
-        setOrders(data.content);
-        setTotalPages(data.totalPages);
+    setDebouncedSearchTerm(searchTerm);
+  }, []);
+  // Cleanup timeout khi component unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
       }
-    } else {
-      const data = await getOrdersByStatus(token, status, currentPage);
-      if (data) {
-        setOrders(data.content);
-        setTotalPages(data.totalPages);
-      }
-    }
-  };
-
-  const handleFilterChange = async (status) => {
-    setStatusFilter(status);
-  };
-
+    };
+  }, [searchTimeout]);
   // Check if status transition is valid
   const isValidStatusTransition = (current, next) => {
     switch (current) {
@@ -204,22 +240,77 @@ const OrderManagement = () => {
     }
   };
 
+  // Helper function to get product name and price for customized vs regular products
+  const getProductInfo = (product) => {
+    if (product.isCustomized && product.modelDesignResponse) {
+      // For customized products
+      return {
+        name:
+          product.modelDesignResponse.modelCustomizeResponse?.name ||
+          product.variantResponse?.productResponse?.productName ||
+          "Sản phẩm tùy chỉnh",
+        price:
+          product.modelDesignResponse.modelCustomizeResponse?.price ||
+          product.variantResponse?.discountPrice ||
+          product.variantResponse?.price ||
+          0,
+        isCustomized: true,
+        designInfo: product.modelDesignResponse,
+      };
+    } else {
+      // For regular products
+      return {
+        name:
+          product.variantResponse?.productResponse?.productName || "Sản phẩm",
+        price:
+          product.variantResponse?.discountPrice ||
+          product.variantResponse?.price ||
+          0,
+        isCustomized: false,
+        designInfo: product?.variantResponse?.imagePath,
+      };
+    }
+  };
+
   return (
     <div className="order-tracking-page">
       <div className="container">
         <h1>Quản Lý Đơn Hàng</h1>
-
+        <div className="top-search-bar">
+          <div className="search-section">
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo mã đơn hàng, khách hàng, email..."
+              value={searchTerm}
+              onChange={(e) => {
+                handleSearchChange(e.target.value);
+              }}
+              className="main-search-input"
+            />
+            <button className="search-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
         <div className="content-wrapper">
           {/* Danh sách đơn hàng */}
           <div className="orders-list">
             <div className="search-controls">
               <div className="search-form">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm theo mã đơn hàng hoặc khách hàng"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
                 <select
                   value={statusFilter}
                   onChange={(e) => handleFilterChange(e.target.value)}
@@ -401,93 +492,99 @@ const OrderManagement = () => {
                       <thead>
                         <tr>
                           <th>Sản phẩm</th>
+                          <th>Loại</th>
                           <th>Đơn giá</th>
                           <th>SL</th>
+                          <th>Phí ship</th>
                           <th>Thành tiền</th>
                         </tr>
                       </thead>
                       <tbody>
                         {selectedOrder.orderItems
-                          ? selectedOrder.orderItems.map((product) => (
-                              <tr key={product.id}>
-                                <td>
-                                  {
-                                    product.variantResponse.productResponse
-                                      .productName
-                                  }
-                                </td>
-                                <td>
-                                  {formatCurrency(
-                                    product.variantResponse.discountPrice
-                                      ? product.variantResponse.discountPrice
-                                      : product.variantResponse.price
-                                  )}
-                                </td>
-                                <td>{product.quantity}</td>
-                                <td>
-                                  {formatCurrency(
-                                    (product.variantResponse.discountPrice
-                                      ? product.variantResponse.discountPrice
-                                      : product.variantResponse.price) *
-                                      product.quantity
-                                  )}
-                                </td>
-                              </tr>
-                            ))
+                          ? selectedOrder.orderItems.map((product) => {
+                              const productInfo = getProductInfo(product);
+                              return (
+                                <tr key={product.id}>
+                                  <td>
+                                    <div className="product-info">
+                                      <div className="product-name">
+                                        {productInfo.name}
+                                      </div>
+                                      {productInfo.isCustomized && (
+                                        <div className="customization-details">
+                                          <span className="custom-badge">
+                                            Tùy chỉnh
+                                          </span>
+
+                                          {productInfo.designInfo
+                                            ?.imagePath && (
+                                            <div className="design-preview">
+                                              <img
+                                                src={`http://localhost:8080${productInfo.designInfo.imagePath}`}
+                                                alt="Design preview"
+                                                className="design-thumbnail"
+                                              />
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <span
+                                      className={`product-type ${
+                                        productInfo.isCustomized
+                                          ? "customized"
+                                          : "regular"
+                                      }`}
+                                    >
+                                      {productInfo.isCustomized
+                                        ? "Tùy chỉnh"
+                                        : "Thường"}
+                                    </span>
+                                  </td>
+                                  <td>{formatCurrency(productInfo.price)}</td>
+                                  <td>{product.quantity}</td>
+                                  <td>
+                                    {formatCurrency(selectedOrder?.shippingFee)}
+                                  </td>
+
+                                  <td>
+                                    {formatCurrency(
+                                      productInfo.price * product.quantity +
+                                        selectedOrder?.shippingFee
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })
                           : selectedOrder.products &&
                             selectedOrder.products.map((product, index) => (
                               <tr key={index}>
-                                <td>{product.name}</td>
+                                <td>
+                                  <div className="product-info">
+                                    <div className="product-name">
+                                      {product.name}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td>
+                                  <span className="product-type regular">
+                                    Thường
+                                  </span>
+                                </td>
                                 <td>{formatCurrency(product.price)}</td>
                                 <td>{product.quantity}</td>
+                                <td>{selectedOrder?.shippingFee}</td>
                                 <td>
                                   {formatCurrency(
-                                    product.price * product.quantity
+                                    product.price * product.quantity +
+                                      selectedOrder.shippingFee
                                   )}
                                 </td>
                               </tr>
                             ))}
                       </tbody>
-                      <tfoot>
-                        <tr>
-                          <td colSpan="3">Tổng tiền sản phẩm:</td>
-                          <td>
-                            {formatCurrency(
-                              selectedOrder.totalPrice ||
-                                calculateTotal(selectedOrder.products || [])
-                            )}
-                          </td>
-                        </tr>
-                        {selectedOrder.couponResponse && (
-                          <tr>
-                            <td colSpan="3">Giảm giá:</td>
-                            <td className="discount-price">
-                              -
-                              {formatCurrency(
-                                selectedOrder.totalPrice -
-                                  selectedOrder.discountPrice
-                              )}
-                            </td>
-                          </tr>
-                        )}
-                        {selectedOrder.shippingFee !== undefined && (
-                          <tr>
-                            <td colSpan="3">Phí vận chuyển:</td>
-                            <td>{formatCurrency(selectedOrder.shippingFee)}</td>
-                          </tr>
-                        )}
-                        <tr className="total-row">
-                          <td colSpan="3">Thành tiền:</td>
-                          <td>
-                            {formatCurrency(
-                              selectedOrder.discountPrice !== undefined
-                                ? selectedOrder.discountPrice
-                                : selectedOrder.totalPrice ||
-                                    calculateTotal(selectedOrder.products || [])
-                            )}
-                          </td>
-                        </tr>
-                      </tfoot>
                     </table>
                   </div>
                 </div>

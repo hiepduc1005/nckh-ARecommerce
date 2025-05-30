@@ -33,12 +33,13 @@ public class CategoryUpdateRequest {
 		this.id = id;
 	}
 
-	public String getCategoryName() {
+	
+	public String getName() {
 		return name;
 	}
 
-	public void setCategoryName(String categoryName) {
-		this.name = categoryName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getCategoryDescription() {

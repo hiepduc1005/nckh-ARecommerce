@@ -15,13 +15,19 @@ public class CategoryCreateRequest {
 				+ "]";
 	}
 
-	public String getCategoryName() {
+	
+
+	public String getName() {
 		return name;
 	}
 
-	public void setCategoryName(String categoryName) {
-		this.name = categoryName;
+
+
+	public void setName(String name) {
+		this.name = name;
 	}
+
+
 
 	public String getCategoryDescription() {
 		return categoryDescription;

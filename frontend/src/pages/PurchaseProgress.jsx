@@ -112,6 +112,62 @@ const PurchaseProgress = () => {
     }
   };
 
+  // Helper function to get product image
+  const getItemImage = (item) => {
+    if (item.isCustomized && item.modelDesignResponse) {
+      // For customized products, prefer model design image
+      return item.modelDesignResponse.imagePath
+        ? `http://localhost:8080${item.modelDesignResponse.imagePath}`
+        : item.modelDesignResponse.modelCustomizeResponse?.imagePath
+        ? `http://localhost:8080${item.modelDesignResponse.modelCustomizeResponse.imagePath}`
+        : "/default-custom-product.png";
+    } else if (item.variantResponse) {
+      // For regular products, use variant image
+      return `http://localhost:8080${item.variantResponse.imagePath}`;
+    }
+    return "/default-product.png";
+  };
+
+  // Helper function to get product name
+  const getItemName = (item) => {
+    if (item.isCustomized && item.modelDesignResponse) {
+      return (
+        item.modelDesignResponse.modelCustomizeResponse?.name ||
+        "Sản phẩm tùy chỉnh"
+      );
+    } else if (item.variantResponse) {
+      return item.variantResponse.productResponse?.productName || "Sản phẩm";
+    }
+    return "Sản phẩm không xác định";
+  };
+
+  // Helper function to get variant info
+  const getVariantInfo = (item) => {
+    if (item.isCustomized && item.modelDesignResponse) {
+      const itemType =
+        item.modelDesignResponse.modelCustomizeResponse?.itemType;
+      const sessionId = item.modelDesignResponse.sessionId;
+      return `Thiết kế tùy chỉnh${itemType ? ` - ${itemType}` : ""}${
+        sessionId ? ` (Session: ${sessionId.substring(0, 8)}...)` : ""
+      }`;
+    } else if (item.variantResponse) {
+      return item.variantResponse.variantName || "Mặc định";
+    }
+    return "Không xác định";
+  };
+
+  // Helper function to get item price
+  const getItemPrice = (item) => {
+    if (item.isCustomized && item.modelDesignResponse) {
+      return item.modelDesignResponse.modelCustomizeResponse?.price || 0;
+    } else if (item.variantResponse) {
+      return (
+        item.variantResponse.discountPrice || item.variantResponse.price || 0
+      );
+    }
+    return 0;
+  };
+
   const renderOrderDetails = () => {
     if (!order) return null;
 
@@ -168,28 +224,40 @@ const PurchaseProgress = () => {
             <div key={item.id} className="item">
               <div className="item-image">
                 <img
-                  src={`http://localhost:8080${item?.variantResponse?.imagePath}`}
-                  alt={item?.variantResponse?.productResponse?.productName}
+                  src={getItemImage(item)}
+                  alt={getItemName(item)}
+                  onError={(e) => {
+                    e.target.src = "/default-product.png";
+                  }}
                 />
               </div>
               <div className="item-details">
                 <div className="item-name">
-                  {item?.variantResponse?.productResponse?.productName}
+                  {getItemName(item)}
+                  {item.isCustomized && (
+                    <span className="custom-indicator"> (Tùy chỉnh)</span>
+                  )}
                 </div>
                 <div className="item-variant">
-                  Phân loại: {item?.variantResponse?.variantName || "Mặc định"}
+                  Phân loại: {getVariantInfo(item)}
                 </div>
+
                 <div className="item-quantity">Số lượng: x{item.quantity}</div>
+                {item.isCustomized && item.modelDesignResponse?.createdAt && (
+                  <div className="design-date">
+                    Ngày thiết kế:{" "}
+                    {new Date(
+                      item.modelDesignResponse.createdAt
+                    ).toLocaleDateString("vi-VN")}
+                  </div>
+                )}
               </div>
               <div className="item-price">
                 <div className="price">
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
                     currency: "VND",
-                  }).format(
-                    item?.variantResponse?.discountPrice ||
-                      item?.variantResponse?.price
-                  )}
+                  }).format(getItemPrice(item))}
                 </div>
               </div>
             </div>
@@ -197,6 +265,10 @@ const PurchaseProgress = () => {
         </div>
       </div>
     );
+  };
+
+  const hasCustomizedItems = () => {
+    return order?.orderItems?.some((item) => item.isCustomized) || false;
   };
 
   if (loading) {

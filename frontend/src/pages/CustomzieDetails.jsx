@@ -8,9 +8,14 @@ import {
   deleteModelDesign,
   getModelsDesignBySessionIdAndCustomizeId,
 } from "../api/modelCustomize";
-import { captureModelImage, captureModelImageFromURL } from "../utils/ultils";
+import {
+  captureModelImage,
+  captureModelImageFromURL,
+  encryptData,
+} from "../utils/ultils";
 import ShareDesignModal from "../components/modal/ShareDesignModal";
 import { toast } from "react-toastify";
+import useAuth from "../hooks/UseAuth";
 
 const CustomizeDetails = () => {
   const { customizeId } = useParams();
@@ -25,6 +30,7 @@ const CustomizeDetails = () => {
 
   // Add state for share modal
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const { user, token } = useAuth();
 
   const navigate = useNavigate();
 
@@ -176,6 +182,50 @@ const CustomizeDetails = () => {
     }
   };
 
+  const handleClickOrder = () => {
+    if (!user || !token) {
+      navigate("/login");
+      return;
+    }
+
+    const data = {
+      coupon: null,
+      discountAmount: 0,
+      isCustomized: true,
+      items: [
+        {
+          quantity: 1,
+          design: {
+            id: selectedDesign.id,
+            name: customizeModel.name,
+            price: customizeModel.price,
+            colorConfig: selectedDesign.colorConfig,
+            imagePath: selectedDesign.imagePath,
+          },
+        },
+      ],
+    };
+
+    const encryptedData = encryptData(data);
+    const encodedData = encodeURIComponent(encryptedData);
+
+    navigate(`/checkout?encrd=${encodedData}`);
+  };
+  // Add handler for buying design
+  const handleBuyDesign = async () => {
+    if (!selectedDesign) {
+      toast.error("Vui lòng chọn một thiết kế để mua.");
+      return;
+    }
+
+    try {
+      handleClickOrder();
+    } catch (err) {
+      console.error("Error purchasing design:", err);
+      toast.error("Có lỗi xảy ra khi mua sản phẩm. Vui lòng thử lại.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -276,26 +326,44 @@ const CustomizeDetails = () => {
               )}
             </div>
 
-            {/* Share button - only show when a design is selected */}
+            {/* Action buttons - only show when a design is selected */}
             {selectedDesign && (
-              <button
-                onClick={handleOpenShareModal}
-                className="share-design-btn"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+              <div className="design-actions">
+                <button onClick={handleBuyDesign} className="buy-design-btn">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M7 4V2C7 1.44772 7.44772 1 8 1H16C16.5523 1 17 1.44772 17 2V4H20C20.5523 4 21 4.44772 21 5C21 5.55228 20.5523 6 20 6H19V19C19 20.1046 18.1046 21 17 21H7C5.89543 21 5 20.1046 5 19V6H4C3.44772 6 3 5.55228 3 5C3 4.44772 3.44772 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7ZM9 8C9.55228 8 10 8.44772 10 9V17C10 17.5523 9.55228 18 9 18C8.44772 18 8 17.5523 8 17V9C8 8.44772 8.44772 8 9 8ZM15 8C15.5523 8 16 8.44772 16 9V17C16 17.5523 15.5523 18 15 18C14.4477 18 14 17.5523 14 17V9C14 8.44772 14.4477 8 15 8Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  Mua thiết kế này
+                </button>
+
+                <button
+                  onClick={handleOpenShareModal}
+                  className="share-design-btn"
                 >
-                  <path
-                    d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.12548 15.0077 5.24917 15.0227 5.37069L8.08264 9.19118C7.54305 8.46078 6.7548 8 5.85714 8C4.27853 8 3 9.34315 3 11C3 12.6569 4.27853 14 5.85714 14C6.7548 14 7.54305 13.5392 8.08264 12.8088L15.0227 16.6293C15.0077 16.7508 15 16.8745 15 17C15 18.6569 16.3431 20 18 20C19.6569 20 21 18.6569 21 17C21 15.3431 19.6569 14 18 14C17.1023 14 16.3141 14.4608 15.7745 15.1912L8.83443 11.3707C8.84949 11.2492 8.85714 11.1255 8.85714 11C8.85714 10.8745 8.84949 10.7508 8.83443 10.6293L15.7745 6.80882C16.3141 7.53922 17.1023 8 18 8Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                Share Design
-              </button>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.12548 15.0077 5.24917 15.0227 5.37069L8.08264 9.19118C7.54305 8.46078 6.7548 8 5.85714 8C4.27853 8 3 9.34315 3 11C3 12.6569 4.27853 14 5.85714 14C6.7548 14 7.54305 13.5392 8.08264 12.8088L15.0227 16.6293C15.0077 16.7508 15 16.8745 15 17C15 18.6569 16.3431 20 18 20C19.6569 20 21 18.6569 21 17C21 15.3431 19.6569 14 18 14C17.1023 14 16.3141 14.4608 15.7745 15.1912L8.83443 11.3707C8.84949 11.2492 8.85714 11.1255 8.85714 11C8.85714 10.8745 8.84949 10.7508 8.83443 10.6293L15.7745 6.80882C16.3141 7.53922 17.1023 8 18 8Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  Chia sẻ
+                </button>
+              </div>
             )}
 
             <button onClick={handleOpenModal} className="customize-button">

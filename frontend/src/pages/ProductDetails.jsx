@@ -181,6 +181,7 @@ const ProductDetails = () => {
     const data = {
       coupon: null,
       discountAmount: 0,
+      isCustomized: false,
       items: [
         {
           quantity,

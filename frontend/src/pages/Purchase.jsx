@@ -74,8 +74,12 @@ const Purchase = () => {
 
       for (const order of deliveredOrders) {
         for (const item of order.orderItems) {
-          const productId = item.variantResponse.productResponse.id;
-          if (!(productId in ratedStatus)) {
+          // Handle both customized and regular products
+          const productId = item.isCustomized
+            ? item.modelDesignResponse?.id
+            : item.variantResponse?.productResponse?.id;
+
+          if (productId && !(productId in ratedStatus)) {
             const isRated = await checkUserRatedProduct(productId, token);
             ratedStatus[productId] = isRated;
           }
@@ -90,16 +94,39 @@ const Purchase = () => {
     }
   };
 
-  // Hàm để nhóm các orderItems theo sản phẩm (product ID)
+  // Hàm để nhóm các orderItems theo sản phẩm (product ID hoặc model design ID)
   const groupOrderItemsByProduct = (orderItems) => {
     const groupedItems = {};
     console.log(orderItems);
+
     orderItems.forEach((item) => {
-      const productId = item.variantResponse.productResponse.id;
+      let productId, productInfo;
+
+      if (item.isCustomized) {
+        // Handle customized products
+        productId = item.modelDesignResponse?.id;
+        productInfo = {
+          id: productId,
+          productName:
+            item.modelDesignResponse?.modelCustomizeResponse?.name ||
+            "Sản phẩm tùy chỉnh",
+          isCustomized: true,
+          modelDesign: item.modelDesignResponse,
+        };
+      } else {
+        // Handle regular products
+        productId = item.variantResponse?.productResponse?.id;
+        productInfo = {
+          ...item.variantResponse.productResponse,
+          isCustomized: false,
+        };
+      }
+
+      if (!productId) return; // Skip if no valid product ID
 
       if (!groupedItems[productId]) {
         groupedItems[productId] = {
-          product: item.variantResponse.productResponse,
+          product: productInfo,
           variants: [item],
           totalQuantity: item.quantity,
         };
@@ -145,7 +172,41 @@ const Purchase = () => {
     const isRated = await checkUserRatedProduct(productId, token);
     console.log(productId, isRated);
 
-    return isRated; // Hiện tại giả định chưa đánh giá
+    return isRated;
+  };
+
+  // Helper function to get product image
+  const getProductImage = (item) => {
+    if (item.isCustomized) {
+      // For customized products, use model design image or a default custom image
+      return item.modelDesignResponse?.imagePath
+        ? `http://localhost:8080${item.modelDesignResponse.imagePath}`
+        : "/default-custom-product.png"; // You should add a default image
+    } else {
+      // For regular products, use variant image
+      return `http://localhost:8080${item.variantResponse.imagePath}`;
+    }
+  };
+
+  // Helper function to get product price
+  const getProductPrice = (item) => {
+    if (item.isCustomized) {
+      // For customized products, price might be in modelDesignResponse
+      return {
+        originalPrice:
+          item.modelDesignResponse?.modelCustomizeResponse?.price || 0,
+        discountPrice:
+          item.modelDesignResponse?.modelCustomizeResponse?.discountPrice ||
+          item.modelDesignResponse?.modelCustomizeResponse?.price ||
+          0,
+      };
+    } else {
+      // For regular products, use variant pricing
+      return {
+        originalPrice: item.variantResponse?.price || 0,
+        discountPrice: item.variantResponse?.discountPrice || 0,
+      };
+    }
   };
 
   const currentType = getTypeFromUrl();
@@ -208,63 +269,91 @@ const Purchase = () => {
                 {/* Hiển thị từng sản phẩm và các biến thể của nó */}
                 {groupedItems.map((item) => (
                   <div key={item.product.id}>
-                    {item.variants.map((variant) => (
-                      <div
-                        key={
-                          variant.id ||
-                          `${item.product.id}-${variant.variantResponse.id}`
-                        }
-                        className="order-item"
-                      >
-                        <div className="item-image">
-                          <img
-                            src={`http://localhost:8080${variant.variantResponse.imagePath}`}
-                            alt={item.product.productName}
-                          />
+                    {item.variants.map((variant) => {
+                      const pricing = getProductPrice(variant);
+
+                      return (
+                        <div
+                          key={
+                            variant.id ||
+                            `${item.product.id}-${
+                              variant.isCustomized
+                                ? "custom"
+                                : variant.variantResponse?.id
+                            }`
+                          }
+                          className="order-item"
+                        >
+                          <div className="item-image">
+                            <img
+                              src={getProductImage(variant)}
+                              alt={item.product.productName}
+                            />
+                          </div>
+                          <div className="item-details">
+                            <div className="item-name">
+                              {item.product.productName}
+                              {variant.isCustomized && (
+                                <span className="custom-indicator">
+                                  {" "}
+                                  (Tùy chỉnh)
+                                </span>
+                              )}
+                            </div>
+                            <div className="item-variant">
+                              {variant.isCustomized ? (
+                                <span>
+                                  Thiết kế:{" "}
+                                  <strong>
+                                    {variant.modelDesignResponse?.designName ||
+                                      "Thiết kế tùy chỉnh"}
+                                  </strong>
+                                  {variant.modelDesignResponse?.description && (
+                                    <div className="custom-description">
+                                      Mô tả:{" "}
+                                      {variant.modelDesignResponse.description}
+                                    </div>
+                                  )}
+                                </span>
+                              ) : (
+                                <span>
+                                  Phân loại hàng:{" "}
+                                  {variant.variantResponse?.attributeValueResponses?.map(
+                                    (attributeValue, index, array) => (
+                                      <span key={attributeValue.attributeName}>
+                                        {attributeValue.attributeName}:{" "}
+                                        <strong>
+                                          {attributeValue.attributeValue}
+                                        </strong>
+                                        {index < array.length - 1 ? " | " : ""}
+                                      </span>
+                                    )
+                                  ) || "Ngẫu nhiên"}
+                                </span>
+                              )}
+                            </div>
+                            <div className="item-quantity">
+                              x{variant.quantity}
+                            </div>
+                          </div>
+                          <div className="item-price">
+                            <div className="original-price">
+                              {formatCurrency(pricing.originalPrice)}
+                            </div>
+                            <div className="discount-price">
+                              {formatCurrency(pricing.discountPrice)}
+                            </div>
+                          </div>
                         </div>
-                        <div className="item-details">
-                          <div className="item-name">
-                            {item.product.productName}
-                          </div>
-                          <div className="item-variant">
-                            <span>
-                              Phân loại hàng:{" "}
-                              {variant.variantResponse.attributeValueResponses.map(
-                                (attributeValue, index, array) => (
-                                  <span key={attributeValue.attributeName}>
-                                    {attributeValue.attributeName}:{" "}
-                                    <strong>
-                                      {attributeValue.attributeValue}
-                                    </strong>
-                                    {index < array.length - 1 ? " | " : ""}
-                                  </span>
-                                )
-                              ) || "Ngẫu nhiên"}
-                            </span>
-                          </div>
-                          <div className="item-quantity">
-                            x{variant.quantity}
-                          </div>
-                        </div>
-                        <div className="item-price">
-                          <div className="original-price">
-                            {formatCurrency(variant.variantResponse.price)}
-                          </div>
-                          <div className="discount-price">
-                            {formatCurrency(
-                              variant.variantResponse.discountPrice
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     {order.orderStatus === "DELIVERED" && (
                       <button
                         className="rate-btn"
                         onClick={() => handleOpenRating(item, item.product)}
                       >
                         {ratedProducts[item.product.id]
-                          ? "CẬP NHẬP ĐÁNH GIÁ"
+                          ? "CẬP NHẬT ĐÁNH GIÁ"
                           : `ĐÁNH GIÁ ${item.product.productName}`}
                       </button>
                     )}

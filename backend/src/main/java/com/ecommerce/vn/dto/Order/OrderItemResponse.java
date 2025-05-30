@@ -2,12 +2,29 @@ package com.ecommerce.vn.dto.order;
 
 import java.util.UUID;
 
+import com.ecommerce.vn.dto.model.ModelDesignResponse;
 import com.ecommerce.vn.dto.variant.VariantResponse;
 
 public class OrderItemResponse {
 	private UUID id;
 	private VariantResponse variantResponse;
 	private Integer quantity;
+	private ModelDesignResponse modelDesignResponse;
+	private Boolean isCustomized;
+	
+	
+	public ModelDesignResponse getModelDesignResponse() {
+		return modelDesignResponse;
+	}
+	public void setModelDesignResponse(ModelDesignResponse modelDesignResponse) {
+		this.modelDesignResponse = modelDesignResponse;
+	}
+	public Boolean getIsCustomized() {
+		return isCustomized;
+	}
+	public void setIsCustomized(Boolean isCustomized) {
+		this.isCustomized = isCustomized;
+	}
 	public UUID getId() {
 		return id;
 	}

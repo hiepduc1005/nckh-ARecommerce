@@ -55,10 +55,12 @@ export const getOrdersUserByStatus = async (token, status) => {
   }
 };
 
-export const getOrdersByStatus = async (token, status, page) => {
+export const getOrdersByStatus = async (token, status, keyword, page) => {
   try {
     const res = await axiosInstance.get(
-      `api/v1/orders/status/${status}?page=${page - 1}&size=${5}`,
+      `api/v1/orders/status/${status}?page=${page - 1}&size=${5}&keyword=${
+        keyword || ""
+      }`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

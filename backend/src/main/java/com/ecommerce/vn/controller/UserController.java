@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.vn.dto.user.UserChangePassword;
@@ -181,7 +185,7 @@ public class UserController {
 		return ResponseEntity.ok(userResponses); 
 	}
 
-	@GetMapping("{userEmail}")
+	@GetMapping("/{userEmail}")
 	public ResponseEntity<UserResponse> findUserByEmail(@PathVariable("userEmail") String email){
 		User user = userService.findUserByEmail(email);
 		if (user == null) {
@@ -189,6 +193,24 @@ public class UserController {
 		}
 
 		UserResponse response = userConvert.userConvertToUserResponse(user);
+		return ResponseEntity.ok(response);
+	}
+	
+	@GetMapping
+	public ResponseEntity<Page<UserResponse>> getUsers(
+			@RequestParam(name = "keyword", required = false, defaultValue = "") String keyword,
+			@RequestParam(name = "active", required = false) Boolean active,
+			@RequestParam(name = "page" , defaultValue = "0") int page,
+			@RequestParam(name = "size" , defaultValue = "8") int size
+			){
+		
+		Page<User> users = userService.getUserPaginate(keyword, active, page, size);
+		Pageable pageable = users.getPageable();
+		long total = users.getTotalElements();
+		List<UserResponse> listUsers = users.stream().map(user -> userConvert.userConvertToUserResponse(user)).toList();
+		
+		Page<UserResponse> response = new PageImpl<>(listUsers, pageable, total);
+		
 		return ResponseEntity.ok(response);
 	}
 

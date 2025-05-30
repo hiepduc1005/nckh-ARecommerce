@@ -20,6 +20,10 @@ const AdminLayout = () => {
         )
       ) {
         navigate("/");
+      } else if (
+        user?.roles?.some((role) => role.roleName === "LOGISTICS_COODINATOR")
+      ) {
+        navigate("/admin/orders-management");
       }
     }
   }, [isAuthenticated, navigate]);

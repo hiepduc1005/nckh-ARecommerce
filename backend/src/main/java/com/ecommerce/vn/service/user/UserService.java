@@ -3,6 +3,8 @@ package com.ecommerce.vn.service.user;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+
 import com.ecommerce.vn.entity.user.User;
 
 public interface UserService {
@@ -32,5 +34,7 @@ public interface UserService {
 	List<User> getActiveUser();
 	
 	User changePassword(String currentPassword,String newPassword,String confirmPassword);
+	
+	Page<User> getUserPaginate(String keyword, Boolean active, int page, int size);
 
 }

@@ -2,7 +2,7 @@ package com.ecommerce.vn.entity.order;
 
 import java.util.UUID;
 
-import com.ecommerce.vn.entity.product.ModelCustomize;
+import com.ecommerce.vn.entity.product.ModelDesign;
 import com.ecommerce.vn.entity.product.Variant;
 
 import jakarta.persistence.Column;
@@ -24,12 +24,12 @@ public class OrderItem {
 	private UUID id;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "variant_id", nullable = false)
+    @JoinColumn(name = "variant_id", nullable = true)
 	private Variant variant;	
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "customize_id")
-	private ModelCustomize customize;
+	@JoinColumn(name = "design_id", nullable = true)
+	private ModelDesign modelDesign;
 	 
 	@Column(name = "is_customized", nullable = false)
 	private Boolean isCustomized = false;
@@ -40,6 +40,23 @@ public class OrderItem {
 	
 	private Integer quantity;
 	
+	
+
+	public ModelDesign getModelDesign() {
+		return modelDesign;
+	}
+
+	public void setModelDesign(ModelDesign modelDesign) {
+		this.modelDesign = modelDesign;
+	}
+
+	public Boolean getIsCustomized() {
+		return isCustomized;
+	}
+
+	public void setIsCustomized(Boolean isCustomized) {
+		this.isCustomized = isCustomized;
+	}
 
 	public UUID getId() {
 		return id;

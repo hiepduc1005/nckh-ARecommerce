@@ -41,6 +41,7 @@ public class Product {
 	@Column(name = "product_name")
 	private String productName;
 	
+	@Column(name = "description", nullable = false, columnDefinition = "TEXT")
 	private String description;
 	
 	@Column(name = "image_path")
@@ -50,7 +51,7 @@ public class Product {
 	private String modelPath;
 
 
-    @Column(name = "short_description")
+    @Column(name = "short_description", nullable = false, columnDefinition = "TEXT")
 	private String shortDescription;
 	
 	@Column(name = "sold_quantity")

@@ -1,5 +1,6 @@
 package com.ecommerce.vn.service.convert;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.vn.dto.order.OrderCreateRequest;
+import com.ecommerce.vn.dto.order.OrderCustomizeCreateRequest;
 import com.ecommerce.vn.dto.order.OrderItemResponse;
 import com.ecommerce.vn.dto.order.OrderResponse;
 import com.ecommerce.vn.dto.order.OrderStatusHistoryResponse;
@@ -64,10 +66,45 @@ public class OrderConvert {
 		order.setPhone(orderCreateRequest.getPhone());
 		order.setEmail(orderCreateRequest.getEmail());
 		order.setNotes(orderCreateRequest.getNotes());
+		order.setShippingFee(BigDecimal.valueOf(orderCreateRequest.getShippingFee()));
 		
 		List<OrderItem> orderItems = orderCreateRequest.getOrderItemCreateRequests()
 		        .stream()
 		        .map(orderItem -> orderItemConvert.orderItemCreateConvertToOrderItem(orderItem,order))
+		        .collect(Collectors.toCollection(ArrayList::new));
+		
+		
+		order.setOrderItems(orderItems);
+		
+		return order;
+		
+	}
+	
+	public Order orderCustomizeCreateConvertToOrder(OrderCustomizeCreateRequest customizeCreateRequest) {
+		if(customizeCreateRequest == null) {
+			return null;
+		}
+		Order order = new Order();
+		String couponCode = customizeCreateRequest.getCouponCode();
+		if(!couponCode.isEmpty()) {
+			Coupon coupon = couponService.getCouponByCode(couponCode);
+			order.setCoupon(coupon);
+		}
+		
+		User user = userService.findUserByEmail(customizeCreateRequest.getEmail());
+		order.setUser(user);
+		order.setAddress(customizeCreateRequest.getAddress());
+		order.setSpecificAddress(customizeCreateRequest.getSpecificAddress());
+		order.setNotes(customizeCreateRequest.getNotes());
+		order.setPaymentMethod(customizeCreateRequest.getPaymentMethod());
+		order.setPhone(customizeCreateRequest.getPhone());
+		order.setEmail(customizeCreateRequest.getEmail());
+		order.setNotes(customizeCreateRequest.getNotes());
+		order.setShippingFee(BigDecimal.valueOf(customizeCreateRequest.getShippingFee()));
+
+		List<OrderItem> orderItems = customizeCreateRequest.getOrderItemCustomizeCreateRequests()
+		        .stream()
+		        .map(orderItem -> orderItemConvert.orderItemCustomizeCreateConvertToOrderItem(orderItem,order))
 		        .collect(Collectors.toCollection(ArrayList::new));
 		
 		

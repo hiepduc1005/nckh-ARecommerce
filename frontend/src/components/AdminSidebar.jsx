@@ -12,30 +12,52 @@ import {
   FiPackage,
   FiClipboard,
   FiEdit,
+  FiUsers,
 } from "react-icons/fi";
 import "../assets/styles/components/AdminSidebar.scss";
 import { FaTicketAlt } from "react-icons/fa";
+import useAuth from "../hooks/UseAuth";
 
 const AdminSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
-  const menuItems = [
-    { name: "Dashboard", icon: <FiHome />, path: "/admin" },
-    { name: "Order", icon: <FiClipboard />, path: "/admin/orders" },
-    { name: "Products", icon: <FiBox />, path: "/admin/products" },
-    { name: "Brands", icon: <FiBriefcase />, path: "/admin/brands" },
-    { name: "Tags", icon: <FiTag />, path: "/admin/tags" },
-    { name: "Categories", icon: <FiLayers />, path: "/admin/categories" },
-    { name: "Attributes", icon: <FiList />, path: "/admin/attributes" },
-    { name: "Coupons", icon: <FaTicketAlt />, path: "/admin/coupons" },
-    {
-      name: "Model Customize",
-      icon: <FiEdit />,
-      path: "/admin/model-customize",
-    },
-  ];
+  const { token, user } = useAuth();
 
+  const menuItems =
+    user && user.roles.some((role) => role.roleName === "ADMIN")
+      ? [
+          { name: "Dashboard", icon: <FiHome />, path: "/admin" },
+          {
+            name: "Users",
+            icon: <FiUsers />,
+            path: "/admin/users",
+          },
+          { name: "Order", icon: <FiClipboard />, path: "/admin/orders" },
+          { name: "Products", icon: <FiBox />, path: "/admin/products" },
+          { name: "Brands", icon: <FiBriefcase />, path: "/admin/brands" },
+          { name: "Tags", icon: <FiTag />, path: "/admin/tags" },
+          { name: "Categories", icon: <FiLayers />, path: "/admin/categories" },
+          { name: "Attributes", icon: <FiList />, path: "/admin/attributes" },
+          { name: "Coupons", icon: <FaTicketAlt />, path: "/admin/coupons" },
+          {
+            name: "Model Customize",
+            icon: <FiEdit />,
+            path: "/admin/model-customize",
+          },
+          {
+            name: "Order Management",
+            icon: <FiPackage />,
+            path: "/admin/orders-management",
+          },
+        ]
+      : [
+          {
+            name: "Order Management",
+            icon: <FiPackage />,
+            path: "/admin/orders-management",
+          },
+        ];
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
   };
@@ -75,8 +97,8 @@ const AdminSidebar = () => {
           <div className="avatar">AD</div>
           {!collapsed && (
             <div className="user-info">
-              <h4>Admin User</h4>
-              <p>admin@example.com</p>
+              <h4>{user.userName} User</h4>
+              <p>{user.email}</p>
             </div>
           )}
         </div>

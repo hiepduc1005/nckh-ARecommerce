@@ -42,6 +42,150 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06
     margin: 0 auto;
     padding: 1.5rem 1rem;
 
+    .top-search-bar {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+
+      .search-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .main-search-input {
+          flex: 1;
+          padding: 10px 16px;
+          border: 1px solid #ced4da;
+          border-radius: 6px;
+          background: white;
+          font-size: 14px;
+          color: #495057;
+          transition: border-color 0.2s ease;
+
+          &::placeholder {
+            color: #6c757d;
+          }
+
+          &:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+          }
+        }
+
+        .search-button {
+          padding: 10px 12px;
+          background: #007bff;
+          border: 1px solid #007bff;
+          border-radius: 6px;
+          color: white;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+
+          &:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+          }
+        }
+      }
+
+      .filter-section {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .status-filter {
+          padding: 10px 12px;
+          border: 1px solid #ced4da;
+          border-radius: 6px;
+          background: white;
+          color: #495057;
+          font-size: 14px;
+          cursor: pointer;
+          min-width: 140px;
+
+          &:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+          }
+        }
+
+        .filter-button {
+          padding: 10px 16px;
+          background: #6c757d;
+          border: 1px solid #6c757d;
+          border-radius: 6px;
+          color: white;
+          font-size: 14px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          svg {
+            width: 14px;
+            height: 14px;
+          }
+
+          &:hover {
+            background: #545b62;
+            border-color: #545b62;
+          }
+        }
+      }
+
+      // Responsive
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 12px;
+
+        .search-section {
+          width: 100%;
+        }
+
+        .filter-section {
+          width: 100%;
+          justify-content: flex-start;
+
+          .status-filter {
+            flex: 1;
+            max-width: 200px;
+          }
+        }
+      }
+
+      @media (max-width: 480px) {
+        .filter-section {
+          flex-direction: column;
+          align-items: stretch;
+
+          .status-filter,
+          .filter-button {
+            width: 100%;
+            max-width: none;
+            text-align: center;
+          }
+        }
+      }
+    }
+
     h1 {
       font-size: 1.5rem;
       font-weight: 700;
@@ -109,6 +253,54 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06
           gap: 0.75rem;
           max-height: 24rem;
           overflow-y: auto;
+
+          .product-info {
+            .product-name {
+              font-weight: 500;
+              margin-bottom: 8px;
+            }
+            
+            .customization-details {
+              .custom-badge {
+                background: #e3f2fd;
+                color: #1976d2;
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 12px;
+                margin-right: 8px;
+              }
+              
+              .color-config {
+                font-size: 12px;
+                color: #666;
+                margin-top: 4px;
+              }
+              
+              .design-thumbnail {
+                width: 40px;
+                height: 40px;
+                object-fit: cover;
+                border-radius: 4px;
+                margin-top: 4px;
+              }
+            }
+          }
+          
+          .product-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            
+            &.customized {
+              background: #e8f5e8;
+              color: #2e7d32;
+            }
+            
+            &.regular {
+              background: #f5f5f5;
+              color: #757575;
+            }
+          }
 
           .order-item {
             border: 1px solid $color-gray-200;

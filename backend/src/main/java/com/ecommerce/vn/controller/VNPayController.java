@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.vn.dto.order.OrderCreateRequest;
+import com.ecommerce.vn.dto.order.OrderCustomizeCreateRequest;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.order.OrderStatus;
 import com.ecommerce.vn.entity.order.PaymentMethod;
@@ -60,6 +61,36 @@ public class VNPayController {
 	    }
 
 	    Order order = orderConvert.orderCreateConvertToOrder(orderCreateRequest);
+	    order = orderService.createOrder(order);
+
+	    if (order == null) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("Không thể tạo đơn hàng. Vui lòng thử lại sau.");
+	    }
+
+	    if (order.getPaymentMethod().equals(PaymentMethod.VNPAY)) {
+	        String paymentUrl = vnPayService.createPaymentURL(order, request);
+	        order.setPaymentUrl(paymentUrl);
+            orderService.updateOrder(order);
+	        return ResponseEntity.ok(paymentUrl);
+	    }
+	 
+
+	    return ResponseEntity.ok("Đơn hàng được tạo thành công!");
+	}
+	
+	@PostMapping("/create-payment/customize")
+	public ResponseEntity<?> createPaymentCustomize(@RequestBody OrderCustomizeCreateRequest orderCustomizeCreateRequest,
+	                                       HttpServletResponse response,
+	                                       HttpServletRequest request) throws IOException {
+	    Optional<Order> existingOrder = orderService.findPendingOrderByUser(orderCustomizeCreateRequest.getEmail());
+
+	    if (existingOrder.isPresent()) {
+	        return ResponseEntity.status(HttpStatus.CONFLICT)
+	                .body("Bạn đã có đơn hàng đang chờ thanh toán!");
+	    }
+
+	    Order order = orderConvert.orderCustomizeCreateConvertToOrder(orderCustomizeCreateRequest);
 	    order = orderService.createOrder(order);
 
 	    if (order == null) {

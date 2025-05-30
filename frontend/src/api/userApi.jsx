@@ -143,3 +143,19 @@ export const verifyResetPassword = async (data) => {
     toast.error(error);
   }
 };
+
+export const getUsers = async (params, token) => {
+  try {
+    const res = await axiosInstance.get("api/v1/users", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+
+      params: params,
+    });
+
+    return res.data;
+  } catch (error) {
+    toast.error(error);
+  }
+};

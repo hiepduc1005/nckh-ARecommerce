@@ -47,6 +47,7 @@ import GlassesCustomize from "../pages/GlassesCustomize";
 import NotificationsPage from "../pages/NotificationsPage";
 import ChangePassword from "../pages/ChangePassword";
 import SupportPage from "../pages/SupportPage";
+import AdminUser from "../pages/AdminUser";
 
 const AppRoutes = () => {
   return (
@@ -99,6 +100,7 @@ const AppRoutes = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="attributes" element={<AdminAttribute />} />
+        <Route path="users" element={<AdminUser />} />
         <Route path="tags" element={<AdminTag />} />
         <Route path="brands" element={<AdminBrand />} />
         <Route path="products" element={<AdminProduct />} />

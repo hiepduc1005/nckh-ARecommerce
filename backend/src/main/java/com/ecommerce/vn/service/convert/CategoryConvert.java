@@ -21,9 +21,9 @@ public class CategoryConvert {
             return null;
         }
         
-        String slug = String.join("-", categoryCreateRequest.getCategoryName().toLowerCase().split(" ") );
+        String slug = String.join("-", categoryCreateRequest.getName().toLowerCase().split(" ") );
         Category category = new Category();
-        category.setCategoryName(categoryCreateRequest.getCategoryName());
+        category.setCategoryName(categoryCreateRequest.getName());
         category.setCategoryDescription(categoryCreateRequest.getCategoryDescription());
         category.setSlug(slug);
 
@@ -32,10 +32,10 @@ public class CategoryConvert {
     
     public Category categoryUpdateConvertToCategory(CategoryUpdateRequest categoryUpdateRequest) {
     	Category category = categoryService.getCategoryById(categoryUpdateRequest.getId());
-        String slug = String.join("-", categoryUpdateRequest.getCategoryName().toLowerCase().split(" ") );
+        String slug = String.join("-", categoryUpdateRequest.getName().toLowerCase().split(" ") );
 
         category.setSlug(slug);
-    	category.setCategoryName(categoryUpdateRequest.getCategoryName());
+    	category.setCategoryName(categoryUpdateRequest.getName());
     	category.setCategoryDescription(categoryUpdateRequest.getCategoryDescription());
     	category.setActive(categoryUpdateRequest.getActive());
     	

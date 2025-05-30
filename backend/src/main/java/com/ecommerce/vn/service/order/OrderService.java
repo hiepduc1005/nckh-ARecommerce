@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.ecommerce.vn.entity.coupon.Coupon;
 import com.ecommerce.vn.entity.order.Order;
@@ -36,7 +37,7 @@ public interface OrderService {
     List<Order> getOrdersByUserEmail(String email);
 
 
-    Page<Order> getOrdersByStatus(OrderStatus status,int page, int size);
+    Page<Order> getOrdersByStatus(OrderStatus status,String keyword,int page, int size);
 
     List<Order> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate);
 
@@ -61,5 +62,7 @@ public interface OrderService {
 	Optional<Order> getOrderByCode(String code);
 
 	Page<Order> getOrdersWithPaginationAndSorting(int page, int size, String sortBy);
+	
+	Page<Order> getOrderByKeyword(String keyword, Pageable pageable);
 
 }

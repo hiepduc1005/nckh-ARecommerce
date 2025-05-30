@@ -29,6 +29,26 @@ $error-color: #e74c3c;
   min-height: 100vh;
   padding: 2rem;
   font-family: 'Inter', sans-serif;
+
+  .item-image {
+    position: relative;
+    
+    .custom-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background-color: #207355;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+  }
 }
 
 .checkout-content {

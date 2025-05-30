@@ -148,6 +148,7 @@ const CartPage = () => {
       items: data,
       coupon: coupon || null,
       discountAmount: discountAmount,
+      isCustomized: false,
     };
 
     const encryptedData = encryptData(checkoutData);

@@ -107,10 +107,11 @@ public class OrderController {
 	@GetMapping("/status/{orderStatus}")
 	public ResponseEntity<Page<OrderResponse>> getOrdersByStatus(
 			@PathVariable(name = "orderStatus", required = false) OrderStatus orderStatus,
-			@RequestParam("page") int page,
-            @RequestParam("size") int size ){
+			@RequestParam(name = "keyword" , defaultValue = "") String keword,
+			@RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue =  "8") int size ){
 		
-		Page<Order> orders = orderService.getOrdersByStatus(orderStatus,page,size);
+		Page<Order> orders = orderService.getOrdersByStatus(orderStatus,keword,page,size);
     	Page<OrderResponse> orderResponse = orders.map(order -> orderConvert.orderConvertToOrderResponse(order));
 
 		return ResponseEntity.ok(orderResponse);

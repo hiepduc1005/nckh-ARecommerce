@@ -19,10 +19,11 @@ import { getVariantsById, getVariantsByIds } from "../api/variantApi";
 import useAuth from "../hooks/UseAuth";
 import SelectPlace from "../components/SelectPlace";
 import { toast } from "react-toastify";
-import { createPayment } from "../api/paymentApi";
+import { createPayment, createPaymentCustomize } from "../api/paymentApi";
 import useCart from "../hooks/UseCart";
 import { getCouponByCode } from "../api/couponApi";
 import { useNavigate } from "react-router-dom";
+import { createModelCustomize } from "../api/modelCustomize";
 
 const Checkout = () => {
   const [email, setEmail] = useState("");
@@ -39,6 +40,7 @@ const Checkout = () => {
   const [coupon, setCoupon] = useState(null);
   const [distance, setDistance] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);
+  const [isCustomized, setIsCustomized] = useState(false);
 
   useEffect(() => {
     const shipFee = calculateShippingFee(distance);
@@ -47,10 +49,14 @@ const Checkout = () => {
     }
   }, [distance]);
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.variant.discountPrice * item.quantity,
-    0
-  );
+  const subtotal = cartItems.reduce((sum, item) => {
+    if (isCustomized && item.design) {
+      return sum + item.design.price * item.quantity;
+    } else if (item.variant) {
+      return sum + item.variant.discountPrice * item.quantity;
+    }
+    return sum;
+  }, 0);
 
   // Calculate discount amount based on coupon type
   const calculateDiscount = () => {
@@ -76,17 +82,35 @@ const Checkout = () => {
   useEffect(() => {
     if (!encrd) return;
     const decryptedData = decryptData(decodeURIComponent(encrd));
-    const handleFetchVariant = async () => {
-      const listIds = decryptedData?.items?.map((dataItem) => dataItem.variant);
-      const data = await getVariantsByIds(listIds);
-      if (data) {
-        const newCartItems = decryptedData?.items?.map(
-          ({ quantity, variant, cartItemId }) => {
-            const variantResponse = data.find((v) => v.id === variant); // Tìm variantResponse theo id
-            return { quantity, variant: variantResponse, cartItemId };
-          }
+
+    const handleFetchData = async () => {
+      // Check if it's customized design or regular variant
+      if (decryptedData?.isCustomized) {
+        setIsCustomized(true);
+        // For customized designs, we already have all the data
+        const customizedItems = decryptedData?.items?.map(
+          ({ quantity, design }) => ({
+            quantity,
+            design,
+          })
         );
-        setCartItems(newCartItems);
+        setCartItems(customizedItems);
+      } else {
+        setIsCustomized(false);
+        // For regular variants, fetch variant data
+        const listIds = decryptedData?.items?.map(
+          (dataItem) => dataItem.variant
+        );
+        const data = await getVariantsByIds(listIds);
+        if (data) {
+          const newCartItems = decryptedData?.items?.map(
+            ({ quantity, variant, cartItemId }) => {
+              const variantResponse = data.find((v) => v.id === variant);
+              return { quantity, variant: variantResponse, cartItemId };
+            }
+          );
+          setCartItems(newCartItems);
+        }
       }
     };
 
@@ -95,7 +119,7 @@ const Checkout = () => {
       setCoupon(decryptedData?.coupon);
     }
 
-    handleFetchVariant();
+    handleFetchData();
   }, [encrd]);
 
   useEffect(() => {
@@ -181,28 +205,73 @@ const Checkout = () => {
       toast.error("Email không hợp lệ!");
       return;
     }
-    const orderItems = cartItems.map((cartItem) => ({
-      quantity: cartItem.quantity,
-      variantId: cartItem.variant.id,
-    }));
 
-    const orderData = {
-      email,
-      couponCode: coupon?.code || "",
-      address: specificAddress,
-      specificAddress: specificAddress,
-      paymentMethod: paymentMethod,
-      notes: customerNote || "",
-      orderItemCreateRequests: orderItems,
-      phone,
-    };
-
-    const paymentURL = await createPayment(orderData);
-    if (paymentURL) {
-      window.location.href = paymentURL;
+    if (!specificAddress) {
+      toast.error("Bạn chưa điền địa chỉ");
+      return;
     }
 
-    // await Promise.all(cartItems.map(cartItem => removeItem(cartItem.cartItemId)));
+    let orderItems;
+
+    if (isCustomized) {
+      // For customized designs
+      orderItems = cartItems.map((cartItem) => ({
+        quantity: cartItem.quantity,
+        designId: cartItem.design.id,
+        // You might need to add more fields based on your API requirements
+      }));
+
+      if (orderItems) {
+        const orderData = {
+          email,
+          couponCode: coupon?.code || "",
+          address: specificAddress,
+          specificAddress: specificAddress,
+          paymentMethod: paymentMethod,
+          notes: customerNote || "",
+          shippingFee: shippingFee,
+          orderItemCustomizeCreateRequests: orderItems,
+          phone,
+          isCustomized, // Add flag to indicate if this is a customized order
+        };
+
+        const paymentURL = await createPaymentCustomize(orderData);
+        if (paymentURL) {
+          window.location.href = paymentURL;
+        }
+      }
+    } else {
+      // For regular variants
+      orderItems = cartItems.map((cartItem) => ({
+        quantity: cartItem.quantity,
+        variantId: cartItem.variant.id,
+      }));
+
+      if (orderItems) {
+        const orderData = {
+          email,
+          couponCode: coupon?.code || "",
+          address: specificAddress,
+          specificAddress: specificAddress,
+          paymentMethod: paymentMethod,
+          notes: customerNote || "",
+          orderItemCreateRequests: orderItems,
+          shippingFee: shippingFee,
+          phone,
+          isCustomized, // Add flag to indicate if this is a customized order
+        };
+
+        const paymentURL = await createPayment(orderData);
+        if (paymentURL) {
+          window.location.href = paymentURL;
+        }
+      }
+    }
+
+    // Only remove cart items for regular variants (not for customized designs)
+    if (!isCustomized) {
+      // await Promise.all(cartItems.map(cartItem => removeItem(cartItem.cartItemId)));
+    }
   };
 
   const paymentMethods = [
@@ -317,30 +386,48 @@ const Checkout = () => {
                 <div className="item-image">
                   <img
                     src={
-                      `http://localhost:8080${item?.variant?.imagePath}` ||
-                      `http://localhost:8080${item?.variant?.productResponse?.imagePath}`
+                      isCustomized && item.design
+                        ? `http://localhost:8080${item.design.imagePath}`
+                        : `http://localhost:8080${item?.variant?.imagePath}` ||
+                          `http://localhost:8080${item?.variant?.productResponse?.imagePath}`
                     }
-                    alt={item?.variant?.productResponse?.productName}
+                    alt={
+                      isCustomized && item.design
+                        ? item.design.name
+                        : item?.variant?.productResponse?.productName
+                    }
                     className="product-thumbnail"
                   />
+                  {/* Add badge for customized items */}
+                  {isCustomized && item.design && (
+                    <div className="custom-badge">Tùy chỉnh</div>
+                  )}
                 </div>
                 <div className="item-details">
                   <span className="name">
-                    {item?.variant?.productResponse?.productName}
+                    {isCustomized && item.design
+                      ? item.design.name
+                      : item?.variant?.productResponse?.productName}
                   </span>
                   <div className="item-attributes">
-                    <span className="attribute">
-                      Loại:{" "}
-                      {item?.variant?.attributeValueResponses
-                        ?.map((attr) => attr.attributeValue)
-                        .join(", ")}
-                    </span>
+                    {isCustomized && item.design ? (
+                      <span className="attribute">Thiết kế tùy chỉnh</span>
+                    ) : (
+                      <span className="attribute">
+                        Loại:{" "}
+                        {item?.variant?.attributeValueResponses
+                          ?.map((attr) => attr.attributeValue)
+                          .join(", ")}
+                      </span>
+                    )}
                   </div>
                   <span className="quantity">x{item.quantity}</span>
                 </div>
                 <span className="price">
                   {convertToVNDFormat(
-                    item?.variant?.discountPrice
+                    isCustomized && item.design
+                      ? item.design.price
+                      : item?.variant?.discountPrice
                       ? item?.variant?.discountPrice
                       : item?.variant?.price
                   )}

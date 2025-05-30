@@ -31,6 +31,7 @@ public class Brand {
 	@Column( unique = true)
 	private String name;
 	
+	@Column(name = "description", nullable = false, columnDefinition = "TEXT")
 	private String description;
 	
 	private String origin;

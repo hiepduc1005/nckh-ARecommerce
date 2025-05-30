@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ import com.ecommerce.vn.entity.order.OrderItem;
 import com.ecommerce.vn.entity.order.OrderStatus;
 import com.ecommerce.vn.entity.order.OrderStatusHistory;
 import com.ecommerce.vn.entity.order.PaymentMethod;
+import com.ecommerce.vn.entity.product.ModelCustomize;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.exception.InvalidCouponException;
 import com.ecommerce.vn.repository.OrderRepository;
@@ -63,6 +66,9 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		for (OrderItem orderItem : order.getOrderItems()) {
+			if(orderItem.getVariant() == null) {
+				break;
+			}
 		    if (orderItem.getQuantity() > orderItem.getVariant().getQuantity()) {
 		        throw new RuntimeException("Số sản phẩm có sẵn không đủ!");
 		    }
@@ -84,11 +90,15 @@ public class OrderServiceImpl implements OrderService {
 		
 		order.setExpiresAt(LocalDateTime.now().plusMinutes(15));
 		order.setCode(code);	
-		order.setShippingFee(BigDecimal.ONE);
 		order.setShippingMethod("");
 		Coupon coupon = order.getCoupon();
-		BigDecimal totalPrice = calculateTotalPrice(order);
-		order.setTotalPrice(totalPrice);			
+		if(order.getOrderItems().get(0).getIsCustomized()) {
+			BigDecimal totalPrice = calculateTotalPriceCustomize(order);
+			order.setTotalPrice(totalPrice);			
+		}else {
+			BigDecimal totalPrice = calculateTotalPrice(order);
+			order.setTotalPrice(totalPrice);						
+		}
 		if (coupon != null) {
 		    if (!couponService.isCouponValid(coupon.getId())) {
 		        throw new InvalidCouponException("Mã giảm giá hết hạn hoặc không hợp lệ!");
@@ -326,13 +336,13 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Page<Order> getOrdersByStatus(OrderStatus status,int page, int size) {
+	public Page<Order> getOrdersByStatus(OrderStatus status,String keyword,int page, int size) {
 		if(status == null) {
 			throw new RuntimeException("Status is missing.");
 		}
-		
+		 
 		Pageable pageable = PageRequest.of(page, size);
-		return orderRepository.findByOrderStatus(status,pageable);
+		return orderRepository.findByOrderStatusAndKeyword(status,keyword,pageable);
 	}
 
 	@Override
@@ -373,6 +383,22 @@ public class OrderServiceImpl implements OrderService {
 		        })
 		        .reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
+	
+	public BigDecimal calculateTotalPriceCustomize(Order order) {
+	    return order.getOrderItems().stream()
+	        .map(orderItem -> {
+	            BigDecimal price = BigDecimal.ZERO;
+	            if (orderItem.getModelDesign() != null) {
+	                ModelCustomize model = orderItem.getModelDesign().getModel();
+	                if (model != null && model.getPrice() > 0) {
+	                    price = BigDecimal.valueOf(model.getPrice());
+	                }
+	            }
+	            return price.multiply(BigDecimal.valueOf(orderItem.getQuantity()));
+	        })
+	        .reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
+
 
 	@Override
 	public Order updateTotalPrice(Order order) {
@@ -405,7 +431,8 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Page<Order> getOrdersWithPaginationAndSorting(int page, int size, String sortBy) {
-		Pageable pageable = PageRequest.of(page, size);
+		
+		Pageable pageable = PageRequest.of(page, size,Sort.by(Direction.DESC,"createdAt"));
 		return orderRepository.findAll(pageable);
 	}
 
@@ -413,6 +440,12 @@ public class OrderServiceImpl implements OrderService {
 	public List<Order> getOrdersByUserEmail(String email) {
 		User user = userService.findUserByEmail(email);
 		return user != null ? user.getOrders() : List.of();
+	}
+
+	@Override
+	public Page<Order> getOrderByKeyword(String keyword, Pageable pageable) {
+	
+		return orderRepository.findOrdersByKey(keyword, pageable);
 	}
 
 

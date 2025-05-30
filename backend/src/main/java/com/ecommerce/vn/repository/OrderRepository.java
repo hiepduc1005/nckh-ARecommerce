@@ -21,8 +21,18 @@ public interface OrderRepository extends JpaRepository<Order,UUID>{
 	@Query("SELECT o FROM Order o WHERE o.user.id = :userId")
 	List<Order> findByUserId(@Param("userId") UUID userId);
 	
-	@Query("SELECT o FROM Order o WHERE o.orderStatus = :status ORDER BY o.createdAt DESC")
-	Page<Order> findByOrderStatus(@Param("status") OrderStatus status, Pageable pageable);
+	@Query("""
+		    SELECT o FROM Order o 
+		    WHERE (
+			    :keyword IS NULL OR :keyword = ''  OR
+		        LOWER(o.code) LIKE LOWER(CONCAT('%', :keyword, '%')) OR 
+		        LOWER(o.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR 
+		        LOWER(o.phone) LIKE LOWER(CONCAT('%', :keyword, '%')) OR 
+		        LOWER(o.specificAddress) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		    ) AND (:status IS NULL OR :status = '' OR :status = 'ALL' OR o.orderStatus = :status ) ORDER BY o.createdAt DESC
+		   
+		""")
+	Page<Order> findByOrderStatusAndKeyword(@Param("status") OrderStatus status,@Param("keyword") String keyword, Pageable pageable);
 	
 	@Query("SELECT o FROM Order o WHERE o.createdAt BETWEEN :startDate AND :endDate")
 	List<Order> findOrdersByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
@@ -48,5 +58,17 @@ public interface OrderRepository extends JpaRepository<Order,UUID>{
 
 	@Query("SELECT o FROM Order o WHERE o.code = :code ")
 	Optional<Order> findByCode(String code);
+	
+	@Query("""
+		    SELECT o FROM Order o 
+		    WHERE (
+		        LOWER(o.code) LIKE LOWER(CONCAT('%', :keyword, '%')) OR 
+		        LOWER(o.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR 
+		        LOWER(o.phone) LIKE LOWER(CONCAT('%', :keyword, '%')) OR 
+		        LOWER(o.specificAddress) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		    )
+		    ORDER BY o.createdAt DESC
+		""")
+   Page<Order> findOrdersByKey(@Param("keyword") String keyword, Pageable pageable);
 
 }
