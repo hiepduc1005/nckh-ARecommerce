@@ -53,7 +53,10 @@ const Checkout = () => {
     if (isCustomized && item.design) {
       return sum + item.design.price * item.quantity;
     } else if (item.variant) {
-      return sum + item.variant.discountPrice * item.quantity;
+      return (
+        sum +
+        (item.variant.discountPrice > 0 || item.variant.price) * item.quantity
+      );
     }
     return sum;
   }, 0);

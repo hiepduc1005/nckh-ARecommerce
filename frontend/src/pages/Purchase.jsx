@@ -422,7 +422,14 @@ const Purchase = () => {
                     )}
                     {order.orderStatus === "PENDING" && (
                       <>
-                        <button className="pay-btn">Thanh Toán</button>
+                        <button
+                          className="pay-btn"
+                          onClick={() =>
+                            (window.location.href = order?.paymentUrl)
+                          }
+                        >
+                          Thanh Toán
+                        </button>
                         <button className="cancel-btn">Hủy Đơn Hàng</button>
                       </>
                     )}

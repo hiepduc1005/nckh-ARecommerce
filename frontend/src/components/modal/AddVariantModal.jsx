@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { createVariant } from "../../api/variantApi";
+import { createVariant, updateVariant } from "../../api/variantApi";
 import CreatableSelect from "react-select/creatable";
 import ImageDropUploader from "../ImageDropUploader";
 import ModalInteracting3DModel from "../ar/ModalInteracting3DModel";
@@ -95,15 +95,32 @@ const VariantModal = ({
     }
 
     // If editing, add variant ID
-    if (isEditMode) {
-      variantData.id = variant.id;
-    }
 
     setIsLoading(true);
     try {
       if (isEditMode) {
-        // await updateVariant(variantData, token);
-        toast.success("Cập nhật biến thể thành công!");
+        const variantData = {
+          variantId: variant.id,
+          price: parseFloat(formData.price),
+          discountPrice: formData.discountPrice
+            ? parseFloat(formData.discountPrice)
+            : 0,
+          quantity: parseInt(formData.quantity, 10),
+          attributeValueCreateRequests: formData.attributeValues,
+          colorConfig: JSON.stringify(colorConfig),
+        };
+
+        const formUpdateVariant = new FormData();
+        formUpdateVariant.append(
+          "variant",
+          new Blob([JSON.stringify(variantData)], { type: "application/json" })
+        );
+        formUpdateVariant.append("image", image);
+
+        const data = await updateVariant(formUpdateVariant, token);
+        if (data) {
+          toast.success("Cập nhật biến thể thành công!");
+        }
       } else {
         const variantData = {
           productId: product.id,

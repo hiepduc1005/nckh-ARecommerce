@@ -20,6 +20,7 @@ import { useStompSocket } from "../../hooks/UseStompSocket";
 import { toast } from "react-toastify";
 import { getNotificationsByUser } from "../../api/notificationApi";
 import SearchDropdown from "../../components/SearchDropdown";
+import { useWishlist } from "../../hooks/UseWishList";
 const Header = () => {
   const { user, isAuthenticated, logout, token } = useAuth();
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -29,22 +30,7 @@ const Header = () => {
 
   const { cart } = useCart();
   const navigate = useNavigate();
-  const wishList = [
-    {
-      id: 1,
-      name: "Khăn giấy gấu trúc Top Gia Sắc Hạ",
-      price: 179000,
-      image:
-        "http://localhost:8080/uploads/8d2bbbec-d731-4855-a270-e94c4f554eef_giaoducqp.jpg",
-    },
-    {
-      id: 2,
-      name: "Bánh quy Oreo Chocolate 288g",
-      price: 45000,
-      image:
-        "http://localhost:8080/uploads/8d2bbbec-d731-4855-a270-e94c4f554eef_giaoducqp.jpg", // Thay bằng ảnh thực tế
-    },
-  ];
+  const { wishlist } = useWishlist();
 
   const [notifications, setNotifications] = useState([]);
   const { client, connected } = useStompSocket();
@@ -128,7 +114,7 @@ const Header = () => {
           <SearchDropdown onSearch={handleSearch} searchIcon={searchIcon} />
           <Link
             className="wishlist-icon"
-            to="/"
+            to="/wishlist"
             onMouseEnter={() => setIsWishListOpen(true)}
             onMouseLeave={() => setIsWishListOpen(false)}
           >
@@ -139,7 +125,7 @@ const Header = () => {
               color="#ff3b30"
             />
             <WishListPopper
-              wishList={wishList}
+              wishlist={wishlist}
               isWishListOpen={isWishListOpen}
             />
           </Link>

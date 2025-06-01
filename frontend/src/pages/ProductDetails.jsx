@@ -31,6 +31,7 @@ import VTOGlassModal from "../components/ar/VTOGlassModal";
 import Modal3DView from "../components/ar/Modal3DView";
 import { trackARViewStart } from "../utils/analytics";
 import useAuth from "../hooks/UseAuth";
+import { useWishlist } from "../hooks/UseWishList";
 
 const products = [
   {
@@ -100,12 +101,27 @@ const ProductDetails = () => {
   const { slug } = useParams();
   const { setLoading } = useLoading();
   const { addItem } = useCart();
+  const { addToWishlist } = useWishlist();
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
   const handleShowModel3D = () => {
     trackARViewStart(product.id);
     setShowModal3DView(true);
+  };
+
+  const handleAddToWishList = async () => {
+    if (!selectedVariants) {
+      toast.error("Bạn chưa chọn biến thể!");
+      return;
+    }
+
+    if (!user || !token) {
+      toast.error("Bạn phải đăng nhập để sử dụng tính năng này!");
+      return;
+    }
+
+    await addToWishlist(selectedVariants);
   };
 
   useEffect(() => {
@@ -253,7 +269,7 @@ const ProductDetails = () => {
           </div>
         </div>
         <div className="button-group">
-          <div className="wishlist">
+          <div className="wishlist" onClick={() => handleAddToWishList()}>
             <FontAwesomeIcon icon={faHeart} color="#207355" size="lg" />
             <span>Thêm vào yêu thích</span>
           </div>

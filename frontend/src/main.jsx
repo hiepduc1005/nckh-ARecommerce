@@ -7,6 +7,7 @@ import { AuthProvider } from "./contexts/AuthProvider.jsx";
 import CartProvider from "./contexts/CartProvider.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { initGA } from "./utils/analytics.js";
+import { WishlistProvider } from "./hooks/UseWishList.jsx";
 
 initGA();
 
@@ -16,7 +17,9 @@ createRoot(document.getElementById("root")).render(
       <LoadingProvider>
         <AuthProvider>
           <CartProvider>
-            <App />
+            <WishlistProvider>
+              <App />
+            </WishlistProvider>
           </CartProvider>
         </AuthProvider>
       </LoadingProvider>

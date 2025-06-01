@@ -50,6 +50,7 @@ import SupportPage from "../pages/SupportPage";
 import AdminUser from "../pages/AdminUser";
 import PaymentPolicy from "../pages/PaymentPolicy";
 import WarrantyPolicy from "../pages/WarrantyPolicy";
+import WishlistPage from "../pages/WishListPage";
 
 const AppRoutes = () => {
   return (
@@ -64,6 +65,7 @@ const AppRoutes = () => {
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
         <Route path="payment-policy" element={<PaymentPolicy />} />
         <Route path="warranty-policy" element={<WarrantyPolicy />} />
+        <Route path="wishlist" element={<WishlistPage />} />
 
         <Route path="test" element={<Interactive3DViewer />} />
         <Route path="customize/shoes" element={<ShoesCustomize />} />
