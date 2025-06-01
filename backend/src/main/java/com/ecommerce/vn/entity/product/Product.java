@@ -38,6 +38,9 @@ public class Product {
 	@Column(name = "active", nullable = false)
 	private Boolean active;
 	
+	@Column(name = "is_featured", nullable = false)
+	private Boolean isFeatured ;
+	
 	@Column(name = "product_name")
 	private String productName;
 	
@@ -110,6 +113,14 @@ public class Product {
 	
 	
 	
+	public Boolean getIsFeatured() {
+		return isFeatured;
+	}
+
+	public void setIsFeatured(Boolean isFeatured) {
+		this.isFeatured = isFeatured;
+	}
+
 	public String getModelPath() {
 		return modelPath;
 	}

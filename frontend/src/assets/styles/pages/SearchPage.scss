@@ -53,6 +53,11 @@ $primaryColorHover: #197050;
     .product-content {
       flex: 1;
       
+      a{
+        text-decoration: none;
+        color: #333;
+      }
+
       .product-header {
         display: flex;
         justify-content: space-between;
@@ -476,6 +481,12 @@ $primaryColorHover: #197050;
         align-items: center;
         gap: 5px;
         margin-top: 30px;
+
+        .pagination-button.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          pointer-events: none;
+        }
         
         .pagination-button, .pagination-number {
           min-width: 40px;

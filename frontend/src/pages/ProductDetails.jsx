@@ -236,10 +236,16 @@ const ProductDetails = () => {
             ))}
           </Slider>
           <div className="button-try">
-            <div className="direct" onClick={() => setShowModalVTO(true)}>
-              <FontAwesomeIcon className="icon" icon={faVideo} />
-              <button>Thử trực tiếp</button>
-            </div>
+            {product?.categories?.some(
+              (category) => category.name === "Glasses"
+            ) ? (
+              <div className="direct" onClick={() => setShowModalVTO(true)}>
+                <FontAwesomeIcon className="icon" icon={faVideo} />
+                <button>Thử trực tiếp</button>
+              </div>
+            ) : (
+              ""
+            )}
             <div className="view" onClick={() => handleShowModel3D()}>
               <FontAwesomeIcon className="icon" icon={faCube} />
               <button>Xem mô hình 3D</button>

@@ -1,0 +1,238 @@
+// SkeletonLoader.scss
+
+@keyframes shimmer {
+    0% {
+      background-position: -468px 0;
+    }
+    100% {
+      background-position: 468px 0;
+    }
+  }
+  
+  .skeleton-box {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 400% 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+    border-radius: 4px;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+  
+    &.skeleton-circle {
+      border-radius: 50%;
+    }
+  
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      animation: shimmer-wave 1.6s ease-in-out infinite;
+    }
+  }
+  
+  @keyframes shimmer-wave {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  // Grid Skeleton
+  .skeleton-item {
+    pointer-events: none;
+    
+    .skeleton-product-image {
+      position: relative;
+      
+      .skeleton-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        opacity: 0.7;
+      }
+    }
+    
+    .skeleton-details {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      
+      .skeleton-title {
+        margin-bottom: 5px;
+      }
+      
+      .skeleton-price {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      
+      .skeleton-rating {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+    }
+  }
+  
+  // List Skeleton
+  .skeleton-list-image {
+    flex-shrink: 0;
+    width: 150px;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .skeleton-list-info {
+    flex: 1;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    .skeleton-title {
+      margin-bottom: 5px;
+    }
+    
+    .skeleton-price {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .skeleton-rating {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .skeleton-attributes {
+      margin: 10px 0;
+      
+      .attributes {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        
+        .attribute {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
+      }
+    }
+    
+    .skeleton-list-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: auto;
+      padding-top: 15px;
+    }
+  }
+  
+  // Checkbox List Skeleton
+  .checkbox-list-skeleton {
+    margin-bottom: 30px;
+    
+    .skeleton-filter-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    .skeleton-checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .skeleton-checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      .skeleton-checkbox {
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+    }
+  }
+  
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .skeleton-list-image {
+      width: 120px;
+      height: 120px;
+    }
+    
+    .skeleton-list-info {
+      padding: 0 15px;
+      
+      .skeleton-list-actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+    
+    .skeleton-details {
+      padding: 12px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .skeleton-list-image {
+      width: 100px;
+      height: 100px;
+    }
+    
+    .skeleton-list-info {
+      padding: 0 10px;
+    }
+    
+    .skeleton-details {
+      padding: 10px;
+      gap: 6px;
+    }
+  }
+  
+  // Dark mode support
+  @media (prefers-color-scheme: dark) {
+    .skeleton-box {
+      background: linear-gradient(90deg, #2a2a2a 25%, #1a1a1a 50%, #2a2a2a 75%);
+      
+      &::after {
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+      }
+    }
+    
+    .skeleton-filter-title {
+      color: #e0e0e0;
+    }
+  }

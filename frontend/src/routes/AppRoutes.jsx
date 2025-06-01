@@ -48,6 +48,8 @@ import NotificationsPage from "../pages/NotificationsPage";
 import ChangePassword from "../pages/ChangePassword";
 import SupportPage from "../pages/SupportPage";
 import AdminUser from "../pages/AdminUser";
+import PaymentPolicy from "../pages/PaymentPolicy";
+import WarrantyPolicy from "../pages/WarrantyPolicy";
 
 const AppRoutes = () => {
   return (
@@ -60,6 +62,9 @@ const AppRoutes = () => {
         <Route path="return-policy" element={<ReturnPolicy />} />
         <Route path="brands" element={<BrandPage />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="payment-policy" element={<PaymentPolicy />} />
+        <Route path="warranty-policy" element={<WarrantyPolicy />} />
+
         <Route path="test" element={<Interactive3DViewer />} />
         <Route path="customize/shoes" element={<ShoesCustomize />} />
         <Route path="customize/glasses" element={<GlassesCustomize />} />

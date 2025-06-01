@@ -1,8 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import "../assets/styles/pages/SearchPage.scss";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import CheckBoxList from "../components/CheckBoxList";
+import {
+  ProductGridSkeleton,
+  ProductListSkeleton,
+  CheckBoxListSkeleton,
+} from "../components/SkeletonLoading";
 import Select from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -38,8 +43,8 @@ const SearchPage = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState([]);
-  const [maxPrice, setMaxPrice] = useState(1000000000);
-  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(null);
+  const [minPrice, setMinPrice] = useState(null);
   const [totalPage, setTotalPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
   const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
@@ -47,6 +52,8 @@ const SearchPage = () => {
 
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const [filterProducts, setFilterProducts] = useState([]);
 
@@ -56,7 +63,19 @@ const SearchPage = () => {
 
   const navigate = useNavigate();
 
+  // Helper function to create URL with updated page parameter
+  const createPageUrl = (pageNumber) => {
+    const params = new URLSearchParams(searchParams);
+    if (pageNumber > 0) {
+      params.set("page", pageNumber);
+    } else {
+      params.delete("page");
+    }
+    return `?${params.toString()}`;
+  };
+
   const fetchBrands = async () => {
+    setBrandsLoading(true);
     const data = await getAllBrands();
 
     if (data) {
@@ -73,9 +92,11 @@ const SearchPage = () => {
     } else {
       toast.error("Có lỗi xảy ra!");
     }
+    setBrandsLoading(false);
   };
 
   const fetchCategories = async () => {
+    setCategoriesLoading(true);
     const data = await getAllCategories();
 
     if (data) {
@@ -91,9 +112,13 @@ const SearchPage = () => {
     } else {
       toast.error("Có lỗi xảy ra!");
     }
+    setCategoriesLoading(false);
   };
 
   useEffect(() => {
+    const page = searchParams.get("page");
+    setCurrentPage(parseInt(page) || 0);
+
     fetchBrands();
     fetchCategories();
 
@@ -122,7 +147,7 @@ const SearchPage = () => {
         setMaxPrice(maxValue);
       }
     }
-  }, []);
+  }, [searchParams]);
 
   const handleProductClick = (productId) => {
     navigate(`${productId}`);
@@ -147,7 +172,6 @@ const SearchPage = () => {
   };
 
   const fetchFilterProduct = async (newFilters) => {
-    console.log("test");
     setLoading(true);
     const data = await getProductsFilter(newFilters);
 
@@ -176,6 +200,9 @@ const SearchPage = () => {
     };
 
     fetchFilterProduct(newFilters);
+
+    // Scroll to top khi filter hoặc pagination thay đổi
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [searchParams, maxPrice, minPrice, currentPage, sortOption]);
 
   const updateUrlParams = (key, values, extractKey = "id") => {
@@ -185,6 +212,8 @@ const SearchPage = () => {
     } else {
       params.delete(key);
     }
+    // Reset page to 0 when filters change
+    params.delete("page");
     setSearchParams(params);
   };
 
@@ -226,6 +255,8 @@ const SearchPage = () => {
       params.delete("sort");
       setSortOption(selectOptions[0]);
     }
+    // Reset page to 0 when sort changes
+    params.delete("page");
     setSearchParams(params);
   };
 
@@ -241,11 +272,7 @@ const SearchPage = () => {
     return (
       <div className="product-grid">
         {filterProducts.map((product) => (
-          <div
-            className="grid-item"
-            key={product.id}
-            onClick={() => handleProductClick(product.slug)}
-          >
+          <Link className="grid-item" key={product.id} to={`${product.slug}`}>
             <div className="product-image">
               <img
                 src={`http://localhost:8080${product.imagePath}`}
@@ -290,7 +317,7 @@ const SearchPage = () => {
               </div>
               <p className="product-description">{product.shortDescription}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     );
@@ -300,11 +327,7 @@ const SearchPage = () => {
     return (
       <div className="product-list">
         {filterProducts.map((product) => (
-          <div
-            className="list-item"
-            key={product.id}
-            onClick={() => handleProductClick(product.id)}
-          >
+          <Link className="list-item" key={product.id} to={`${product.slug}`}>
             <div className="product-image">
               <img
                 src={`http://localhost:8080${product.imagePath}`}
@@ -373,7 +396,7 @@ const SearchPage = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     );
@@ -384,33 +407,39 @@ const SearchPage = () => {
 
     return (
       <div className="pagination">
-        <button
-          disabled={currentPage === 0}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-          className="pagination-button"
-        >
-          &lt; Trước
-        </button>
+        {currentPage > 0 ? (
+          <Link
+            to={createPageUrl(currentPage - 1)}
+            className="pagination-button"
+          >
+            &lt; Trước
+          </Link>
+        ) : (
+          <span className="pagination-button disabled">&lt; Trước</span>
+        )}
 
         {[...Array(totalPage).keys()].map((page) => (
-          <button
+          <Link
             key={page}
-            onClick={() => setCurrentPage(page)}
+            to={createPageUrl(page)}
             className={`pagination-number ${
               currentPage === page ? "active" : ""
             }`}
           >
             {page + 1}
-          </button>
+          </Link>
         ))}
 
-        <button
-          disabled={currentPage === totalPage - 1}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-          className="pagination-button"
-        >
-          Sau &gt;
-        </button>
+        {currentPage < totalPage - 1 ? (
+          <Link
+            to={createPageUrl(currentPage + 1)}
+            className="pagination-button"
+          >
+            Sau &gt;
+          </Link>
+        ) : (
+          <span className="pagination-button disabled">Sau &gt;</span>
+        )}
       </div>
     );
   };
@@ -428,26 +457,36 @@ const SearchPage = () => {
 
       <div className="body">
         <div className="filter-sidebar">
-          <CheckBoxList
-            title={"Thương hiệu"}
-            listCheckBox={brands}
-            setSelect={handleBrandChange}
-            selected={selectedBrands}
-            loading={loading}
-          />
-          <CheckBoxList
-            title={"Phân loại"}
-            listCheckBox={categories}
-            setSelect={handleCategoryChange}
-            selected={selectedCategories}
-            loading={loading}
-          />
+          {brandsLoading ? (
+            <CheckBoxListSkeleton title="Thương hiệu" count={5} />
+          ) : (
+            <CheckBoxList
+              title={"Thương hiệu"}
+              listCheckBox={brands}
+              setSelect={handleBrandChange}
+              selected={selectedBrands}
+              loading={false}
+            />
+          )}
+
+          {categoriesLoading ? (
+            <CheckBoxListSkeleton title="Phân loại" count={6} />
+          ) : (
+            <CheckBoxList
+              title={"Phân loại"}
+              listCheckBox={categories}
+              setSelect={handleCategoryChange}
+              selected={selectedCategories}
+              loading={false}
+            />
+          )}
+
           <CheckBoxList
             title={"Khoảng giá"}
             listCheckBox={priceRanges}
             setSelect={handlePriceChange}
             selected={selectedPriceRange}
-            loading={loading}
+            loading={false}
           />
         </div>
 
@@ -485,16 +524,29 @@ const SearchPage = () => {
             </div>
 
             <div className="results-info">
-              Hiển thị {filterProducts.length} sản phẩm{" "}
-              {totalPage > 0 ? `(Trang ${currentPage + 1}/${totalPage})` : ""}
+              {loading ? (
+                <div
+                  className="skeleton-box"
+                  style={{ width: "200px", height: "20px" }}
+                />
+              ) : (
+                <>
+                  Hiển thị {filterProducts.length} sản phẩm{" "}
+                  {totalPage > 0
+                    ? `(Trang ${currentPage + 1}/${totalPage})`
+                    : ""}
+                </>
+              )}
             </div>
           </div>
 
           {loading ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p>Đang tải sản phẩm...</p>
-            </div>
+            // Hiển thị skeleton thay vì loading spinner
+            viewMode === "grid" ? (
+              <ProductGridSkeleton count={8} />
+            ) : (
+              <ProductListSkeleton count={8} />
+            )
           ) : filterProducts.length > 0 ? (
             <>
               {viewMode === "grid" ? renderGridView() : renderListView()}
@@ -503,16 +555,16 @@ const SearchPage = () => {
           ) : (
             <div className="no-results">
               <p>Không tìm thấy sản phẩm phù hợp.</p>
-              <button
+              <Link
+                to="?"
                 onClick={() => {
-                  setSearchParams({});
                   setSelectedCategories([]);
                   setSelectedBrands([]);
                   setSelectedPriceRange([]);
                 }}
               >
                 Xóa bộ lọc
-              </button>
+              </Link>
             </div>
           )}
         </div>

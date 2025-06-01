@@ -132,12 +132,7 @@ const BrandPage = () => {
                   </div>
                   <div className="brand-info">
                     <h3>{brand.name}</h3>
-                    <p className="brand-category">
-                      {
-                        categories.find((c) => c.value === brand.category)
-                          ?.label
-                      }
-                    </p>
+                    <p className="brand-category">{brand.category}</p>
                     <p className="brand-description">
                       {brand.description.substring(0, 60)}...
                     </p>
@@ -186,12 +181,7 @@ const BrandPage = () => {
               </div>
               <div className="detail-section">
                 <h3>Danh mục</h3>
-                <p>
-                  {
-                    categories.find((c) => c.value === selectedBrand.category)
-                      ?.label
-                  }
-                </p>
+                <p>{selectedBrand.category}</p>
               </div>
               <div className="detail-section">
                 <h3>Số lượng sản phẩm</h3>

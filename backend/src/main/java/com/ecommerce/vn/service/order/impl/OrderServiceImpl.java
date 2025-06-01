@@ -35,6 +35,7 @@ import com.ecommerce.vn.service.EmailService;
 import com.ecommerce.vn.service.coupon.CouponService;
 import com.ecommerce.vn.service.notification.NotificationService;
 import com.ecommerce.vn.service.order.OrderService;
+import com.ecommerce.vn.service.product.ProductService;
 import com.ecommerce.vn.service.user.UserService;
 
 
@@ -56,6 +57,9 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Autowired
 	private NotificationService notificationService;
+	
+	@Autowired
+	private ProductService productService;
 
 	@Override
 	@Transactional
@@ -194,6 +198,7 @@ public class OrderServiceImpl implements OrderService {
 			try {
 				sendNotificationByStatus(orderStatus,order);
 				sendEmailByStatus(orderStatus,order);
+				updateSoldQuantityByStatus(currentStatus,orderStatus, order);
 			} catch (IOException e) {
 				
 				e.printStackTrace();
@@ -248,6 +253,14 @@ public class OrderServiceImpl implements OrderService {
 	        default:
 	    }
 	}
+	
+	private void updateSoldQuantityByStatus(OrderStatus currentStatus,OrderStatus orderStatus,Order order) {
+		if (!currentStatus.equals(OrderStatus.DELIVERED) && orderStatus.equals(OrderStatus.DELIVERED)) {
+		    productService.updateSoldQuantity(order);
+		}
+	}
+	
+	
 	
 	private void sendNotificationByStatus(OrderStatus status, Order order) throws IOException {
 		switch (status) {

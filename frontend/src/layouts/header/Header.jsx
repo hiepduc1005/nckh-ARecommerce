@@ -3,7 +3,12 @@ import webicon from "../../assets/icons/webicon.png";
 import searchIcon from "../../assets/icons/search-icon.png";
 
 import "./Header.scss";
-import { Link } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import Topbar from "../../components/Topbar";
 import useAuth from "../../hooks/UseAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,12 +19,16 @@ import useCart from "../../hooks/UseCart";
 import { useStompSocket } from "../../hooks/UseStompSocket";
 import { toast } from "react-toastify";
 import { getNotificationsByUser } from "../../api/notificationApi";
+import SearchDropdown from "../../components/SearchDropdown";
 const Header = () => {
   const { user, isAuthenticated, logout, token } = useAuth();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishListOpen, setIsWishListOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
   const { cart } = useCart();
+  const navigate = useNavigate();
   const wishList = [
     {
       id: 1,
@@ -76,6 +85,19 @@ const Header = () => {
     }
   }, [token]);
 
+  // Hàm xử lý tìm kiếm
+  const handleSearch = (searchTerm) => {
+    const pathName = location.pathname;
+    if (pathName === "/products") {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set("s", searchTerm);
+      newParams.delete("page");
+      setSearchParams(newParams);
+    } else {
+      navigate(`/products?s=${searchTerm}`);
+    }
+  };
+
   return (
     <>
       <Topbar
@@ -89,8 +111,12 @@ const Header = () => {
           <Link to={"/"} className="webicon-container">
             <img src={webicon}></img>
           </Link>
-          <Link className="navbar-link">Kính Mắt</Link>
-          <Link className="navbar-link">Giày</Link>
+          <Link to={"/products?categories=Glasses"} className="navbar-link">
+            Kính Mắt
+          </Link>
+          <Link to={"/products?categories=Sneaker"} className="navbar-link">
+            Giày
+          </Link>
           <Link to={"/brands"} className="navbar-link">
             Thương Hiệu
           </Link>
@@ -99,12 +125,7 @@ const Header = () => {
           </Link>
         </div>
         <div className="header-right">
-          <div className="header-search">
-            <input placeholder="Tìm kiếm sản phẩm..." />
-            <Link className="search-button">
-              <img src={searchIcon}></img>
-            </Link>
-          </div>
+          <SearchDropdown onSearch={handleSearch} searchIcon={searchIcon} />
           <Link
             className="wishlist-icon"
             to="/"

@@ -48,7 +48,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
             + "AND ( :minPrice IS NULL OR (v.discountPrice IS NOT NULL AND v.discountPrice > 0 AND v.discountPrice >= :minPrice) OR v.price >= :minPrice) "
             + "AND ( :maxPrice IS NULL OR (v.discountPrice IS NOT NULL AND v.discountPrice > 0 AND v.discountPrice <= :maxPrice) OR v.price <= :maxPrice) "
             + "AND (:brands IS NULL OR b.name IN :brands) "
-            + "AND (:keyword IS NULL OR p.productName LIKE CONCAT('%', :keyword, '%')) ")
+            + "AND (:keyword IS NULL OR p.productName LIKE CONCAT('%', :keyword, '%') OR p.description LIKE CONCAT('%', :keyword, '%')) ")
     Page<Product> filterProducts(
             @Param("categories") List<String> categories,
             @Param("brands") List<String> brands,
@@ -81,6 +81,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
             nativeQuery = true)
     List<ProductWithScore> findRelatedProducts(@Param("productId") UUID productId);
 
+    @Query("SELECT p FROM Product p WHERE p.isFeatured = true")
+    Page<Product> findProductsFeatured(Pageable pageable);
+    
     @Query("SELECT p FROM Product p JOIN p.tags t WHERE t = :tag")
     List<Product> findByTag(@Param("tag") Tag tag);
     

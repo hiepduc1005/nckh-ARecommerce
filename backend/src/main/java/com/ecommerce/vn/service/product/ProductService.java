@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.dto.product.ProductWithScore;
+import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Tag;
 
@@ -30,6 +32,8 @@ public interface ProductService {
 
     // Phân trang và sắp xếp sản phẩm
     Page<Product> getProductsWithPaginationAndSorting(int page, int size, String sortBy);
+    
+    Page<Product> getFeaturedProducts(Pageable pageable);
 
     Product getProductById(UUID productId);
     
@@ -45,22 +49,18 @@ public interface ProductService {
     
     List<Product> getProductByTag(Tag tag);
     
-//    San pham noi bat
-    List<Product> getFeatureProduct();
-    
+
     Boolean isProductExist(UUID productId);
 
+    void updateSoldQuantity(Order order);
 
-
-    // // Sản phẩm yêu thích
-    // List<Product> getWishlist(UUID userId);
     
-    // void addToWishlist(UUID userId, UUID productId);
-    
-    // void removeFromWishlist(UUID userId, UUID productId);
 
     // Sản phẩm liên quan
      List<ProductWithScore> getRelatedProducts(UUID productId);
      
      Product getProductBySlug(String slug);
+     
+     void updateProductFeatured(List<Product> products);
+     
 }

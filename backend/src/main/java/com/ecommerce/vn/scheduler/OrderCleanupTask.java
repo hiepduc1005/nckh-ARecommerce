@@ -13,8 +13,11 @@ import com.ecommerce.vn.repository.OrderRepository;
 
 @Component
 public class OrderCleanupTask {
-    @Autowired
+   
+	@Autowired
     private OrderRepository orderRepository;
+    
+
 
     @Scheduled(fixedRate = 300000) 
     public void cancelExpiredOrders() {
@@ -24,4 +27,8 @@ public class OrderCleanupTask {
             orderRepository.save(order);
         }
     }
+    
+  
+    
+    
 } 

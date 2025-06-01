@@ -1,35 +1,39 @@
 import React, { useEffect, useState } from "react";
 import "../assets/styles/pages/Home.scss";
 import banner from "../assets/images/banner4.png";
-import ProductCarousel from "../components/ProductCarousel";
-import glassImage from "../assets/images/glass-image.png";
-import SaleProductCarousel from "../components/SaleProductCarousel";
 import useLoading from "../hooks/UseLoading";
-import { getProductsPaginate } from "../api/productApi";
+import { getProductsFeatured, getProductsPaginate } from "../api/productApi";
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, ShoppingCart } from "lucide-react";
 import ReactStars from "react-stars";
 import { formatCurrency } from "../utils/ultils";
-const popularCategories = [
-  { id: 1, name: "Kính mắt", image: "/api/placeholder/200/200" },
-  { id: 2, name: "Kính thời trang", image: "/api/placeholder/200/200" },
-  { id: 3, name: "Kính râm", image: "/api/placeholder/200/200" },
-  { id: 4, name: "Gọng kính", image: "/api/placeholder/200/200" },
-];
+import { getAllCategories } from "../api/categoryApi";
 
 const Home = () => {
-  const categoryData = {
-    title: "Kính Mắt",
-    description: "Tổng hợp các mẫu kính nổi bật trong tháng vừa qua",
-    image: glassImage,
-  };
-
   const { setLoading } = useLoading();
   const [products, setProducts] = useState([]);
+  const [productFeatured, setProductFeatured] = useState([]);
+  const [popularCategories, setPopularCategories] = useState([]);
   const navigate = useNavigate();
 
   const handleNavigateProductDetails = (slug) => {
     navigate(`/products/${slug}`);
+  };
+
+  const fetchProductFeatured = async () => {
+    const data = await getProductsFeatured(0, 8);
+
+    if (data) {
+      setProductFeatured(data.content);
+    }
+  };
+
+  const fetchCategoriesFeatured = async () => {
+    const data = await getAllCategories();
+
+    if (data) {
+      setPopularCategories(data);
+    }
   };
 
   useEffect(() => {
@@ -38,6 +42,8 @@ const Home = () => {
       const data = await getProductsPaginate(1, 8);
       setProducts(data.content);
     };
+    fetchCategoriesFeatured();
+    fetchProductFeatured();
     fetchProducts();
     setLoading(false);
   }, []);
@@ -75,13 +81,20 @@ const Home = () => {
           <h2>Danh mục phổ biến</h2>
           <div className="categories-grid">
             {popularCategories.map((category) => (
-              <div key={category.id} className="category-item">
+              <Link
+                to={`/products??categories=${category.name}`}
+                key={category.id}
+                className="category-item"
+              >
                 <div className="image-container">
-                  <img src={category.image} alt={category.name} />
+                  <img
+                    src={`http://localhost:8080${category.imagePath}`}
+                    alt={category.name}
+                  />
                   <div className="overlay"></div>
                 </div>
                 <h3>{category.name}</h3>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -92,7 +105,7 @@ const Home = () => {
         <div className="container">
           <h2>Sản phẩm nổi bật</h2>
           <div className="products-grid">
-            {products.map((product) => (
+            {productFeatured.map((product) => (
               <div key={product.id} className="product-card">
                 <div
                   className="image-container"
@@ -141,7 +154,7 @@ const Home = () => {
               </div>
             ))}
           </div>
-          <div className="view-more">
+          <div className="view-more" onClick={() => navigate("/products")}>
             <button>Xem thêm sản phẩm</button>
           </div>
         </div>

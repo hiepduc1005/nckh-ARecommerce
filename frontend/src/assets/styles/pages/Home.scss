@@ -60,6 +60,10 @@ $container-padding: 0 1.5rem;
 .homepage-container{
   section {
     margin-bottom: 5rem;
+
+    a{
+      text-decoration: none;
+    }
     
     h2 {
       font-size: 2rem;

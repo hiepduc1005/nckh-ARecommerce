@@ -21,8 +21,8 @@ const Footer = () => {
         <div className="item">
           <div className="title">Sản Phẩm</div>
           <div className="links">
-            <Link>Kính mắt</Link>
-            <Link>Giày</Link>
+            <Link to={`/products?categories=Glasses`}>Kính mắt</Link>
+            <Link to={`/products?categories=Sneaker`}>Giày</Link>
             <Link>Coming soon...</Link>
           </div>
         </div>
@@ -31,9 +31,15 @@ const Footer = () => {
         <div className="item">
           <div className="title">Liên hệ với chúng tôi</div>
           <div className="links">
-            <Link><img src={fb} alt="Facebook" /> Facebook</Link>
-            <Link><img src={instagram} alt="Instagram" /> Instagram</Link>
-            <Link><img src={xIcon} alt="X" /> X</Link>
+            <Link>
+              <img src={fb} alt="Facebook" /> Facebook
+            </Link>
+            <Link>
+              <img src={instagram} alt="Instagram" /> Instagram
+            </Link>
+            <Link>
+              <img src={xIcon} alt="X" /> X
+            </Link>
           </div>
         </div>
 
@@ -42,10 +48,10 @@ const Footer = () => {
           <div className="title">Về HHQTV Store</div>
           <div className="links">
             <Link to={"/privacy-policy"}>Chính sách bảo mật</Link>
-            <Link>Chính sách thanh toán</Link>
+            <Link to={"/payment-policy"}>Chính sách thanh toán</Link>
             <Link to={"/return-policy"}>Chính sách đổi trả</Link>
-            <Link>Chính sách bảo hành</Link>
-            <Link>Giới thiệu</Link>
+            <Link to={"/warranty-policy"}>Chính sách bảo hành</Link>
+            <Link to={"/about-us"}>Giới thiệu</Link>
           </div>
         </div>
 

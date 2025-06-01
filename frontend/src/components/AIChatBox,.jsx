@@ -442,7 +442,7 @@ export default function AIChatbox() {
               <div className="login-required">
                 <LogIn size={48} className="login-icon" />
                 <h4>Yêu cầu đăng nhập</h4>
-                <p>Vui lòng đăng nhập để sử dụng chatbox</p>
+                <p>Vui lòng đăng nhập để sử dụng chatbot</p>
               </div>
             ) : (
               <>
