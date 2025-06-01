@@ -15,6 +15,7 @@ import com.ecommerce.vn.entity.notification.Notification;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.rating.Rating;
 import com.ecommerce.vn.entity.role.Role;
+import com.ecommerce.vn.entity.wishlist.WishList;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -104,6 +105,19 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Notification> notifications  = new ArrayList<Notification>();
 	
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user" )
+	private WishList wishList;
+	
+	
+	
+	public WishList getWishList() {
+		return wishList;
+	}
+
+	public void setWishList(WishList wishList) {
+		this.wishList = wishList;
+	}
+
 	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
