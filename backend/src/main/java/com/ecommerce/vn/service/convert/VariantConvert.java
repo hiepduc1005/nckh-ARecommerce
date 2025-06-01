@@ -2,6 +2,7 @@ package com.ecommerce.vn.service.convert;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,10 +10,12 @@ import org.springframework.stereotype.Service;
 import com.ecommerce.vn.dto.attribute.AttributeValueResponse;
 import com.ecommerce.vn.dto.variant.VariantCreateRequest;
 import com.ecommerce.vn.dto.variant.VariantResponse;
+import com.ecommerce.vn.dto.variant.VariantUpdateRequest;
 import com.ecommerce.vn.entity.attribute.AttributeValue;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Variant;
 import com.ecommerce.vn.repository.ProductRepository;
+import com.ecommerce.vn.service.variant.VariantService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -30,6 +33,9 @@ public class VariantConvert {
 	
 	@Autowired
 	private ProductRepository productRepository;
+	
+	@Autowired
+	private VariantService variantService;
 	
 	public VariantResponse variantConvertToVariantResponse(Variant variant) {
 		VariantResponse variantResponse = new VariantResponse();
@@ -67,11 +73,30 @@ public class VariantConvert {
 	    List<AttributeValue> attributeValues = variantCreateRequest.getAttributeValueCreateRequests()
 	            .stream()
 	            .map(attributeValueConvert::attributeValueCreateRequestConvert)
-	            .toList();
+	            .collect(Collectors.toList());
 
 	    variant.setAttributeValues(attributeValues);
 
 	    return variant;
 		
 	}
+	
+	public Variant variantUpdateConvertToVariant(VariantUpdateRequest updateRequest) {
+		
+	    Variant variant = variantService.getVariantById(updateRequest.getVariantId());
+	    variant.setPrice(BigDecimal.valueOf(updateRequest.getPrice()));
+	    variant.setQuantity(updateRequest.getQuantity());
+	    variant.setDiscountPrice(BigDecimal.valueOf(updateRequest.getDiscountPrice()));
+	    variant.setColorConfig(updateRequest.getColorConfig());
+	    List<AttributeValue> attributeValues = updateRequest.getAttributeValueCreateRequests()
+	            .stream()
+	            .map(attributeValueConvert::attributeValueCreateRequestConvert)
+	            .collect(Collectors.toList());
+
+	    variant.setAttributeValues(attributeValues);
+
+	    return variant;
+		
+	}
+	
 }

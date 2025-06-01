@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.dto.variant.VariantCreateRequest;
 import com.ecommerce.vn.dto.variant.VariantResponse;
+import com.ecommerce.vn.dto.variant.VariantUpdateRequest;
 import com.ecommerce.vn.entity.product.Variant;
 import com.ecommerce.vn.service.FileUploadService;
 import com.ecommerce.vn.service.convert.VariantConvert;
@@ -59,6 +61,27 @@ public class VariantController {
         variant.setImagePath(imagePath);
 		
         variant = variantService.createVariant(variant);
+		
+		VariantResponse variantResponse = variantConvert.variantConvertToVariantResponse(variant);
+		
+		return ResponseEntity.ok(variantResponse);
+	}
+	
+	@PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<?> updateVariant(
+			@RequestPart("image") MultipartFile image,
+			@RequestPart("variant") VariantUpdateRequest variantUpdateRequest
+			){
+		
+		if(image == null) {
+    		return ResponseEntity.badRequest().body("Variant image is empty!");
+    	}
+		Variant variant = variantConvert.variantUpdateConvertToVariant(variantUpdateRequest);
+        
+		String imagePath = fileUploadService.uploadFileToServer(image);
+        variant.setImagePath(imagePath);
+		
+        variant = variantService.updateVariant(variant);
 		
 		VariantResponse variantResponse = variantConvert.variantConvertToVariantResponse(variant);
 		
