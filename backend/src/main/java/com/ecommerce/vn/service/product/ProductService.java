@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ecommerce.vn.dto.product.ProductWithScore;
 import com.ecommerce.vn.entity.order.Order;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.entity.product.Tag;
@@ -57,7 +56,7 @@ public interface ProductService {
     
 
     // Sản phẩm liên quan
-     List<ProductWithScore> getRelatedProducts(UUID productId);
+     List<Product> getRelatedProducts(UUID productId);
      
      Product getProductBySlug(String slug);
      

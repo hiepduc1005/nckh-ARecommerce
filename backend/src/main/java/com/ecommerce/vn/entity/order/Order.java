@@ -68,7 +68,7 @@ public class Order {
 	@OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<OrderStatusHistory> orderStatusHistories  = new ArrayList<OrderStatusHistory>();
 	
-	@CreatedDate
+//	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 	

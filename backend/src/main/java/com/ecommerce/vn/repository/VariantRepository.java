@@ -20,24 +20,24 @@ import com.ecommerce.vn.entity.product.Variant;
 @Repository
 public interface VariantRepository extends JpaRepository<Variant, UUID>{
 	
-	@Query("SELECT v FROM Variant v WHERE v.price BETWEEN :minPrice AND :maxPrice")
+	@Query("SELECT v FROM Variant v WHERE ( v.active = true ) AND ( v.price BETWEEN :minPrice AND :maxPrice ) ")
 	List<Variant> findAllByPriceBetween(@Param("minPrice") BigDecimal minPrice,@Param("maxPrice") BigDecimal maxPrice);
 	
-	@Query("SELECT v FROM Variant v WHERE "
+	@Query("SELECT v FROM Variant v WHERE ( v.active = true ) AND "
 			+ "(v.discountPrice IS NOT NULL AND v.discountPrice BETWEEN :minPrice AND :maxPrice) OR "
 			+ "(v.discountPrice IS NULL AND v.price BETWEEN :minPrice AND :maxPrice)")
 	List<Variant> findAllByDiscountPriceBetween(@Param("minPrice") BigDecimal minPrice,@Param("maxPrice") BigDecimal maxPrice);
 	
-	@Query("SELECT v FROM Variant v JOIN v.attributeValues av WHERE av IN :attributeValues GROUP BY v HAVING COUNT(DISTINCT av) = :attributeSize")
+	@Query("SELECT v FROM Variant v JOIN v.attributeValues av WHERE ( v.active = true ) AND ( av IN :attributeValues ) GROUP BY v HAVING COUNT(DISTINCT av) = :attributeSize")
 	List<Variant> findByAttributeValues(@Param("attributeValues") Set<AttributeValue> attributeValues, @Param("attributeSize") long attributeSize);
 	
-	@Query("SELECT v.quantity FROM Variant v WHERE v.id = :variantId")
+	@Query("SELECT v.quantity FROM Variant v WHERE ( v.active = true ) AND ( v.id = :variantId )" )
 	Integer findVariantQuantity(@Param("variantId") UUID variantId);
 	
-	@Query("SELECT v FROM Variant v WHERE v.product.id = :productId")
+	@Query("SELECT v FROM Variant v WHERE ( v.active = true ) AND ( v.product.id = :productId)")
 	Page<Variant> findByProductId(@Param("productId") UUID productId ,  Pageable pageable);
 	
-	@Query("SELECT v FROM Variant v WHERE v.product.slug = :slug")
+	@Query("SELECT v FROM Variant v WHERE ( v.active = true ) AND ( v.product.slug = :slug ) ")
 	Page<Variant> findByProductSlug(@Param("slug") String slug ,  Pageable pageable);
 	
 	@Modifying

@@ -33,7 +33,8 @@ public class ModelCustomize {
 
 	@Enumerated(EnumType.STRING)
     private ItemType itemType; 
-    
+	
+	private Boolean active = true;
 
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
@@ -41,6 +42,16 @@ public class ModelCustomize {
 	
 
     
+
+	public Boolean getActive() {
+		return active;
+	}
+
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
 
 	public String getName() {
 		return name;

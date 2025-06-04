@@ -53,12 +53,11 @@ public class VariantServiceImpl implements VariantService{
 	@Override
 	@Transactional
 	public void deleteVariant(UUID variantId) {
-		if(variantId != null) {
-			variantRepository.deleteById(variantId);
-			return;
-		}
+		Variant variant = getVariantById(variantId);
+		variant.setActive(false);
 		
-		throw new RuntimeException("ID must not null !");
+		
+		updateVariant(variant);
 	}
 
 	@Override

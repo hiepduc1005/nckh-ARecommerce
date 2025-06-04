@@ -54,11 +54,11 @@ public class Rating {
 	@OneToMany(mappedBy = "rating", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RatingImage> images = new ArrayList<>();
 	
-	@CreatedDate
+//	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
-	@LastModifiedDate
+//	@LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 	

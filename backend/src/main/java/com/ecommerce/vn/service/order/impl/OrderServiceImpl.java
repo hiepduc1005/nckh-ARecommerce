@@ -332,7 +332,7 @@ public class OrderServiceImpl implements OrderService {
 	            throw new IllegalArgumentException("Unsupported discount type");
 		}
 		
-		return totalPrice;
+		return totalPrice.add(order.getShippingFee());
 	}
 
 	@Override
@@ -394,7 +394,7 @@ public class OrderServiceImpl implements OrderService {
 		            		((orderItem.getVariant().getDiscountPrice() != null && orderItem.getVariant().getDiscountPrice().doubleValue() > 0) ? orderItem.getVariant().getDiscountPrice() : orderItem.getVariant().getPrice() )  : BigDecimal.ZERO;
 		            return price.multiply(BigDecimal.valueOf(orderItem.getQuantity()));
 		        })
-		        .reduce(BigDecimal.ZERO, BigDecimal::add);
+		        .reduce(BigDecimal.ZERO, BigDecimal::add).add(order.getShippingFee());
 	}
 	
 	public BigDecimal calculateTotalPriceCustomize(Order order) {
@@ -409,7 +409,7 @@ public class OrderServiceImpl implements OrderService {
 	            }
 	            return price.multiply(BigDecimal.valueOf(orderItem.getQuantity()));
 	        })
-	        .reduce(BigDecimal.ZERO, BigDecimal::add);
+	        .reduce(BigDecimal.ZERO, BigDecimal::add).add(order.getShippingFee());
 	}
 
 

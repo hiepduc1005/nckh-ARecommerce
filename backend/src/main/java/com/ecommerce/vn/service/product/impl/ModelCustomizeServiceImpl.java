@@ -46,7 +46,8 @@ public class ModelCustomizeServiceImpl implements ModelCustomizeService{
 	@Override
 	public void deleteModel(UUID modelId) {
 		ModelCustomize model = getModelById(modelId);
-		modelRepository.delete(model);
+		model.setActive(false);
+		updateModel(model);
 	}
 
 	@Override

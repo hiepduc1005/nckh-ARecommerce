@@ -1,5 +1,6 @@
 package com.ecommerce.vn.repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,9 @@ public interface OrderRepository extends JpaRepository<Order,UUID>{
 		   
 		""")
 	Page<Order> findByOrderStatusAndKeyword(@Param("status") OrderStatus status,@Param("keyword") String keyword, Pageable pageable);
+	
+	@Query("SELECT o FROM Order o WHERE :status IS NULL OR :status = '' OR :status = 'ALL' OR o.orderStatus = :status ")
+	List<Order> findByOrderStatus(@Param("status") OrderStatus status);
 	
 	@Query("SELECT o FROM Order o WHERE o.createdAt BETWEEN :startDate AND :endDate")
 	List<Order> findOrdersByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
@@ -71,4 +75,9 @@ public interface OrderRepository extends JpaRepository<Order,UUID>{
 		""")
    Page<Order> findOrdersByKey(@Param("keyword") String keyword, Pageable pageable);
 
+	@Query("SELECT COUNT(o), SUM(o.totalPrice) FROM Order o WHERE o.createdAt >= :date")
+	Object[] getOrderStatsByDate(@Param("date") LocalDateTime date);
+	
+	@Query("SELECT SUM(o.totalPrice) FROM Order o ")
+	BigDecimal getTotalRevenue();
 }

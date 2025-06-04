@@ -75,8 +75,12 @@ public class VNPayController {
 	        return ResponseEntity.ok(paymentUrl);
 	    }
 	 
+	    order.setOrderStatus(OrderStatus.PROCESSING);
+        orderService.updateOrder(order);
+        
+        String redirectUrl = FRONTEND_PAYMENT + "?orderCode=" + order.getCode();
 
-	    return ResponseEntity.ok("Đơn hàng được tạo thành công!");
+	    return ResponseEntity.ok(redirectUrl);
 	}
 	
 	@PostMapping("/create-payment/customize")

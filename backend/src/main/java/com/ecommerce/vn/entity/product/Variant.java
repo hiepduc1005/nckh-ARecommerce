@@ -83,7 +83,20 @@ public class Variant {
 	@OneToMany(mappedBy = "variant")
 	private List<OrderItem>  orderItems  = new ArrayList<>();
 	
-	
+	private Boolean active = true;
+
+
+	public Boolean getActive() {
+		return active;
+	}
+
+
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+
 
 	public List<OrderItem> getOrderItems() {
 		return orderItems;

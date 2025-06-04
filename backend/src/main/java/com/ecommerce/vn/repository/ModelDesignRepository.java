@@ -15,12 +15,12 @@ import com.ecommerce.vn.entity.product.ModelDesign;
 @Repository
 public interface ModelDesignRepository extends JpaRepository<ModelDesign, UUID>{
 
-	@Query("SELECT md FROM ModelDesign md WHERE md.sessionId = :sessionId ORDER BY md.createdAt")
+	@Query("SELECT md FROM ModelDesign md WHERE ( md.sessionId = :sessionId ) AND ( md.active = true )  ORDER BY md.createdAt")
 	Page<ModelDesign> getModelDesignsBySessionId(@Param("sessionId") String sessionId, Pageable pageable);
 	
-	@Query("SELECT md FROM ModelDesign md WHERE md.sessionId = :sessionId AND md.cloneFrom = :cloneFrom")
+	@Query("SELECT md FROM ModelDesign md WHERE md.sessionId = :sessionId AND md.cloneFrom = :cloneFrom AND ( md.active = true ) ")
 	Optional<ModelDesign> getModelDesignByCloneAndSessionId(@Param("sessionId") String sessionId,@Param("cloneFrom") UUID cloneFrom);
 
-	@Query("SELECT md FROM ModelDesign md WHERE md.sessionId = :sessionId AND md.model.id = :customizeId ORDER BY md.createdAt")
+	@Query("SELECT md FROM ModelDesign md WHERE md.sessionId = :sessionId AND md.model.id = :customizeId AND ( md.active = true ) ORDER BY md.createdAt")
 	Page<ModelDesign> getModelDesignsBySessionIdAndCustomizeId(@Param("customizeId") UUID customizeId,@Param("sessionId") String sessionId, Pageable pageable);
 }

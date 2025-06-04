@@ -32,6 +32,28 @@ public interface RatingRepository extends JpaRepository<Rating, UUID>{
     @Query("SELECT AVG(r.ratingValue) FROM Rating r WHERE r.product = :product")
     Double getAverageByProduct(@Param("product") Product product);
     
+    @Query("SELECT AVG(r.ratingValue) FROM Rating r WHERE r.product.id = :productId")
+    Double findAverageRatingByProductId(@Param("productId") UUID productId);
+    
+    boolean existsByUserIdAndProductId(UUID userId, UUID productId);
+
+    
+    long countByProductId(UUID productId);
+    
+    long countByCommentIsNotNull();
+    
+    long countByIsVerifiedTrue();
+    
+    @Query("SELECT AVG(r.ratingValue) FROM Rating r")
+    Double findAverageRating();
+    
+    @Query("SELECT COUNT(DISTINCT r) FROM Rating r WHERE SIZE(r.images) > 0")
+    long countRatingsWithImages();
+    
+    List<Rating> findByProductIdAndIsVerifiedTrue(UUID productId);
+
+
+
     @Query("SELECT COUNT(*) FROM Rating r WHERE r.user = :user AND r.product = :product")
     Long isUserRatedThisProduct(@Param("product") Product product ,@Param("user") User user);
 

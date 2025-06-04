@@ -71,7 +71,7 @@ public class User {
     @Column(name = "active", nullable = false)
     private Boolean active = false;
 
-    @CreatedDate
+//    @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

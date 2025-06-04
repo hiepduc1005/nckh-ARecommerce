@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.vn.dto.model.ModelCustomizeCreateRequest;
 import com.ecommerce.vn.dto.model.ModelCustomizeResponse;
+import com.ecommerce.vn.dto.model.ModelCustomizeUpdateRequest;
 import com.ecommerce.vn.entity.product.ItemType;
 import com.ecommerce.vn.entity.product.ModelCustomize;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
@@ -65,6 +67,32 @@ public class ModelCustomizeController {
         ModelCustomizeResponse response = modelCustomizeConvert.convertToResponse(modelCustomize);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<?> updateModelCustomize(
+			@RequestPart("customize") ModelCustomizeUpdateRequest updateRequest,
+			@RequestPart(name ="model",required = false) MultipartFile model,
+			@RequestPart(name ="image",required = false) MultipartFile image){
+		
+    	ModelCustomize modelCustomize = modelCustomizeConvert.convertUpdateRequest(updateRequest);
+    	if(image != null) {
+    		
+    		String imagePath = fileUploadService.uploadFileToServer(image);
+    		modelCustomize.setImagePath(imagePath);
+    		
+    	}
+    	
+    	if(model != null) {
+    		String modelPath = fileUploadService.uploadModelToServer(model);
+    		modelCustomize.setModelPath(modelPath);
+    		
+    	}
+        modelCustomize = modelCustomizeService.updateModel(modelCustomize);
+        
+        ModelCustomizeResponse response = modelCustomizeConvert.convertToResponse(modelCustomize);
+        
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     
     @GetMapping

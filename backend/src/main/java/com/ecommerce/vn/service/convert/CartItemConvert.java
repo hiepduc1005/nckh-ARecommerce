@@ -24,6 +24,7 @@ public class CartItemConvert {
 		cartItemResponse.setId(cartItem.getId());
 		cartItemResponse.setQuantity(cartItem.getQuantity());
 		cartItemResponse.setVariantResponse(variantConvert.variantConvertToVariantResponse(cartItem.getVariant()));
+		
 	
 		return cartItemResponse;
 	}

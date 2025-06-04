@@ -7,11 +7,14 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.vn.entity.cart.Cart;
+import com.ecommerce.vn.entity.cart.CartItem;
 import com.ecommerce.vn.entity.product.Variant;
 import com.ecommerce.vn.entity.user.User;
 import com.ecommerce.vn.entity.wishlist.WishList;
 import com.ecommerce.vn.entity.wishlist.WishListItem;
 import com.ecommerce.vn.repository.WishListRepository;
+import com.ecommerce.vn.service.cart.CartService;
 import com.ecommerce.vn.service.wishlist.WishListService;
 
 import jakarta.transaction.Transactional;
@@ -21,6 +24,9 @@ public class WishListServiceImpl implements WishListService{
 
 	@Autowired
 	private WishListRepository wishListRepository;
+	
+	@Autowired
+	private CartService cartService;
 	
 	@Override
 	@Transactional
@@ -104,6 +110,24 @@ public class WishListServiceImpl implements WishListService{
         return wishList.getWishListItems().stream()
             .anyMatch(item -> item.getVariant().getId().equals(variant.getId()));
     }
+
+
+	@Override
+	@Transactional
+	public void wishListToCart(WishListItem wishListItem,User user) {
+	    Variant variant = wishListItem.getVariant();
+	    
+	    Cart cart = user.getCart();
+	    CartItem cartItem = new CartItem();
+	    cartItem.setCart(cart);
+	    cartItem.setVariant(variant);
+	    cartItem.setQuantity(1);
+	    
+	    
+	    cartService.addItemToCart(cart.getId(), cartItem);
+	    removeItem(user, variant);
+		
+	}
 
 
 

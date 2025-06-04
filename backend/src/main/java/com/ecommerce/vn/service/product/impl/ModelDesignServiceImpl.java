@@ -46,7 +46,8 @@ public class ModelDesignServiceImpl implements ModelDesignService{
 	@Override
 	public void deleteModelDesign(UUID modelDesignId) {
 		ModelDesign modelDesign = getModelDesignById(modelDesignId);
-		modelDesignRepository.delete(modelDesign);
+		modelDesign.setActive(false);
+		updateModeldeDesign(modelDesign);
 	}
 
 	@Override

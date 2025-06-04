@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ecommerce.vn.dto.product.ProductCreateRequest;
 import com.ecommerce.vn.dto.product.ProductResponse;
 import com.ecommerce.vn.dto.product.ProductUpdateRequest;
-import com.ecommerce.vn.dto.product.ProductWithScore;
 import com.ecommerce.vn.entity.product.Product;
 import com.ecommerce.vn.exception.ResourceNotFoundException;
 import com.ecommerce.vn.service.FileUploadService;
@@ -224,10 +223,13 @@ public class ProductController {
     }
     
     @GetMapping("/{productId}/related")
-    public ResponseEntity<List<ProductWithScore>> getProductsRelated(@PathVariable("productId") UUID productId) {
-        List<ProductWithScore> products = productService.getRelatedProducts(productId);
-
-        return new ResponseEntity<>(products, HttpStatus.OK);
+    public ResponseEntity<List<ProductResponse>> getProductsRelated(@PathVariable("productId") UUID productId) {
+        List<Product> products = productService.getRelatedProducts(productId);
+        List<ProductResponse> productResponses = products.stream()
+        		.map((product) -> 
+        			productConvert.productConvertToProductResponse(product)
+        			).toList();
+        return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
     
     @GetMapping("/featured")

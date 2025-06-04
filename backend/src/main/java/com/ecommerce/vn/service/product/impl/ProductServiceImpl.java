@@ -1,7 +1,9 @@
 package com.ecommerce.vn.service.product.impl;
 
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -59,7 +61,8 @@ public class ProductServiceImpl implements ProductService{
 	@Override
 	public void deleteProduct(UUID productId) {
 		Product product = getProductById(productId);
-		productRepository.delete(product);
+		product.setActive(false);
+		updateProduct(product);
 	}
 
 	@Override
@@ -181,13 +184,17 @@ public class ProductServiceImpl implements ProductService{
 
 	@Override
 	@Transactional(readOnly = true )
-	public List<ProductWithScore> getRelatedProducts(UUID productId) {	
+	public List<Product> getRelatedProducts(UUID productId) {	
 		if(isProductExist(productId)) {
-			List<ProductWithScore> relatedProducts = productRepository.findRelatedProducts(productId);			
-			return relatedProducts;
+			List<byte[]> relatedProducts = productRepository.findTop6RelatedProductIds(productId);			
+			
+			List<UUID> relatedProductsId =  relatedProducts.stream().map(related -> toUUID(related)).toList();
+			
+			List<Product> products = productRepository.findAllById(relatedProductsId);
+			return products;
 		}
 		
-		return List.of();
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -211,7 +218,7 @@ public class ProductServiceImpl implements ProductService{
 		return productRepository.findProductsFeatured(pageable);
 	}
 
-	@Async
+//	@Async
 	@Override
 	public void updateSoldQuantity(Order order) {
 		Boolean isCustomized = order.getOrderItems().get(0).getIsCustomized();
@@ -274,6 +281,13 @@ public class ProductServiceImpl implements ProductService{
 
 	} 
 	
+	
+	private UUID toUUID(byte[] bytes) {
+	    ByteBuffer bb = ByteBuffer.wrap(bytes);
+	    long high = bb.getLong();
+	    long low = bb.getLong();
+	    return new UUID(high, low);
+	}
 	
 
 }

@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.vn.dto.wishlist.WishListResponse;
 import com.ecommerce.vn.entity.product.Variant;
 import com.ecommerce.vn.entity.user.User;
+import com.ecommerce.vn.entity.wishlist.WishListItem;
 import com.ecommerce.vn.service.convert.WishListConvert;
 import com.ecommerce.vn.service.user.UserService;
 import com.ecommerce.vn.service.variant.VariantService;
+import com.ecommerce.vn.service.wishlist.WishListItemService;
 import com.ecommerce.vn.service.wishlist.WishListService;
 
 @RestController
@@ -35,6 +37,9 @@ public class WishListController {
 	
 	@Autowired
 	private VariantService variantService;
+	
+	@Autowired
+	private WishListItemService wishListItemService;
 	
 	@GetMapping("/user")
 	public ResponseEntity<WishListResponse> getWishListByUser() {
@@ -61,6 +66,21 @@ public class WishListController {
 		User user = userService.findUserByEmail(email);        
 		Variant variant = variantService.getVariantById(variantId);
         wishListService.removeItem(user, variant);
+        return ResponseEntity.ok().build();
+    } 
+	
+	@PostMapping("/to-cart/{itemId}")
+    public ResponseEntity<?> moveItemToCart(@PathVariable UUID itemId) {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		User user = userService.findUserByEmail(email);        
+        WishListItem wishListItem = wishListItemService.getWishListItemById(itemId);
+        
+        if (!wishListItem.getWishlist().getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(403).body("Không được phép thao tác trên wishlist này.");
+        }
+
+        wishListService.wishListToCart(wishListItem, user);
+
         return ResponseEntity.ok().build();
     } 
 	

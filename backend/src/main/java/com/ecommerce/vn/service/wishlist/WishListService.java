@@ -15,6 +15,7 @@ public interface WishListService {
 	void addItem(User user, Variant variant);
 	void removeItem(User user, Variant variant);
 	void clearWishlist(User user);
+	void wishListToCart(WishListItem wishListItem,User user);
 	boolean existsInWishlist(User user, Variant variant);
 
 }

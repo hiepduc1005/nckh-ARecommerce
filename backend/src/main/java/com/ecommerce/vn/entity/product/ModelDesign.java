@@ -41,8 +41,17 @@ public class ModelDesign {
 	
 	private UUID cloneFrom;
 
+	private Boolean active = true;
+
 	
-	
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
 
 	public UUID getCloneFrom() {
 		return cloneFrom;

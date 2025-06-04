@@ -170,8 +170,9 @@ public class RatingServiceImpl implements RatingService {
 	    List<Object[]> rawDistribution = ratingRepository.getRatingDistributionRaw(product);
 	    return rawDistribution.stream()
 	            .collect(Collectors.toMap(
-	                    row -> ((Number) row[0]).intValue(), // Rating value (e.g., 1, 2, 3, 4, 5)
-	                    row -> ((Number) row[1]).longValue() // Count
+	                row -> ((Number) row[0]).intValue(),           // key
+	                row -> ((Number) row[1]).longValue(),          // value
+	                Long::sum                                       // merge function: cộng giá trị khi trùng key
 	            ));
 	}
 

@@ -63,6 +63,8 @@ public class OrderItemConvert {
 		}else {
 			orderItemResponse.setVariantResponse(variantConvert.variantConvertToVariantResponse(orderItem.getVariant()));			
 		}
+		
+		orderItemResponse.setIsCustomized(orderItem.getIsCustomized());
 		return orderItemResponse;
 	}
 	
