@@ -198,15 +198,24 @@ const Purchase = () => {
         discountPrice:
           item.modelDesignResponse?.modelCustomizeResponse?.discountPrice ||
           item.modelDesignResponse?.modelCustomizeResponse?.price ||
-          0,
+          null,
       };
     } else {
       // For regular products, use variant pricing
       return {
         originalPrice: item.variantResponse?.price || 0,
-        discountPrice: item.variantResponse?.discountPrice || 0,
+        discountPrice: item.variantResponse?.discountPrice || null,
       };
     }
+  };
+
+  // Helper function to calculate order subtotal (before shipping)
+  const getOrderSubtotal = (order) => {
+    const finalPrice = order.discountPrice
+      ? order.discountPrice
+      : order.totalPrice;
+    const shippingFee = order.shippingFee || 0;
+    return finalPrice - shippingFee;
   };
 
   const currentType = getTypeFromUrl();
@@ -246,6 +255,12 @@ const Purchase = () => {
           {orders?.map((order) => {
             // Nhóm các orderItems theo sản phẩm
             const groupedItems = groupOrderItemsByProduct(order.orderItems);
+            const orderSubtotal = getOrderSubtotal(order);
+            const shippingFee = order.shippingFee || 0;
+            const finalTotal = order.discountPrice
+              ? order.discountPrice
+              : order.totalPrice;
+
             return (
               <div key={order.id} className="order-card">
                 <div className="order-header">
@@ -337,12 +352,20 @@ const Purchase = () => {
                             </div>
                           </div>
                           <div className="item-price">
-                            <div className="original-price">
+                            <div
+                              className={`${
+                                pricing.discountPrice
+                                  ? "original-price"
+                                  : "discount-price "
+                              }`}
+                            >
                               {formatCurrency(pricing.originalPrice)}
                             </div>
-                            <div className="discount-price">
-                              {formatCurrency(pricing.discountPrice)}
-                            </div>
+                            {pricing.discountPrice && (
+                              <div className="discount-price">
+                                {formatCurrency(pricing.discountPrice)}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -375,21 +398,49 @@ const Purchase = () => {
                       )}
                     </div>
                     <div className="price-info">
-                      <span className="order-total-label">Thành tiền:</span>
-                      <span className="order-total-price">
-                        {formatCurrency(
-                          order.discountPrice
-                            ? order.discountPrice
-                            : order.totalPrice
+                      {/* Hiển thị breakdown chi tiết của giá */}
+                      <div className="price-breakdown">
+                        <div className="subtotal-row">
+                          <span className="label">Tạm tính:</span>
+                          <span className="value">
+                            {formatCurrency(orderSubtotal)}
+                          </span>
+                        </div>
+                        {shippingFee > 0 && (
+                          <div className="shipping-row">
+                            <span className="label">Phí vận chuyển:</span>
+                            <span className="value">
+                              {formatCurrency(shippingFee)}
+                            </span>
+                          </div>
                         )}
-                      </span>
+                        {order.discountAmount && order.discountAmount > 0 && (
+                          <div className="discount-row">
+                            <span className="label">Giảm giá:</span>
+                            <span className="value discount">
+                              -{formatCurrency(order.discountAmount)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="total-row">
+                        <span className="order-total-label">Thành tiền:</span>
+                        <span className="order-total-price">
+                          {formatCurrency(finalTotal)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div className="order-actions">
                     {/* Updated order action buttons based on new statuses */}
                     {order.orderStatus === "CANCELLED" && (
                       <>
-                        <button className="buy-again-btn">Mua Lại</button>
+                        <button
+                          className="buy-again-btn"
+                          onClick={() => navigate("/products")}
+                        >
+                          Mua Lại
+                        </button>
                         <button className="details-btn">
                           Xem Chi Tiết Hủy Đơn
                         </button>
@@ -405,7 +456,12 @@ const Purchase = () => {
                         >
                           Theo Dõi Đơn Hàng
                         </button>
-                        <button className="buy-again-btn">Mua Lại</button>
+                        <button
+                          className="buy-again-btn"
+                          onClick={() => navigate("/products")}
+                        >
+                          Mua Lại
+                        </button>
                       </>
                     )}
                     {order.orderStatus === "PAID" && (
@@ -455,14 +511,19 @@ const Purchase = () => {
                         >
                           Theo Dõi Đơn Hàng
                         </button>
-                        <button className="confirm-delivery-btn">
+                        {/* <button className="confirm-delivery-btn">
                           Xác Nhận Đã Nhận
-                        </button>
+                        </button> */}
                       </>
                     )}
                     {order.orderStatus === "REFUNDED" && (
                       <>
-                        <button className="buy-again-btn">Mua Lại</button>
+                        <button
+                          className="buy-again-btn"
+                          onClick={() => navigate("/products")}
+                        >
+                          Mua Lại
+                        </button>
                         <button className="details-btn">
                           Xem Chi Tiết Hoàn Tiền
                         </button>

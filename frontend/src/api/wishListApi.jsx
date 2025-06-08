@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import axiosInstance from "../utils/axiosInstance";
 const WISHLIST_API_BASE = "/api/v1/wishlist";
 
@@ -44,6 +45,24 @@ export const removeItemFromWishlist = async (token, variantId) => {
   } catch (error) {
     console.error("Error removing item from wishlist:", error);
     toast.error("Xóa sản phẩm vào danh sách yêu thích thất bại!");
+  }
+};
+
+export const wishListToCart = async (token, wishListItemId) => {
+  try {
+    await axiosInstance.post(
+      `${WISHLIST_API_BASE}/to-cart/${wishListItemId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error removing item from wishlist:", error);
+    toast.error("Chuyển sản phẩm yêu thích sang giỏ hàng thất bại");
   }
 };
 

@@ -275,6 +275,13 @@ const CreateModelCustomizeForm = ({
       itemType: formData.itemType,
     };
 
+    const modelCustomizeUpdate = {
+      id: formData.id,
+      name: formData.name,
+      price: formData.price,
+      itemType: formData.itemType,
+    };
+
     const formDataToSend = new FormData();
     formDataToSend.append(
       "customize",
@@ -283,19 +290,26 @@ const CreateModelCustomizeForm = ({
       })
     );
 
+    const formDataUpdateToSend = new FormData();
+    formDataUpdateToSend.append(
+      "customize",
+      new Blob([JSON.stringify(modelCustomizeUpdate)], {
+        type: "application/json",
+      })
+    );
+
     if (formData.imageFile) {
       formDataToSend.append("image", formData.imageFile);
+      formDataUpdateToSend.append("image", formData.imageFile);
     }
 
     if (formData.modelFile) {
       formDataToSend.append("model", formData.modelFile);
+      formDataUpdateToSend.append("model", formData.modelFile);
     }
 
     if (isEditing) {
-      formDataToSend.append("id", formData.id);
-      formDataToSend.append("imagePath", formData.imagePath);
-      formDataToSend.append("modelPath", formData.modelPath);
-      await onUpdateModel(formDataToSend);
+      await onUpdateModel(formDataUpdateToSend);
     } else {
       await onCreateModel(formDataToSend);
     }

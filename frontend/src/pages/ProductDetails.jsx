@@ -21,7 +21,11 @@ import {
 import ProductRecommend from "../components/ProductRecommend";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import ProductDetailsTapList from "../components/ProductDetailsTapList";
-import { getProductById, getProductBySlug } from "../api/productApi";
+import {
+  getProductById,
+  getProductBySlug,
+  getProductsRelated,
+} from "../api/productApi";
 import { toast } from "react-toastify";
 import useLoading from "../hooks/UseLoading";
 import { getVariantsByProductSlug } from "../api/variantApi";
@@ -88,6 +92,7 @@ const products = [
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
+  const [productsRelated, setProductsRelated] = useState();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState(null);
   const [selectedVariantStock, setSelectVariantStock] = useState(null);
@@ -123,6 +128,20 @@ const ProductDetails = () => {
 
     await addToWishlist(selectedVariants);
   };
+
+  const fetchProductsRelated = async () => {
+    const data = await getProductsRelated(product?.id);
+
+    if (data) {
+      setProductsRelated(data);
+    }
+  };
+
+  useEffect(() => {
+    if (product && product?.id) {
+      fetchProductsRelated();
+    }
+  }, [product]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -281,8 +300,13 @@ const ProductDetails = () => {
         <ProductDetailsTapList product={product} />
         <div className="products-recommend">
           <div className="title">Đề xuất cho bạn</div>
-          <ProductRecommend products={products} />
-          <Link to={"/"} content="Xem thêm" title="Xem thêm" className="more">
+          <ProductRecommend products={productsRelated} />
+          <Link
+            to={"/products"}
+            content="Xem thêm"
+            title="Xem thêm"
+            className="more"
+          >
             Xem thêm
           </Link>
         </div>
@@ -328,11 +352,12 @@ const ProductDetails = () => {
         <div className="product-options">
           {/* Attribute Selection Based on Product Data */}
           <h3>Biến thể:</h3>
-          {variants &&
-            variants.map((variant) => (
-              <div key={variant.id} className="variant-selection">
-                <div className="variant-options">
+          <div className="variant-selection">
+            <div className="variant-options">
+              {variants &&
+                variants.map((variant) => (
                   <button
+                    key={variant.id}
                     className={`variant-option ${
                       selectedVariants === variant.id ? "selected" : ""
                     }`}
@@ -363,9 +388,9 @@ const ProductDetails = () => {
                       )}
                     </div>
                   </button>
-                </div>
-              </div>
-            ))}
+                ))}
+            </div>
+          </div>
 
           <h3>Số lượng:</h3>
           <div className="quantity-control">

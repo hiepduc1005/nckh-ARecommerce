@@ -21,15 +21,6 @@ const SupportPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
-  const quickActions = [
-    { icon: ShoppingBag, title: "Đơn hàng của tôi", desc: "Theo dõi đơn hàng" },
-    { icon: RotateCcw, title: "Đổi trả hàng", desc: "Hướng dẫn đổi trả" },
-    { icon: CreditCard, title: "Thanh toán", desc: "Phương thức thanh toán" },
-    { icon: Truck, title: "Vận chuyển", desc: "Thông tin giao hàng" },
-    { icon: Gift, title: "Khuyến mãi", desc: "Ưu đãi & voucher" },
-    { icon: Shield, title: "Bảo mật", desc: "Chính sách bảo mật" },
-  ];
-
   const faqData = [
     {
       id: 1,
@@ -196,12 +187,7 @@ const SupportPage = () => {
       info: "0987654321",
       desc: "8:00 - 22:00 (Kể cả T7, CN)",
     },
-    {
-      icon: MessageCircle,
-      title: "Chat trực tuyến",
-      info: "Hỗ trợ 24/7",
-      desc: "Phản hồi trong vòng 2 phút",
-    },
+
     {
       icon: Mail,
       title: "Email",
@@ -244,24 +230,6 @@ const SupportPage = () => {
       </div>
 
       <div className="main-container">
-        {/* Quick Actions */}
-        <div className="quick-actions">
-          <h3>Hỗ trợ nhanh</h3>
-          <div className="actions-grid">
-            {quickActions.map((action, index) => (
-              <div key={index} className="action-item">
-                <div className="action-icon">
-                  <action.icon className="icon" />
-                </div>
-                <div className="action-content">
-                  <h4>{action.title}</h4>
-                  <p>{action.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Main Content */}
         <div className="content-grid">
           {/* FAQ Section */}

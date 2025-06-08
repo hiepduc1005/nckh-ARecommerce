@@ -12,10 +12,12 @@ import {
   existsInWishlist,
   getWishListByUser,
   removeItemFromWishlist,
+  wishListToCart,
 } from "../api/wishListApi";
 import useAuth from "../hooks/UseAuth";
 import { toast } from "react-toastify";
 import useLoading from "../hooks/UseLoading";
+import useCart from "./UseCart";
 
 const WishlistContext = createContext();
 
@@ -23,6 +25,7 @@ export const WishlistProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState(null);
   const { token, user } = useAuth();
   const { setLoading } = useLoading();
+  const { fetchCart } = useCart();
 
   const fetchWishlist = useCallback(async () => {
     if (!token || !user) return;
@@ -69,6 +72,29 @@ export const WishlistProvider = ({ children }) => {
     }
   };
 
+  const wishListItemToCart = async (wishListItemId) => {
+    if (!token || !user) return;
+    setLoading(true);
+    try {
+      await wishListToCart(token, wishListItemId);
+
+      setWishlist((prevWishlist) => {
+        if (!prevWishlist) return null;
+        return {
+          ...prevWishlist,
+          wishListItems: prevWishlist.wishListItems.filter(
+            (item) => item.id !== wishListItemId
+          ),
+        };
+      });
+
+      fetchCart();
+      toast.success("Chuyển sản phẩm yêu thích sang giỏ hàng thành công");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const clearWishlistData = async () => {
     if (!token || !user) return;
     setLoading(true);
@@ -99,6 +125,7 @@ export const WishlistProvider = ({ children }) => {
         removeFromWishlist,
         clearWishlistData,
         checkWishlistItem,
+        wishListItemToCart,
       }}
     >
       {children}

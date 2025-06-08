@@ -272,6 +272,39 @@ const OrderManagement = () => {
     }
   };
 
+  const getPaginationRange = (currentPage, totalPages) => {
+    const delta = 2; // Số trang hiển thị ở mỗi bên của trang hiện tại
+    const range = [];
+    const rangeWithDots = [];
+
+    // Tính toán phạm vi trang
+    const start = Math.max(2, currentPage - delta);
+    const end = Math.min(totalPages - 1, currentPage + delta);
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+
+    // Luôn hiển thị trang đầu
+    if (currentPage - delta > 2) {
+      rangeWithDots.push(1, "...");
+    } else {
+      rangeWithDots.push(1);
+    }
+
+    // Thêm các trang trong phạm vi
+    rangeWithDots.push(...range);
+
+    // Luôn hiển thị trang cuối
+    if (currentPage + delta < totalPages - 1) {
+      rangeWithDots.push("...", totalPages);
+    } else if (totalPages > 1) {
+      rangeWithDots.push(totalPages);
+    }
+
+    return rangeWithDots;
+  };
+
   return (
     <div className="order-tracking-page">
       <div className="container">
@@ -360,36 +393,55 @@ const OrderManagement = () => {
               )}
             </div>
 
-            {/* Pagination controls */}
-            {orders.length > 0 && (
+            {orders.length > 0 && totalPages > 1 && (
               <div className="pagination">
+                {/* Nút Previous */}
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                   className="pagination-button"
                 >
-                  &laquo;
+                  &laquo; Trước
                 </button>
 
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i + 1}
-                    onClick={() => handlePageChange(i + 1)}
-                    className={`pagination-button ${
-                      currentPage === i + 1 ? "active" : ""
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
+                {/* Các số trang */}
+                {getPaginationRange(currentPage, totalPages).map(
+                  (page, index) => {
+                    if (page === "...") {
+                      return (
+                        <span key={`dots-${index}`} className="pagination-dots">
+                          ...
+                        </span>
+                      );
+                    }
 
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`pagination-button ${
+                          currentPage === page ? "active" : ""
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  }
+                )}
+
+                {/* Nút Next */}
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className="pagination-button"
                 >
-                  &raquo;
+                  Sau &raquo;
                 </button>
+
+                {/* Thông tin trang hiện tại */}
+                <div className="pagination-info">
+                  Trang {currentPage} / {totalPages}
+                </div>
               </div>
             )}
           </div>

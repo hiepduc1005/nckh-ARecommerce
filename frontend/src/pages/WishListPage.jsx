@@ -4,7 +4,12 @@ import "../assets/styles/pages/WishlistPage.scss";
 import { useWishlist } from "../hooks/UseWishList";
 
 const WishlistPage = () => {
-  const { wishlist, removeFromWishlist, clearWishlistData } = useWishlist();
+  const {
+    wishlist,
+    removeFromWishlist,
+    clearWishlistData,
+    wishListItemToCart,
+  } = useWishlist();
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
   const [sortBy, setSortBy] = useState("newest"); // 'newest', 'oldest', 'price-high', 'price-low'
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -138,6 +143,7 @@ const WishlistPage = () => {
           <button
             className="add-to-cart-btn"
             disabled={variantResponse.quantity === 0}
+            onClick={() => wishListItemToCart(item?.id)}
           >
             <ShoppingCart size={16} />
             {variantResponse.quantity > 0 ? "Thêm vào giỏ hàng" : "Hết hàng"}

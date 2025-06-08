@@ -154,7 +154,7 @@ const CartPage = () => {
     const encryptedData = encryptData(checkoutData);
     const encodedData = encodeURIComponent(encryptedData);
 
-    navigate(`/checkout?encrd=${encodedData}`);
+    navigate(`/checkout?encrd=${encodedData}`, { state: { isCart: true } });
   };
 
   return (
@@ -199,11 +199,20 @@ const CartPage = () => {
                         {cartItem.variantResponse?.productResponse?.productName}
                       </div>
                       <div className="product-price">
-                        <div className="discount">
-                          {cartItem.variantResponse?.discountPrice.toLocaleString()}{" "}
-                          Đ
-                        </div>
-                        <div className="original">
+                        {cartItem.variantResponse?.discountPrice > 0 && (
+                          <div className="discount">
+                            {cartItem.variantResponse?.discountPrice > 0 &&
+                              cartItem.variantResponse?.discountPrice.toLocaleString()}{" "}
+                            Đ
+                          </div>
+                        )}
+                        <div
+                          className={`${
+                            cartItem.variantResponse?.discountPrice > 0
+                              ? "original"
+                              : "discount"
+                          }`}
+                        >
                           {cartItem.variantResponse?.price.toLocaleString()} Đ
                         </div>
                       </div>

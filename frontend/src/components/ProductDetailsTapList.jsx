@@ -21,7 +21,10 @@ const ProductDetailsTapList = ({ product }) => {
         </TabList>
 
         <TabPanel>
-          <div className="description-content">
+          <div
+            className="description-content"
+            style={{ whiteSpace: "pre-line" }}
+          >
             {product?.description ? (
               <p>{product.description}</p>
             ) : (

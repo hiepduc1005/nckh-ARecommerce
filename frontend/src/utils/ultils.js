@@ -183,282 +183,278 @@ export const captureModelImage = async (modelFile, colorConfig = null) => {
     try {
       // Tạo một canvas tạm thời
       const canvas = document.createElement("canvas");
-      canvas.width = 400;
-      canvas.height = 400;
+      canvas.width = 800; // Tăng kích thước để có chất lượng tốt hơn
+      canvas.height = 800;
       const renderer = new THREE.WebGLRenderer({
         canvas,
         antialias: true,
         alpha: true,
+        preserveDrawingBuffer: true, // Quan trọng để capture ảnh
       });
-      // Đổi màu nền thành trắng
+      
+      // Đổi màu nền thành trắng và tăng cường ánh sáng
       renderer.setClearColor(0xffffff, 1);
-      // Bật tính năng tối ưu hóa ánh sáng
-      renderer.physicallyCorrectLights = true;
-      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      
+      // Cài đặt tone mapping để ảnh sáng hơn
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.5; // Tăng exposure để sáng hơn
+      renderer.toneMappingExposure = 2.5; // Tăng exposure cao hơn
+      renderer.outputEncoding = THREE.sRGBEncoding;
 
       // Tạo cảnh và camera
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-      camera.position.set(0, 0, 5);
+      scene.background = new THREE.Color(0xf5f5f5); // Nền xám nhạt thay vì trắng hoàn toàn
+      
+      const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000); // Giảm FOV để tập trung hơn
+      camera.position.set(4, 3, 6); // Điều chỉnh vị trí camera
+      camera.lookAt(0, 0, 0);
 
-      // Cải thiện hệ thống ánh sáng
-      // Tăng cường ánh sáng ambient
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.0); // Tăng cường độ từ 0.5 lên 1.0
+      // HỆ THỐNG ÁNH SÁNG ĐƯỢC CẢI THIỆN MẠNH
+      
+      // 1. Ambient Light - Ánh sáng môi trường mạnh
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
       scene.add(ambientLight);
 
-      // Thêm nhiều nguồn ánh sáng từ các hướng khác nhau
-      const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
-      directionalLight1.position.set(0, 1, 2);
-      scene.add(directionalLight1);
+      // 2. Key Light - Ánh sáng chính từ trước
+      const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
+      keyLight.position.set(5, 8, 5);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 2048;
+      keyLight.shadow.mapSize.height = 2048;
+      scene.add(keyLight);
 
-      // Thêm ánh sáng phụ từ hướng đối diện để giảm bóng tối
-      const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
-      directionalLight2.position.set(0, -1, -2);
-      scene.add(directionalLight2);
+      // 3. Fill Light - Ánh sáng phụ từ bên trái
+      const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      fillLight.position.set(-3, 4, 2);
+      scene.add(fillLight);
 
-      // Thêm ánh sáng từ bên cạnh để tăng chiều sâu
-      const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.6);
-      directionalLight3.position.set(-2, 0, 1);
-      scene.add(directionalLight3);
+      // 4. Back Light - Ánh sáng từ phía sau để tạo chiều sâu
+      const backLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      backLight.position.set(-2, 2, -3);
+      scene.add(backLight);
+
+      // 5. Rim Light - Ánh sáng viền từ trên cao
+      const rimLight = new THREE.DirectionalLight(0xffffff, 1.0);
+      rimLight.position.set(0, 10, -5);
+      scene.add(rimLight);
+
+      // 6. Point Lights - Thêm các nguồn sáng điểm
+      const pointLight1 = new THREE.PointLight(0xffffff, 1.5, 50);
+      pointLight1.position.set(3, 3, 3);
+      scene.add(pointLight1);
+
+      const pointLight2 = new THREE.PointLight(0xffffff, 1.2, 50);
+      pointLight2.position.set(-3, 3, 3);
+      scene.add(pointLight2);
+
+      // 7. Hemisphere Light - Ánh sáng bầu trời
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+      hemiLight.position.set(0, 20, 0);
+      scene.add(hemiLight);
 
       // Xác định loại file
       const fileExtension = modelFile.name.split(".").pop().toLowerCase();
-
-      // Tạo URL blob để load model
       const objectUrl = URL.createObjectURL(modelFile);
 
+      // Hàm áp dụng material sáng hơn
+      function applyBrightMaterial(object) {
+        object.traverse((child) => {
+          if (child.isMesh) {
+            if (!child.userData.originalMaterial) {
+              child.userData.originalMaterial = child.material;
+            }
+            
+            // Sử dụng MeshStandardMaterial với cài đặt sáng
+            const newMaterial = new THREE.MeshStandardMaterial({
+              color: 0xcccccc, // Màu sáng hơn
+              metalness: 0.1,   // Giảm tính kim loại
+              roughness: 0.3,   // Giảm độ nhám để phản xạ nhiều hơn
+              emissive: 0x333333, // Thêm ánh sáng phát ra
+              emissiveIntensity: 0.1,
+            });
+            
+            child.material = newMaterial;
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+      }
+
+      // Hàm áp dụng cấu hình màu sắc được cải thiện
+      function applyColorConfig(object, colorConfig) {
+        object.traverse((child) => {
+          if (child.name && colorConfig[child.name]) {
+            const colorData = colorConfig[child.name];
+            const color = new THREE.Color(colorData.color);
+            
+            if (child.isMesh) {
+              if (!child.userData.originalMaterial) {
+                child.userData.originalMaterial = child.material;
+              }
+              
+              // Sử dụng MeshStandardMaterial với cài đặt sáng
+              const newMaterial = new THREE.MeshStandardMaterial({
+                color: color,
+                metalness: 0.1,
+                roughness: 0.4,
+                emissive: color.clone().multiplyScalar(0.1), // Thêm chút phát sáng
+                emissiveIntensity: 0.05,
+              });
+              
+              // Sao chép texture nếu có
+              if (child.material) {
+                if (Array.isArray(child.material)) {
+                  child.material = child.material.map(mat => {
+                    const newMat = newMaterial.clone();
+                    if (mat.map) newMat.map = mat.map;
+                    if (mat.normalMap) newMat.normalMap = mat.normalMap;
+                    return newMat;
+                  });
+                } else {
+                  if (child.material.map) newMaterial.map = child.material.map;
+                  if (child.material.normalMap) newMaterial.normalMap = child.material.normalMap;
+                  child.material = newMaterial;
+                }
+              } else {
+                child.material = newMaterial;
+              }
+              
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          } else if (child.isMesh) {
+            // Áp dụng material mặc định sáng
+            applyBrightMaterial(child.parent || object);
+          }
+        });
+      }
+
       // Xử lý tùy theo loại file
+      const loaderCallbacks = {
+        onLoad: (loadedObject) => {
+          const model = loadedObject.scene || loadedObject;
+          
+          // Áp dụng màu sắc
+          if (colorConfig) {
+            applyColorConfig(model, colorConfig);
+          } else {
+            applyBrightMaterial(model);
+          }
+          
+          processLoadedModel(model);
+        },
+        onProgress: (xhr) => {
+          // Progress callback
+        },
+        onError: (error) => {
+          console.error("Lỗi khi load model:", error);
+          URL.revokeObjectURL(objectUrl);
+          reject(error);
+        }
+      };
+
+      // Load model theo loại file
       if (fileExtension === "obj") {
         const loader = new OBJLoader();
-        loader.load(
-          objectUrl,
-          (object) => {
-            // Áp dụng màu sắc nếu có colorConfig
-            if (colorConfig) {
-              applyColorConfig(object, colorConfig);
-            } else {
-              // Nếu không có colorConfig, áp dụng material mặc định sáng hơn
-              applyDefaultMaterial(object);
-            }
-            // Xử lý model đã load
-            processLoadedModel(object, scene, camera, renderer, resolve, objectUrl);
-          },
-          (xhr) => {
-            // Progress callback nếu cần
-          },
-          (error) => {
-            console.error("Lỗi khi load OBJ:", error);
-            URL.revokeObjectURL(objectUrl);
-            reject(error);
-          }
-        );
+        loader.load(objectUrl, loaderCallbacks.onLoad, loaderCallbacks.onProgress, loaderCallbacks.onError);
       } else if (fileExtension === "glb" || fileExtension === "gltf") {
         const loader = new GLTFLoader();
-        loader.load(
-          objectUrl,
-          (gltf) => {
-            // Áp dụng màu sắc nếu có colorConfig
-            if (colorConfig) {
-              applyColorConfig(gltf.scene, colorConfig);
-            } else {
-              // Nếu không có colorConfig, áp dụng material mặc định sáng hơn
-              applyDefaultMaterial(gltf.scene);
-            }
-            // Với GLTF, chúng ta cần lấy scene
-            processLoadedModel(gltf.scene, scene, camera, renderer, resolve, objectUrl);
-          },
-          (xhr) => {
-            // Progress callback nếu cần
-          },
-          (error) => {
-            console.error("Lỗi khi load GLTF/GLB:", error);
-            URL.revokeObjectURL(objectUrl);
-            reject(error);
-          }
-        );
+        loader.load(objectUrl, loaderCallbacks.onLoad, loaderCallbacks.onProgress, loaderCallbacks.onError);
       } else if (fileExtension === "fbx") {
         const loader = new FBXLoader();
-        loader.load(
-          objectUrl,
-          (object) => {
-            // Áp dụng màu sắc nếu có colorConfig
-            if (colorConfig) {
-              applyColorConfig(object, colorConfig);
-            } else {
-              // Nếu không có colorConfig, áp dụng material mặc định sáng hơn
-              applyDefaultMaterial(object);
-            }
-            // Xử lý model đã load
-            processLoadedModel(object, scene, camera, renderer, resolve, objectUrl);
-          },
-          (xhr) => {
-            // Progress callback nếu cần
-          },
-          (error) => {
-            console.error("Lỗi khi load FBX:", error);
-            URL.revokeObjectURL(objectUrl);
-            reject(error);
-          }
-        );
+        loader.load(objectUrl, loaderCallbacks.onLoad, loaderCallbacks.onProgress, loaderCallbacks.onError);
       } else {
         URL.revokeObjectURL(objectUrl);
         reject(new Error("Định dạng file không được hỗ trợ"));
       }
 
-      // Hàm áp dụng material mặc định sáng hơn cho model nếu không có colorConfig
-      function applyDefaultMaterial(object) {
-        object.traverse((child) => {
-          if (child.isMesh) {
-            // Lưu lại material gốc nếu cần
-            if (!child.userData.originalMaterial) {
-              child.userData.originalMaterial = child.material;
-            }
-            
-            // Tạo material mới sáng hơn với khả năng phản xạ cao
-            const newMaterial = new THREE.MeshPhongMaterial({
-              color: 0x333333, // Màu tối nhưng không quá đen
-              shininess: 100,   // Độ bóng cao
-              specular: 0x999999, // Tăng độ phản xạ ánh sáng
-              emissive: 0x111111, // Thêm chút phát quang
-            });
-            
-            child.material = newMaterial;
-          }
-        });
-      }
+      function processLoadedModel(model) {
+        try {
+          // Tự động điều chỉnh kích thước và vị trí
+          const box = new THREE.Box3().setFromObject(model);
+          const size = box.getSize(new THREE.Vector3());
+          const center = box.getCenter(new THREE.Vector3());
 
-      // Hàm áp dụng cấu hình màu sắc cho model
-      function applyColorConfig(object, colorConfig) {
-        object.traverse((child) => {
-          // Kiểm tra xem đối tượng có trong cấu hình màu không
-          if (child.name && colorConfig[child.name]) {
-            // Lấy thông tin màu từ cấu hình
-            const colorData = colorConfig[child.name];
-            const hexColor = colorData.color;
-            
-            // Chuyển đổi mã màu hex thành màu THREE.js
-            const color = new THREE.Color(hexColor);
-            
-            // Thêm material mới với màu đã chỉ định
-            if (child.isMesh) {
-              // Lưu lại material gốc nếu cần
-              if (!child.userData.originalMaterial) {
-                child.userData.originalMaterial = child.material;
-              }
-              
-              // Nếu đối tượng đã có material, sao chép thuộc tính khác và chỉ thay đổi màu
-              if (child.material) {
-                if (Array.isArray(child.material)) {
-                  // Nếu có nhiều material, áp dụng màu cho tất cả
-                  child.material = child.material.map(mat => {
-                    // Sử dụng MeshPhongMaterial thay vì MeshStandardMaterial để sáng hơn
-                    const newMat = new THREE.MeshPhongMaterial({
-                      color: color,
-                      shininess: 100,
-                      specular: 0x999999,
-                    });
-                    
-                    // Sao chép các thuộc tính khác từ material gốc nếu cần
-                    if (mat.map) newMat.map = mat.map;
-                    if (mat.normalMap) newMat.normalMap = mat.normalMap;
-                    
-                    return newMat;
-                  });
-                } else {
-                  // Nếu chỉ có một material
-                  // Sử dụng MeshPhongMaterial thay vì MeshStandardMaterial để sáng hơn
-                  const newMaterial = new THREE.MeshPhongMaterial({
-                    color: color,
-                    shininess: 100,
-                    specular: 0x999999,
-                  });
-                  
-                  // Sao chép các thuộc tính khác từ material gốc nếu cần
-                  if (child.material.map) newMaterial.map = child.material.map;
-                  if (child.material.normalMap) newMaterial.normalMap = child.material.normalMap;
-                  
-                  child.material = newMaterial;
+          const maxDim = Math.max(size.x, size.y, size.z);
+          const scale = 3.5 / maxDim; // Tăng từ 2.5 lên 3.5 để model to hơn
+          model.scale.set(scale, scale, scale);
+
+          model.position.x = -center.x * scale -1;
+          model.position.y = -center.y * scale;
+          model.position.z = -center.z * scale;
+
+          // Điều chỉnh góc xoay để hiển thị tốt hơn
+          model.rotation.x = -Math.PI / 12; // Nghiêng nhẹ
+          model.rotation.y = Math.PI / 2;   // Tăng từ PI/6 lên PI/3 để xoay sang phải hơn
+
+          scene.add(model);
+
+          // Điều chỉnh camera để nhìn model tốt hơn
+          camera.position.set(
+            center.x * scale + 4,
+            center.y * scale + 3,
+            center.z * scale + 6
+          );
+          camera.lookAt(
+            center.x * scale,
+            center.y * scale,
+            center.z * scale
+          );
+
+          // Render với chất lượng cao
+          renderer.setSize(800, 800);
+          
+          // Render nhiều lần để đảm bảo chất lượng
+          for (let i = 0; i < 5; i++) {
+            renderer.render(scene, camera);
+          }
+
+          // Đợi một chút để đảm bảo render hoàn thành
+          setTimeout(() => {
+            canvas.toBlob(
+              (blob) => {
+                if (!blob) {
+                  reject(new Error("Không thể tạo ảnh từ canvas"));
+                  return;
                 }
-              } else {
-                // Nếu không có material, tạo một material mới
-                child.material = new THREE.MeshPhongMaterial({
-                  color: color,
-                  shininess: 100,
-                  specular: 0x999999,
-                });
-              }
-            }
-          } else if (child.isMesh && !child.material) {
-            // Nếu phần này không có trong colorConfig và không có material, áp dụng material mặc định sáng hơn
-            child.material = new THREE.MeshPhongMaterial({
-              color: 0x333333,
-              shininess: 100,
-              specular: 0x999999,
-              emissive: 0x111111,
-            });
-          }
-        });
-      }
 
-      // Hàm xử lý model sau khi đã load
-      function processLoadedModel(model, scene, camera, renderer, resolve, objectUrl) {
-        // Tự động điều chỉnh kích thước và vị trí của model
-        const box = new THREE.Box3().setFromObject(model);
-        const size = box.getSize(new THREE.Vector3());
-        const center = box.getCenter(new THREE.Vector3());
+                const imageFile = new File(
+                  [blob],
+                  `${modelFile.name.split(".")[0]}-preview.png`,
+                  { type: "image/png" }
+                );
 
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 3 / maxDim;
-        model.scale.set(scale, scale, scale);
-
-        model.position.x = -center.x * scale;
-        model.position.y = -center.y * scale;
-        model.position.z = -center.z * scale;
-
-        // Xoay model để có góc nhìn tốt hơn
-        model.rotation.x = Math.PI / 10; // Giảm góc nghiêng
-        model.rotation.y = Math.PI / 4; // Thêm góc xoay theo trục Y để nhìn rõ chi tiết hơn
-
-        scene.add(model);
-
-        // Render nhiều lần để cải thiện chất lượng hình ảnh
-        for (let i = 0; i < 3; i++) {
-          renderer.render(scene, camera);
-        }
-
-        // Chuyển đổi canvas thành file ảnh
-        canvas.toBlob(
-          (blob) => {
-            const imageFile = new File(
-              [blob],
-              `${modelFile.name.split(".")[0]}-preview.png`,
-              { type: "image/png" }
+                // Giải phóng bộ nhớ
+                cleanup();
+                resolve(imageFile);
+              },
+              "image/png",
+              1.0
             );
+          }, 100);
 
-            // Giải phóng bộ nhớ
-            URL.revokeObjectURL(objectUrl);
-            
-            // Giải phóng tài nguyên Three.js
-            renderer.dispose();
-            scene.traverse((object) => {
-              if (object.geometry) object.geometry.dispose();
-              if (object.material) {
-                if (Array.isArray(object.material)) {
-                  object.material.forEach(material => material.dispose());
-                } else {
-                  object.material.dispose();
-                }
-              }
-            });
-
-            resolve(imageFile);
-          },
-          "image/png",
-          1.0 // Tăng chất lượng lên mức tối đa
-        );
+        } catch (error) {
+          cleanup();
+          reject(error);
+        }
       }
+
+      function cleanup() {
+        URL.revokeObjectURL(objectUrl);
+        renderer.dispose();
+        scene.traverse((object) => {
+          if (object.geometry) object.geometry.dispose();
+          if (object.material) {
+            if (Array.isArray(object.material)) {
+              object.material.forEach(material => material.dispose());
+            } else {
+              object.material.dispose();
+            }
+          }
+        });
+      }
+
     } catch (error) {
       console.error("Lỗi khi chụp ảnh model:", error);
       reject(error);
@@ -473,45 +469,75 @@ export const captureModelImage = async (modelFile, colorConfig = null) => {
       try {
         // Tạo một canvas tạm thời
         const canvas = document.createElement("canvas");
-        canvas.width = 400;
-        canvas.height = 400;
+        canvas.width = 800; // Tăng kích thước để có chất lượng tốt hơn
+        canvas.height = 800;
         const renderer = new THREE.WebGLRenderer({
           canvas,
           antialias: true,
           alpha: true,
+          preserveDrawingBuffer: true, // Quan trọng để capture ảnh
         });
-        // Đổi màu nền sáng hơn
+        
+        // Đổi màu nền thành trắng và tăng cường ánh sáng
         renderer.setClearColor(0xffffff, 1);
-        // Bật tính năng tối ưu hóa ánh sáng
-        renderer.physicallyCorrectLights = true;
-        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        
+        // Cài đặt tone mapping để ảnh sáng hơn
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.5; // Tăng exposure để sáng hơn
+        renderer.toneMappingExposure = 2.5; // Tăng exposure cao hơn
+        renderer.outputEncoding = THREE.sRGBEncoding;
   
         // Tạo cảnh và camera
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-        camera.position.set(0, 0, 5);
+        scene.background = new THREE.Color(0xf5f5f5); // Nền xám nhạt thay vì trắng hoàn toàn
+        
+        const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000); // Giảm FOV để tập trung hơn
+        camera.position.set(4, 3, 6); // Điều chỉnh vị trí camera
+        camera.lookAt(0, 0, 0);
   
-        // Tăng cường hệ thống ánh sáng
-        // Tăng cường ánh sáng ambient
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.0); // Tăng cường độ từ 0.5 lên 1.0
+        // HỆ THỐNG ÁNH SÁNG ĐƯỢC CẢI THIỆN MẠNH
+        
+        // 1. Ambient Light - Ánh sáng môi trường mạnh
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
         scene.add(ambientLight);
   
-        // Thêm nhiều ánh sáng định hướng từ các góc khác nhau
-        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1.2); // Tăng cường độ
-        directionalLight1.position.set(0, 1, 2);
-        scene.add(directionalLight1);
+        // 2. Key Light - Ánh sáng chính từ trước
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
+        keyLight.position.set(5, 8, 5);
+        keyLight.castShadow = true;
+        keyLight.shadow.mapSize.width = 2048;
+        keyLight.shadow.mapSize.height = 2048;
+        scene.add(keyLight);
   
-        // Thêm ánh sáng từ hướng đối diện để giảm bóng đổ
-        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight2.position.set(0, -1, -2);
-        scene.add(directionalLight2);
+        // 3. Fill Light - Ánh sáng phụ từ bên trái
+        const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        fillLight.position.set(-3, 4, 2);
+        scene.add(fillLight);
   
-        // Thêm ánh sáng từ bên trái
-        const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.6);
-        directionalLight3.position.set(-2, 0, 1);
-        scene.add(directionalLight3);
+        // 4. Back Light - Ánh sáng từ phía sau để tạo chiều sâu
+        const backLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        backLight.position.set(-2, 2, -3);
+        scene.add(backLight);
+  
+        // 5. Rim Light - Ánh sáng viền từ trên cao
+        const rimLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        rimLight.position.set(0, 10, -5);
+        scene.add(rimLight);
+  
+        // 6. Point Lights - Thêm các nguồn sáng điểm
+        const pointLight1 = new THREE.PointLight(0xffffff, 1.5, 50);
+        pointLight1.position.set(3, 3, 3);
+        scene.add(pointLight1);
+  
+        const pointLight2 = new THREE.PointLight(0xffffff, 1.2, 50);
+        pointLight2.position.set(-3, 3, 3);
+        scene.add(pointLight2);
+  
+        // 7. Hemisphere Light - Ánh sáng bầu trời
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+        hemiLight.position.set(0, 20, 0);
+        scene.add(hemiLight);
   
         // Trích xuất định dạng file từ URL
         const urlParts = modelURL.split('.');
@@ -521,226 +547,202 @@ export const captureModelImage = async (modelFile, colorConfig = null) => {
         const pathParts = modelURL.split('/');
         const fileName = pathParts[pathParts.length - 1].split('?')[0]; // Loại bỏ query params nếu có
   
-        // Xử lý tùy theo loại file
-        if (fileExtension === "obj") {
-          const loader = new OBJLoader();
-          loader.load(
-            modelURL,
-            (object) => {
-              // Áp dụng màu sắc nếu có colorConfig
-              if (colorConfig) {
-                applyColorConfig(object, colorConfig);
-              } else {
-                // Nếu không có colorConfig, áp dụng material mặc định sáng hơn
-                applyDefaultMaterial(object);
-              }
-              // Xử lý model đã load
-              processLoadedModel(object, scene, camera, renderer, resolve, fileName);
-            },
-            (xhr) => {
-              // Progress callback nếu cần
-            },
-            (error) => {
-              console.error("Lỗi khi load OBJ:", error);
-              reject(error);
-            }
-          );
-        } else if (fileExtension === "glb" || fileExtension === "gltf") {
-          const loader = new GLTFLoader();
-          loader.load(
-            modelURL,
-            (gltf) => {
-              // Áp dụng màu sắc nếu có colorConfig
-              if (colorConfig) {
-                applyColorConfig(gltf.scene, colorConfig);
-              } else {
-                // Nếu không có colorConfig, áp dụng material mặc định sáng hơn
-                applyDefaultMaterial(gltf.scene);
-              }
-              // Với GLTF, chúng ta cần lấy scene
-              processLoadedModel(gltf.scene, scene, camera, renderer, resolve, fileName);
-            },
-            (xhr) => {
-              // Progress callback nếu cần
-            },
-            (error) => {
-              console.error("Lỗi khi load GLTF/GLB:", error);
-              reject(error);
-            }
-          );
-        } else if (fileExtension === "fbx") {
-          const loader = new FBXLoader();
-          loader.load(
-            modelURL,
-            (object) => {
-              // Áp dụng màu sắc nếu có colorConfig
-              if (colorConfig) {
-                applyColorConfig(object, colorConfig);
-              } else {
-                // Nếu không có colorConfig, áp dụng material mặc định sáng hơn
-                applyDefaultMaterial(object);
-              }
-              // Xử lý model đã load
-              processLoadedModel(object, scene, camera, renderer, resolve, fileName);
-            },
-            (xhr) => {
-              // Progress callback nếu cần
-            },
-            (error) => {
-              console.error("Lỗi khi load FBX:", error);
-              reject(error);
-            }
-          );
-        } else {
-          reject(new Error("Định dạng file không được hỗ trợ"));
-        }
-  
-        // Hàm áp dụng material mặc định sáng hơn cho model nếu không có colorConfig
-        function applyDefaultMaterial(object) {
+        // Hàm áp dụng material sáng hơn
+        function applyBrightMaterial(object) {
           object.traverse((child) => {
             if (child.isMesh) {
-              // Tạo material sáng hơn với độ phản xạ tăng
-              const newMaterial = new THREE.MeshPhongMaterial({
-                color: 0x333333, // Màu tối nhưng không quá đen
-                shininess: 100,   // Độ bóng cao
-                specular: 0x999999, // Tăng độ phản xạ ánh sáng
-                emissive: 0x111111, // Thêm chút phát quang
-              });
-              
-              // Lưu lại material gốc nếu cần
               if (!child.userData.originalMaterial) {
                 child.userData.originalMaterial = child.material;
               }
               
+              // Sử dụng MeshStandardMaterial với cài đặt sáng
+              const newMaterial = new THREE.MeshStandardMaterial({
+                color: 0xcccccc, // Màu sáng hơn
+                metalness: 0.1,   // Giảm tính kim loại
+                roughness: 0.3,   // Giảm độ nhám để phản xạ nhiều hơn
+                emissive: 0x333333, // Thêm ánh sáng phát ra
+                emissiveIntensity: 0.1,
+              });
+              
               child.material = newMaterial;
+              child.castShadow = true;
+              child.receiveShadow = true;
             }
           });
         }
   
-        // Hàm áp dụng cấu hình màu sắc cho model
+        // Hàm áp dụng cấu hình màu sắc được cải thiện
         function applyColorConfig(object, colorConfig) {
           object.traverse((child) => {
-            // Kiểm tra xem đối tượng có trong cấu hình màu không
             if (child.name && colorConfig[child.name]) {
-              // Lấy thông tin màu từ cấu hình
               const colorData = colorConfig[child.name];
-              const hexColor = colorData.color;
+              const color = new THREE.Color(colorData.color);
               
-              // Chuyển đổi mã màu hex thành màu THREE.js
-              const color = new THREE.Color(hexColor);
-              
-              // Thêm material mới với màu đã chỉ định
               if (child.isMesh) {
-                // Nếu đối tượng đã có material, sao chép thuộc tính khác và chỉ thay đổi màu
+                if (!child.userData.originalMaterial) {
+                  child.userData.originalMaterial = child.material;
+                }
+                
+                // Sử dụng MeshStandardMaterial với cài đặt sáng
+                const newMaterial = new THREE.MeshStandardMaterial({
+                  color: color,
+                  metalness: 0.1,
+                  roughness: 0.4,
+                  emissive: color.clone().multiplyScalar(0.1), // Thêm chút phát sáng
+                  emissiveIntensity: 0.05,
+                });
+                
+                // Sao chép texture nếu có
                 if (child.material) {
                   if (Array.isArray(child.material)) {
-                    // Nếu có nhiều material, áp dụng màu cho tất cả
                     child.material = child.material.map(mat => {
-                      // Sử dụng MeshPhongMaterial thay vì MeshStandardMaterial để sáng hơn
-                      const newMat = new THREE.MeshPhongMaterial({
-                        color: color,
-                        shininess: 100,
-                        specular: 0x999999,
-                      });
-                      
-                      // Sao chép các thuộc tính khác từ material gốc nếu cần
+                      const newMat = newMaterial.clone();
                       if (mat.map) newMat.map = mat.map;
                       if (mat.normalMap) newMat.normalMap = mat.normalMap;
-                      
                       return newMat;
                     });
                   } else {
-                    // Nếu chỉ có một material
-                    // Sử dụng MeshPhongMaterial thay vì MeshStandardMaterial để sáng hơn
-                    const newMaterial = new THREE.MeshPhongMaterial({
-                      color: color,
-                      shininess: 100,
-                      specular: 0x999999,
-                    });
-                    
-                    // Sao chép các thuộc tính khác từ material gốc nếu cần
                     if (child.material.map) newMaterial.map = child.material.map;
                     if (child.material.normalMap) newMaterial.normalMap = child.material.normalMap;
-                    
                     child.material = newMaterial;
                   }
                 } else {
-                  // Nếu không có material, tạo một material mới
-                  child.material = new THREE.MeshPhongMaterial({
-                    color: color,
-                    shininess: 100,
-                    specular: 0x999999,
-                  });
+                  child.material = newMaterial;
                 }
+                
+                child.castShadow = true;
+                child.receiveShadow = true;
               }
             } else if (child.isMesh) {
-              // Nếu phần này không có trong colorConfig, áp dụng material mặc định sáng hơn
-              const newMaterial = new THREE.MeshPhongMaterial({
-                color: 0x333333,
-                shininess: 100,
-                specular: 0x999999,
-                emissive: 0x111111,
-              });
-              child.material = newMaterial;
+              // Áp dụng material mặc định sáng
+              applyBrightMaterial(child.parent || object);
             }
           });
         }
   
-        // Hàm xử lý model sau khi đã load
-        function processLoadedModel(model, scene, camera, renderer, resolve, fileName) {
-          // Tự động điều chỉnh kích thước và vị trí của model
-          const box = new THREE.Box3().setFromObject(model);
-          const size = box.getSize(new THREE.Vector3());
-          const center = box.getCenter(new THREE.Vector3());
-  
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const scale = 3 / maxDim;
-          model.scale.set(scale, scale, scale);
-  
-          model.position.x = -center.x * scale;
-          model.position.y = -center.y * scale;
-          model.position.z = -center.z * scale;
-  
-          // Xoay model để có góc nhìn tốt hơn - điều chỉnh góc xoay
-          model.rotation.x = Math.PI / 10;
-          model.rotation.y = Math.PI / 4; // Thêm xoay theo trục Y để nhìn rõ hơn
-  
-          scene.add(model);
-  
-          // Render nhiều lần để cải thiện chất lượng
-          for (let i = 0; i < 3; i++) {
-            renderer.render(scene, camera);
+        // Xử lý tùy theo loại file
+        const loaderCallbacks = {
+          onLoad: (loadedObject) => {
+            const model = loadedObject.scene || loadedObject;
+            
+            // Áp dụng màu sắc
+            if (colorConfig) {
+              applyColorConfig(model, colorConfig);
+            } else {
+              applyBrightMaterial(model);
+            }
+            
+            processLoadedModel(model);
+          },
+          onProgress: (xhr) => {
+            // Progress callback
+          },
+          onError: (error) => {
+            console.error("Lỗi khi load model:", error);
+            reject(error);
           }
+        };
   
-          // Chuyển đổi canvas thành file ảnh
-          canvas.toBlob(
-            (blob) => {
-              const fileNameWithoutExt = fileName.split('.')[0];
-              const imageFile = new File(
-                [blob],
-                `${fileNameWithoutExt}-preview.png`,
-                { type: "image/png" }
-              );
-  
-              // Giải phóng bộ nhớ
-              renderer.dispose();
-              scene.traverse((object) => {
-                if (object.geometry) object.geometry.dispose();
-                if (object.material) {
-                  if (Array.isArray(object.material)) {
-                    object.material.forEach(material => material.dispose());
-                  } else {
-                    object.material.dispose();
-                  }
-                }
-              });
-  
-              resolve(imageFile);
-            },
-            "image/png",
-            1.0 // Tăng chất lượng lên mức tối đa
-          );
+        // Load model theo loại file
+        if (fileExtension === "obj") {
+          const loader = new OBJLoader();
+          loader.load(modelURL, loaderCallbacks.onLoad, loaderCallbacks.onProgress, loaderCallbacks.onError);
+        } else if (fileExtension === "glb" || fileExtension === "gltf") {
+          const loader = new GLTFLoader();
+          loader.load(modelURL, loaderCallbacks.onLoad, loaderCallbacks.onProgress, loaderCallbacks.onError);
+        } else if (fileExtension === "fbx") {
+          const loader = new FBXLoader();
+          loader.load(modelURL, loaderCallbacks.onLoad, loaderCallbacks.onProgress, loaderCallbacks.onError);
+        } else {
+          reject(new Error("Định dạng file không được hỗ trợ"));
         }
+  
+        function processLoadedModel(model) {
+          try {
+            // Tự động điều chỉnh kích thước và vị trí
+            const box = new THREE.Box3().setFromObject(model);
+            const size = box.getSize(new THREE.Vector3());
+            const center = box.getCenter(new THREE.Vector3());
+  
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 3.5 / maxDim; // Tăng từ 2.5 lên 3.5 để model to hơn
+            model.scale.set(scale, scale, scale);
+  
+            model.position.x = -center.x * scale - 1;
+            model.position.y = -center.y * scale;
+            model.position.z = -center.z * scale;
+  
+            // Điều chỉnh góc xoay để hiển thị tốt hơn
+            model.rotation.x = -Math.PI / 12; // Nghiêng nhẹ
+            model.rotation.y = Math.PI / 2;   // Tăng từ PI/6 lên PI/3 để xoay sang phải hơn
+  
+            scene.add(model);
+  
+            // Điều chỉnh camera để nhìn model tốt hơn
+            camera.position.set(
+              center.x * scale + 4,
+              center.y * scale + 3,
+              center.z * scale + 6
+            );
+            camera.lookAt(
+              center.x * scale,
+              center.y * scale,
+              center.z * scale
+            );
+  
+            // Render với chất lượng cao
+            renderer.setSize(800, 800);
+            
+            // Render nhiều lần để đảm bảo chất lượng
+            for (let i = 0; i < 5; i++) {
+              renderer.render(scene, camera);
+            }
+  
+            // Đợi một chút để đảm bảo render hoàn thành
+            setTimeout(() => {
+              canvas.toBlob(
+                (blob) => {
+                  if (!blob) {
+                    reject(new Error("Không thể tạo ảnh từ canvas"));
+                    return;
+                  }
+  
+                  const fileNameWithoutExt = fileName.split('.')[0];
+                  const imageFile = new File(
+                    [blob],
+                    `${fileNameWithoutExt}-preview.png`,
+                    { type: "image/png" }
+                  );
+  
+                  // Giải phóng bộ nhớ
+                  cleanup();
+                  resolve(imageFile);
+                },
+                "image/png",
+                1.0
+              );
+            }, 100);
+  
+          } catch (error) {
+            cleanup();
+            reject(error);
+          }
+        }
+  
+        function cleanup() {
+          renderer.dispose();
+          scene.traverse((object) => {
+            if (object.geometry) object.geometry.dispose();
+            if (object.material) {
+              if (Array.isArray(object.material)) {
+                object.material.forEach(material => material.dispose());
+              } else {
+                object.material.dispose();
+              }
+            }
+          });
+        }
+  
       } catch (error) {
         console.error("Lỗi khi chụp ảnh model:", error);
         reject(error);

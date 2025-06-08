@@ -176,7 +176,7 @@ const ModelCustomizeList = ({
                 <button
                   className="pagination-btn prev"
                   onClick={handlePrevClick}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 0}
                 >
                   <i className="fas fa-chevron-left"></i>
                 </button>
@@ -186,9 +186,9 @@ const ModelCustomizeList = ({
                     <button
                       key={index}
                       className={`pagination-btn page-number ${
-                        currentPage === page ? "active" : ""
+                        currentPage === page - 1 ? "active" : ""
                       }`}
-                      onClick={() => handlePageClick(page)}
+                      onClick={() => handlePageClick(page - 1)}
                     >
                       {page}
                     </button>
@@ -202,7 +202,7 @@ const ModelCustomizeList = ({
                 <button
                   className="pagination-btn next"
                   onClick={handleNextClick}
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages - 1}
                 >
                   <i className="fas fa-chevron-right"></i>
                 </button>

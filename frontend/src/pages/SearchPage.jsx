@@ -179,7 +179,6 @@ const SearchPage = () => {
       setTotalPage(data?.totalPages);
       setFilterProducts(data?.content);
     }
-
     setLoading(false);
   };
 
@@ -189,7 +188,7 @@ const SearchPage = () => {
     const search = searchParams.get("s") || "";
 
     const newFilters = {
-      size: 8,
+      size: 9,
       brands: brandsString,
       categories: categoriesString,
       maxPrice,

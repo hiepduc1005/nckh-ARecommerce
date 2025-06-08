@@ -6,6 +6,7 @@ import {
   createModelCustomize,
   deleteModelCustomize,
   getModelsByType,
+  updateModelCustomize,
 } from "../api/modelCustomize";
 import useAuth from "../hooks/UseAuth";
 import { toast } from "react-toastify";
@@ -16,7 +17,7 @@ const AdminModelCustomize = () => {
   const [selectedModel, setSelectedModel] = useState(null);
 
   // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [pageSize, setPageSize] = useState(5);
@@ -68,19 +69,14 @@ const AdminModelCustomize = () => {
   const handleUpdateModel = async (updatedModel) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/models/${updatedModel.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedModel),
-      });
-
+      const response = await updateModelCustomize(updatedModel, token);
       if (!response.ok) {
         throw new Error("Không thể cập nhật model");
       }
+      if (response) {
+        toast.success("Cập nhập thành công!");
+      }
 
-      // Refresh current page
       fetchModels(currentPage, pageSize);
       setSelectedModel(null);
     } catch (err) {
@@ -97,7 +93,7 @@ const AdminModelCustomize = () => {
   const handlePageSizeChange = (e) => {
     const newSize = parseInt(e.target.value);
     setPageSize(newSize);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(0); // Reset to first page when changing page size
   };
 
   return (

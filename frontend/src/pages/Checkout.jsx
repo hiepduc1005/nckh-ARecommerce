@@ -22,8 +22,9 @@ import { toast } from "react-toastify";
 import { createPayment, createPaymentCustomize } from "../api/paymentApi";
 import useCart from "../hooks/UseCart";
 import { getCouponByCode } from "../api/couponApi";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { createModelCustomize } from "../api/modelCustomize";
+import { clearFromCart } from "../api/cartApi";
 
 const Checkout = () => {
   const [email, setEmail] = useState("");
@@ -41,6 +42,8 @@ const Checkout = () => {
   const [distance, setDistance] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);
   const [isCustomized, setIsCustomized] = useState(false);
+
+  const location = useLocation();
 
   useEffect(() => {
     const shipFee = calculateShippingFee(distance);
@@ -77,7 +80,7 @@ const Checkout = () => {
   const total = subtotal - discountAmount + shippingFee; // Adding shipping, subtracting discount
 
   const { user, token } = useAuth();
-  const { removeItem } = useCart();
+  const { clearCart } = useCart();
   const navigate = useNavigate();
   const query = useQuery();
   const encrd = query.get("encrd");
@@ -238,6 +241,8 @@ const Checkout = () => {
           isCustomized, // Add flag to indicate if this is a customized order
         };
 
+        const isCart = location.state?.isCart;
+
         const paymentURL = await createPaymentCustomize(orderData);
         if (paymentURL) {
           window.location.href = paymentURL;
@@ -271,9 +276,10 @@ const Checkout = () => {
       }
     }
 
-    // Only remove cart items for regular variants (not for customized designs)
-    if (!isCustomized) {
-      // await Promise.all(cartItems.map(cartItem => removeItem(cartItem.cartItemId)));
+    const isCart = location.state?.isCart;
+
+    if (!isCustomized && isCart) {
+      await clearCart();
     }
   };
 

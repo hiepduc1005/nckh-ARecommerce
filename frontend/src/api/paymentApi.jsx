@@ -10,7 +10,10 @@ export const createPayment = async (data) => {
     }
     return res.data;
   } catch (error) {
-    console.error(error);
+    if (error.status === 409) {
+      toast.error("Bạn có 1 đơn hàng chưa thanh toán.");
+      return null;
+    }
     return null;
   }
 };
@@ -21,12 +24,12 @@ export const createPaymentCustomize = async (data) => {
       "payment/create-payment/customize",
       data
     );
-    if (res.status === 409) {
+    return res.data;
+  } catch (error) {
+    if (error.status === 409) {
       toast.error("Bạn có 1 đơn hàng chưa thanh toán.");
       return null;
     }
-    return res.data;
-  } catch (error) {
     console.error(error);
     return null;
   }

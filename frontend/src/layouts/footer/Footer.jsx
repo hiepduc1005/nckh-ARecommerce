@@ -8,13 +8,6 @@ import xIcon from "../../assets/icons/x-icon.png";
 const Footer = () => {
   return (
     <footer className="footer">
-      {/* Header Buttons */}
-      <div className="footer-header">
-        <div className="button-link">Trung Tâm Trợ Giúp</div>
-        <div className="button-link">Trò Chuyện Trực Tiếp</div>
-        <div className="button-link">Gửi email cho chúng tôi</div>
-      </div>
-
       {/* Footer Content */}
       <div className="footer-content">
         {/* Sản phẩm */}

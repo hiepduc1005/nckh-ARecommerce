@@ -251,22 +251,102 @@
               }
             }
           }
+
+          .price-breakdown {
+            background: #f8fffe;
+            border: 1px solid #e8f5f1;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
           
-          .price-info {
-            text-align: right;
-            
-            .order-total-label {
-              font-size: 14px;
-              color: #333;
-              margin-right: 4px;
-            }
-            
-            .order-total-price {
-              font-size: 18px;
-              color: #207355; // Thay đổi màu chủ đạo
-              font-weight: 500;
+            .subtotal-row,
+            .shipping-row,
+            .discount-row {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 8px 0;
+              border-bottom: 1px solid #e8f5f1;
+              
+              &:last-child {
+                border-bottom: none;
+              }
+          
+              .label {
+                color: #5a6c57;
+                font-size: 14px;
+                font-weight: 400;
+              }
+          
+              .value {
+                color: #207355;
+                font-size: 14px;
+                font-weight: 500;
+          
+                &.discount {
+                  color: #d73527;
+                  font-weight: 600;
+                }
+              }
             }
           }
+          
+          .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #207355 0%, #2d8f68 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(32, 115, 85, 0.15);
+          
+            .order-total-label {
+              font-size: 16px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+          
+            .order-total-price {
+              font-size: 18px;
+              font-weight: 700;
+              letter-spacing: 0.5px;
+            }
+          }
+          
+          // Responsive design
+          @media (max-width: 768px) {
+            .price-breakdown {
+              padding: 12px;
+              margin-bottom: 12px;
+          
+              .subtotal-row,
+              .shipping-row,
+              .discount-row {
+                padding: 6px 0;
+          
+                .label,
+                .value {
+                  font-size: 13px;
+                }
+              }
+            }
+          
+            .total-row {
+              padding: 12px;
+          
+              .order-total-label {
+                font-size: 15px;
+              }
+          
+              .order-total-price {
+                font-size: 16px;
+              }
+            }
+          }
+          
         }
       }
     }

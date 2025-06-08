@@ -16,6 +16,22 @@ export const createModelCustomize = async (data, token) => {
   }
 };
 
+export const updateModelCustomize = async (data, token) => {
+  try {
+    const res = await axiosInstance.put("api/v1/model-customize", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
 export const createModelDesign = async (data) => {
   try {
     const res = await axiosInstance.post("api/v1/model-design", data, {

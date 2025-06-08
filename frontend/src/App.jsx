@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { usePageTracking } from "./hooks/UsePageTracking";
 import { generateSessionId } from "../src/utils/ultils";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 function App() {
   usePageTracking();
 
@@ -15,6 +16,12 @@ function App() {
       localStorage.setItem("session_id", storedId);
     }
   }, []);
+
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <>

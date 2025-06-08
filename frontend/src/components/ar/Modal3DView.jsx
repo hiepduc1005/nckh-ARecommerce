@@ -17,6 +17,7 @@ import {
 import * as THREE from "three";
 import "../../assets/styles/components/modal/Modal3DView.scss";
 import { trackARSessionEnd } from "../../utils/analytics";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 // Simplified Loader component
 function Loader() {
@@ -450,7 +451,7 @@ function Modal3DView({
 // Preload the GLTF model to avoid loading issues
 useGLTF.preload = (url) => {
   return new Promise((resolve, reject) => {
-    const loader = new THREE.GLTFLoader();
+    const loader = new GLTFLoader();
     loader.load(url, resolve, undefined, (error) => {
       console.error("Failed to preload GLTF:", error);
       reject(error);

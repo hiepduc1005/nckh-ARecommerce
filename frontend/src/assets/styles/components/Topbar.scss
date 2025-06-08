@@ -1,6 +1,11 @@
 $primaryColor: #207355;
 
-.topbar-container{
+// Breakpoints
+$mobile: 768px;
+$tablet: 1024px;
+$desktop: 1200px;
+
+.topbar-container {
     height: 40px;
     display: flex;
     flex-direction: row;
@@ -10,16 +15,91 @@ $primaryColor: #207355;
     color: $primaryColor;
     background-color: whitesmoke;
 
-    .left{
+    // Tablet and smaller
+    @media (max-width: $tablet) {
+        padding: 0 40px;
+        height: 36px;
+    }
+
+    // Mobile
+    @media (max-width: $mobile) {
+        padding: 0 16px;
+        height: auto;
+        min-height: 32px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .left {
         display: flex;
         flex-direction: row;
         gap: 30px;
+        align-items: center;
 
-        .email-contact,.phone-contact {
+        // Tablet
+        @media (max-width: $tablet) {
+            gap: 20px;
+        }
+
+        // Mobile
+        @media (max-width: $mobile) {
+            gap: 12px;
+            flex-wrap: wrap;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .email-contact,
+        .phone-contact {
             font-size: 16px;
             cursor: pointer;
-            span{
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+
+            // Tablet
+            @media (max-width: $tablet) {
+                font-size: 14px;
+            }
+
+            // Mobile
+            @media (max-width: $mobile) {
+                font-size: 12px;
+            }
+
+            span {
                 margin-left: 12px;
+
+                // Tablet
+                @media (max-width: $tablet) {
+                    margin-left: 8px;
+                }
+
+                // Mobile - Hide text, show only icons
+                @media (max-width: $mobile) {
+                    display: none;
+                }
+            }
+
+            // Show text on hover for mobile (optional)
+            @media (max-width: $mobile) {
+                position: relative;
+                
+                &:hover span,
+                &:focus span {
+                    display: block;
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    background: $primaryColor;
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 10px;
+                    white-space: nowrap;
+                    z-index: 1000;
+                    margin-left: 0;
+                }
             }
         }
 
@@ -28,52 +108,237 @@ $primaryColor: #207355;
             align-items: center;
             gap: 10px;
             font-size: 16px;
-        
+
+            // Tablet
+            @media (max-width: $tablet) {
+                font-size: 14px;
+                gap: 8px;
+            }
+
+            // Mobile
+            @media (max-width: $mobile) {
+                font-size: 12px;
+                gap: 6px;
+            }
+
+            span {
+                // Mobile - Hide "Follow us on" text
+                @media (max-width: $mobile) {
+                    display: none;
+                }
+            }
+
             a {
                 color: $primaryColor;
                 font-size: 20px;
                 display: flex;
                 align-items: center;
-                justify-content: center;      
+                justify-content: center;
                 background: rgba(255, 255, 255, 0.2);
                 border-radius: 50%;
                 transition: background 0.3s;
-        
+                padding: 4px;
+                width: 32px;
+                height: 32px;
+
+                // Tablet
+                @media (max-width: $tablet) {
+                    font-size: 18px;
+                    width: 28px;
+                    height: 28px;
+                }
+
+                // Mobile
+                @media (max-width: $mobile) {
+                    font-size: 16px;
+                    width: 24px;
+                    height: 24px;
+                    padding: 2px;
+                }
+
                 &:hover {
                     background: rgba(255, 255, 255, 0.4);
                 }
             }
         }
-        
     }
 
-    .right{
+    .right {
         display: flex;
         flex-direction: row;
         gap: 20px;
+        align-items: center;
+
+        // Tablet
+        @media (max-width: $tablet) {
+            gap: 16px;
+        }
+
+        // Mobile
+        @media (max-width: $mobile) {
+            gap: 12px;
+            flex-wrap: wrap;
+        }
 
         .user {
             font-size: 16px;
             cursor: pointer;
-            span{
-                margin-left: 8px;
-            }
             position: relative;
             display: flex;
             align-items: center;
+            white-space: nowrap;
+
+            // Tablet
+            @media (max-width: $tablet) {
+                font-size: 14px;
+            }
+
+            // Mobile
+            @media (max-width: $mobile) {
+                font-size: 12px;
+            }
+
+            span {
+                margin-left: 8px;
+
+                // Mobile - Truncate long usernames
+                @media (max-width: $mobile) {
+                    margin-left: 4px;
+                    max-width: 80px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
         }
 
-        .notification-icon, .support-icon{
+        .notification-icon,
+        .support-icon {
             display: flex;
             flex-direction: row;
             text-decoration: none;
             align-items: center;
-            color: #207355;
+            color: $primaryColor;
+            font-size: 16px;
 
-            span{
-                margin-left: 8px;
+            // Tablet
+            @media (max-width: $tablet) {
+                font-size: 14px;
             }
+
+            // Mobile
+            @media (max-width: $mobile) {
+                font-size: 12px;
+            }
+
+            span {
+                margin-left: 8px;
+
+                // Mobile - Hide text labels
+                @media (max-width: $mobile) {
+                    display: none;
+                }
+
+                // Tablet - Shorter text
+                @media (max-width: $tablet) {
+                    margin-left: 4px;
+                }
+            }
+
+            // Mobile tooltip on hover (optional)
+            @media (max-width: $mobile) {
+                position: relative;
                 
+                &:hover::after {
+                    content: attr(data-tooltip);
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: $primaryColor;
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 10px;
+                    white-space: nowrap;
+                    z-index: 1000;
+                }
+            }
+        }
+
+        // Notification dropdown responsive
+        .notification-dropdown {
+            // Mobile
+            @media (max-width: $mobile) {
+                position: fixed !important;
+                top: auto !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: calc(100vw - 32px) !important;
+                max-width: 400px !important;
+                bottom: 60px !important;
+                z-index: 9999 !important;
+            }
+        }
+
+        // Account popper responsive
+        .account-popper {
+            // Mobile
+            @media (max-width: $mobile) {
+                position: fixed !important;
+                top: auto !important;
+                right: 16px !important;
+                bottom: 60px !important;
+                left: auto !important;
+                transform: none !important;
+                z-index: 9999 !important;
+            }
         }
     }
 }
+
+// Mobile-specific utilities
+@media (max-width: $mobile) {
+    .topbar-mobile-only {
+        display: block !important;
+    }
+    
+    .topbar-hide-mobile {
+        display: none !important;
+    }
+    
+    // Compact mode for very small screens
+    @media (max-width: 480px) {
+        .topbar-container {
+            .left .email-contact,
+            .left .phone-contact {
+                span {
+                    display: none !important;
+                }
+            }
+            
+            .right .user span {
+                max-width: 60px;
+            }
+        }
+    }
+}
+
+// Animation for mobile interactions
+@media (max-width: $mobile) {
+    .topbar-container .left .email-contact,
+    .topbar-container .left .phone-contact {
+        &:active {
+            transform: scale(0.95);
+            transition: transform 0.1s;
+        }
+    }
+    
+    .topbar-container .right .notification-icon,
+    .topbar-container .right .support-icon {
+        &:active {
+            transform: scale(0.95);
+            transition: transform 0.1s;
+        }
+    }
+}
+

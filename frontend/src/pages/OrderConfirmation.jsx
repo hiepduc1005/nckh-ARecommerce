@@ -58,7 +58,8 @@ const OrderConfirmation = () => {
   // Render based on order status
   const renderOrderContent = () => {
     switch (orderData?.orderStatus) {
-      case "PAID" || "PROCESSING":
+      case "PAID":
+      case "PROCESSING":
         return (
           <div className="order-confirmation">
             <div className="order-confirmation__content">

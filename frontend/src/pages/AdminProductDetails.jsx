@@ -258,7 +258,7 @@ const AdminProductDetails = () => {
 
               <div className="product-description">
                 <h3>Description</h3>
-                <p>{product.description}</p>
+                <p style={{ whiteSpace: "pre-line" }}>{product.description}</p>
 
                 <h3>Short Description</h3>
                 <p>{product.shortDescription}</p>

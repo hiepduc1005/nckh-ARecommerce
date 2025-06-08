@@ -45,6 +45,17 @@ export const getProductsPaginate = async (page, size) => {
   }
 };
 
+export const getProductsRelated = async (productId) => {
+  try {
+    const res = await axiosInstance.get(`api/v1/products/${productId}/related`);
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
 export const getProductsFilter = async (filters) => {
   try {
     const res = await axiosInstance.get(`api/v1/products/filter`, {

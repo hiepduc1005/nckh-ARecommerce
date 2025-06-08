@@ -198,6 +198,27 @@ const PurchaseProgress = () => {
             </div>
           )}
           <div className="info-row">
+            <span className="label">Tạm tính:</span>
+            <span className="">
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(
+                (order.discountPrice ? order.discountPrice : order.totalPrice) -
+                  order.shippingFee
+              )}
+            </span>
+          </div>
+          <div className="info-row">
+            <span className="label">Phí ship:</span>
+            <span className="">
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(order.shippingFee)}
+            </span>
+          </div>
+          <div className="info-row">
             <span className="label">Tổng tiền:</span>
             <span className="total-price">
               {new Intl.NumberFormat("vi-VN", {
