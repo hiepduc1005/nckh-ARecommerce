@@ -46,6 +46,10 @@ const Checkout = () => {
   const location = useLocation();
 
   useEffect(() => {
+    document.title = "Xác nhận thanh toán | HHQTV Store";
+  }, []);
+
+  useEffect(() => {
     const shipFee = calculateShippingFee(distance);
     if (shipFee) {
       setShippingFee(shipFee);

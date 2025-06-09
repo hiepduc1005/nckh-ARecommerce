@@ -25,6 +25,10 @@ const Register = () => {
   const { setLoading } = useLoading();
 
   useEffect(() => {
+    document.title = "Đăng ký";
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) {
       setLoading(true);
       navigate("/");

@@ -16,6 +16,10 @@ const GlassesCustomize = () => {
     fetchGlasses();
   }, [page, size]);
 
+  useEffect(() => {
+    document.title = "Danh sách kính tùy chỉnh | HHQTV Store";
+  }, []);
+
   const fetchGlasses = async () => {
     try {
       setLoading(true);

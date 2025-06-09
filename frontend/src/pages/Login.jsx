@@ -20,6 +20,10 @@ const Login = () => {
   const { setLoading } = useLoading();
 
   useEffect(() => {
+    document.title = "Đăng nhập";
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) {
       setLoading(true);
       navigate("/");

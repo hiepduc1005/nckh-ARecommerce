@@ -12,6 +12,10 @@ const ChangePassword = () => {
     confirmPassword: "",
   });
 
+  useEffect(() => {
+    document.title = "Đổi mật khẩu";
+  }, []);
+
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,

@@ -115,6 +115,12 @@ const ProductDetails = () => {
     setShowModal3DView(true);
   };
 
+  useEffect(() => {
+    if (product) {
+      document.title = `${product.productName}`;
+    }
+  }, [product]);
+
   const handleAddToWishList = async () => {
     if (!selectedVariants) {
       toast.error("Bạn chưa chọn biến thể!");

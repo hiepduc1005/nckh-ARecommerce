@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Phone,
   Mail,
@@ -20,6 +20,10 @@ import "../assets/styles/pages/SupportPage.scss";
 const SupportPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
+
+  useEffect(() => {
+    document.title = "Hỗ trợ | HHQTV Store";
+  }, []);
 
   const faqData = [
     {

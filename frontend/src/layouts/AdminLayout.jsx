@@ -9,6 +9,10 @@ const AdminLayout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = "Quản trị viên | HHQTV Store";
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated !== undefined && isAuthenticated === false) {
       navigate("/login");
     } else if (isAuthenticated) {

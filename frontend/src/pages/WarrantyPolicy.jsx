@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../assets/styles/pages/WarrantyPolicy.scss";
 
 const WarrantyPolicy = () => {
+  useEffect(() => {
+    document.title = "Chính sách bảo hành | HHQTV Store";
+  }, []);
   return (
     <div className="policy-container">
       <div className="policy-content">

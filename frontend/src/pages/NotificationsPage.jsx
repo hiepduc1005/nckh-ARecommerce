@@ -36,6 +36,10 @@ const NotificationsPage = () => {
   const { client, connected } = useStompSocket();
 
   useEffect(() => {
+    document.title = `Thông báo | HHQTV Store`;
+  }, []);
+
+  useEffect(() => {
     if (connected && client && user) {
       const subscription = client.subscribe(
         `/user/${user?.id}/queue/notification`,

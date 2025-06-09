@@ -16,9 +16,14 @@ const OrderConfirmation = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title("Kiểm tra trạng thái đơn hàng | HHQTV Store");
+  }, []);
+
+  useEffect(() => {
     const fetchOrderStatus = async () => {
       if (!orderCode) {
         setError("Không tìm thấy mã đơn hàng");
+        document.title("Không tìm thấy mã đơn hàng");
         setLoading(false);
         return;
       }
@@ -32,6 +37,8 @@ const OrderConfirmation = () => {
         setLoading(false);
       } catch (err) {
         setError("Không thể tra cứu đơn hàng");
+        document.title("Không thể tra cứu đơn hàng");
+
         setLoading(false);
       }
     };

@@ -26,6 +26,10 @@ const Purchase = () => {
     return searchParams.get("type") || "all";
   };
 
+  useEffect(() => {
+    document.title = "Thanh toán | HHQTV Store";
+  }, []);
+
   // Updated to match backend OrderStatus enum
   const orderStatusLabels = {
     PENDING: "Chờ thanh toán",

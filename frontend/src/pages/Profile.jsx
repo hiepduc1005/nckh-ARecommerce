@@ -1,49 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import '../assets/styles/pages/Profile.scss';
-import defaultUser from '../assets/images/defaultUser.jpg';
-import useAuth from '../hooks/UseAuth';
-import { isValidDate, isValidPhoneNum } from '../utils/ultils';
-import { toast } from 'react-toastify';
-import { updateUser } from '../api/userApi';
+import React, { useEffect, useState } from "react";
+import "../assets/styles/pages/Profile.scss";
+import defaultUser from "../assets/images/defaultUser.jpg";
+import useAuth from "../hooks/UseAuth";
+import { isValidDate, isValidPhoneNum } from "../utils/ultils";
+import { toast } from "react-toastify";
+import { updateUser } from "../api/userApi";
 
 const Profile = () => {
-
   const [userInfo, setUserInfo] = useState({
-    username: '9n4yikub10',
-    firstname: '',
-    lastname: '',
-    email: 'hi********@gmail.com',
-    phone: '',
-    gender: '', // 'Nam', 'Nữ', 'Khác'
-    birthDay: '',
-    birthMonth: '',
-    birthYear: '',
+    username: "9n4yikub10",
+    firstname: "",
+    lastname: "",
+    email: "hi********@gmail.com",
+    phone: "",
+    gender: "", // 'Nam', 'Nữ', 'Khác'
+    birthDay: "",
+    birthMonth: "",
+    birthYear: "",
   });
-  const {user,token} = useAuth();
-
+  const { user, token } = useAuth();
 
   useEffect(() => {
-    if(user){
-      const [birthDay, birthMonth, birthYear] = user?.dateOfBirth ? user.dateOfBirth.split("/") : ["",'',''];
+    document.title = "Thông tin người dùng | HHQTV Store";
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      const [birthDay, birthMonth, birthYear] = user?.dateOfBirth
+        ? user.dateOfBirth.split("/")
+        : ["", "", ""];
       setUserInfo({
         ...userInfo,
-        firstname: user.firstname || '',
-        lastname: user.lastname || '',
-        username: user.userName || '9n4yikub10',
-        email: user.email || 'hi********@gmail.com',
-        phone: user.phoneNumber || '0903403668',
-        birthDay : +birthDay || '',
-        birthMonth : +birthMonth || '',
-        birthYear: +birthYear || '',
-        gender:user.gender
+        firstname: user.firstname || "",
+        lastname: user.lastname || "",
+        username: user.userName || "9n4yikub10",
+        email: user.email || "hi********@gmail.com",
+        phone: user.phoneNumber || "0903403668",
+        birthDay: +birthDay || "",
+        birthMonth: +birthMonth || "",
+        birthYear: +birthYear || "",
+        gender: user.gender,
       });
-
-      
     }
-    
-  },[user])
+  }, [user]);
 
-  const handleInputChange =  (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUserInfo({
       ...userInfo,
@@ -53,28 +54,28 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Kiểm tra số điện thoại
     if (!isValidPhoneNum(userInfo.phone)) {
       toast.error("Số điện thoại không hợp lệ");
       return;
     }
-  
+
     // Kiểm tra giá trị hợp lệ trước khi parse
     const day = Number(userInfo.birthDay);
     const month = Number(userInfo.birthMonth);
     const year = Number(userInfo.birthYear);
-  
+
     if (!day || !month || !year || !isValidDate(day, month, year)) {
       toast.error("Ngày sinh không hợp lệ");
       return;
     }
-  
+
     // Định dạng ngày tháng (thêm "0" nếu cần)
     const birthDay = day < 10 ? `0${day}` : day;
     const birthMonth = month < 10 ? `0${month}` : month;
     const birthDate = `${birthDay}/${birthMonth}/${year}`;
-  
+
     const userDataUpdate = {
       id: user.id,
       email: userInfo.email,
@@ -85,12 +86,11 @@ const Profile = () => {
       dateOfBirth: birthDate,
       gender: userInfo.gender,
     };
-  
+
     try {
       const userUpdate = await updateUser(userDataUpdate, token);
-  
+
       if (userUpdate) {
-        
         setUserInfo((prev) => ({
           ...prev,
           firstname: userUpdate.firstname || prev.firstname,
@@ -166,7 +166,9 @@ const Profile = () => {
               <label>Email</label>
               <div className="input-group email-group">
                 <span>{userInfo.email}</span>
-                <a href="#" className="change-link">Thay Đổi</a>
+                <a href="#" className="change-link">
+                  Thay Đổi
+                </a>
               </div>
             </div>
 
@@ -176,10 +178,14 @@ const Profile = () => {
                 {userInfo.phone ? (
                   <>
                     <span>{userInfo.phone}</span>
-                    <a href="#" className="change-link">Thay Đổi</a>
+                    <a href="#" className="change-link">
+                      Thay Đổi
+                    </a>
                   </>
                 ) : (
-                  <a href="#" className="add-link">Thêm</a>
+                  <a href="#" className="add-link">
+                    Thêm
+                  </a>
                 )}
               </div>
             </div>
@@ -192,7 +198,7 @@ const Profile = () => {
                     type="radio"
                     name="gender"
                     value="Nam"
-                    checked={userInfo?.gender === 'Nam'}
+                    checked={userInfo?.gender === "Nam"}
                     onChange={handleInputChange}
                   />
                   <span className="radio-custom"></span>
@@ -203,7 +209,7 @@ const Profile = () => {
                     type="radio"
                     name="gender"
                     value="Nữ"
-                    checked={userInfo.gender === 'Nữ'}
+                    checked={userInfo.gender === "Nữ"}
                     onChange={handleInputChange}
                   />
                   <span className="radio-custom"></span>
@@ -214,7 +220,7 @@ const Profile = () => {
                     type="radio"
                     name="gender"
                     value="Khác"
-                    checked={userInfo.gender === 'Khác'}
+                    checked={userInfo.gender === "Khác"}
                     onChange={handleInputChange}
                   />
                   <span className="radio-custom"></span>

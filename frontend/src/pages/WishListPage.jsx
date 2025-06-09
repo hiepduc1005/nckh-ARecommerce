@@ -29,6 +29,10 @@ const WishlistPage = () => {
     });
   };
 
+  useEffect(() => {
+    document.title = "Danh sách yêu thích | HHQTV Store";
+  }, []);
+
   const getSortedItems = () => {
     if (!wishlist?.wishListItems) return [];
 

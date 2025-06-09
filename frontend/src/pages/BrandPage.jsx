@@ -14,6 +14,10 @@ const BrandPage = () => {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.title = "Thương hiệu | HHQTV Store";
+  }, []);
+
   const fetchBrands = async () => {
     const data = await getAllBrands();
 

@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../assets/styles/pages/PaymentPolicy.scss";
 
 const PaymentPolicy = () => {
+  useEffect(() => {
+    document.title = "Chính sách thanh toán | HHQTV Store";
+  }, []);
   return (
     <div className="policy-container">
       <div className="policy-content">

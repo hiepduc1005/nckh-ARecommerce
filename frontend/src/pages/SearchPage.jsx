@@ -74,6 +74,10 @@ const SearchPage = () => {
     return `?${params.toString()}`;
   };
 
+  useEffect(() => {
+    document.title = "Tìm kiếm sản phẩm | HHQTV Store";
+  }, []);
+
   const fetchBrands = async () => {
     setBrandsLoading(true);
     const data = await getAllBrands();

@@ -13,6 +13,10 @@ const UserAddress = () => {
   const [addresses, setAddresses] = useState([]);
   const [distance, setDistance] = useState(0);
 
+  useEffect(() => {
+    document.title = "Địa chỉ";
+  }, []);
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [newAddress, setNewAddress] = useState({
     name: "",

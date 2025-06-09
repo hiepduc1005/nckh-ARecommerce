@@ -35,6 +35,12 @@ const CustomizeDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (customizeModel) {
+      document.title = `${customizeModel.name} tùy chỉnh | HHQTV Store`;
+    }
+  }, [customizeModel]);
+
+  useEffect(() => {
     const fetchCustomizeModel = async () => {
       try {
         setLoading(true);

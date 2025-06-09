@@ -16,6 +16,10 @@ const PurchaseProgress = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = "Tiến trình đơn hàng | HHQTV Store";
+  }, []);
+
+  useEffect(() => {
     const fetchOrderByCode = async () => {
       setLoading(true);
       try {

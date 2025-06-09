@@ -13,6 +13,10 @@ const ShoesCustomize = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
+    document.title = "Danh sách giày tùy chỉnh | HHQTV Store";
+  }, []);
+
+  useEffect(() => {
     fetchShoes();
   }, [page, size]);
 

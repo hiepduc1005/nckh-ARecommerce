@@ -7,6 +7,10 @@ const ShareDesign = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = "Chia sẻ thiết kế sản phẩm | HHQTV Store";
+  }, []);
+
+  useEffect(() => {
     const cloneDesign = async () => {
       if (designId) {
         const sessionId = localStorage.getItem("session_id");

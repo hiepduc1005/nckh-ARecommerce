@@ -37,6 +37,7 @@ const Home = () => {
   };
 
   useEffect(() => {
+    document.title = "Trang chủ | HHQTV Store";
     setLoading(true);
     const fetchProducts = async () => {
       const data = await getProductsPaginate(1, 8);

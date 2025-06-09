@@ -27,6 +27,10 @@ const CartPage = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
 
+  useEffect(() => {
+    document.title = "Giỏ hàng | HHQTV Store";
+  }, []);
+
   const handleQuantityChange = (variantId, newQuantity) => {
     if (newQuantity > 0) {
       setQuantity((prev) => ({
