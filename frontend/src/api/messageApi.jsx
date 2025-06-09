@@ -7,6 +7,7 @@ export const createMessage = async (data, token) => {
     const res = await axiosInstance.post("api/v1/messages", data, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
       },
     });
 

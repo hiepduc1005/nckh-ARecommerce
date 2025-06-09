@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, Loader, Bot, User, X, LogIn } from "lucide-react";
+import { Send, Loader, Bot, User, X, LogIn, Image, Trash2 } from "lucide-react";
 import "../assets/styles/components/AIChatbox.scss";
 import useAuth from "../hooks/UseAuth";
 import { createMessage, getMessageByUser } from "../api/messageApi";
@@ -13,8 +13,10 @@ export default function AIChatbox() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedImages, setSelectedImages] = useState([]); // New state for images
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null); // New ref for file input
   const abortControllerRef = useRef(null);
 
   const { user, token } = useAuth();
@@ -81,38 +83,113 @@ export default function AIChatbox() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Handle image file selection
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files);
+    const maxFiles = 5; // Maximum number of images allowed
+    const maxSize = 10 * 1024 * 1024; // 10MB limit per file
+
+    const validFiles = files.filter((file) => {
+      if (!file.type.startsWith("image/")) {
+        alert("Chỉ cho phép tải lên file hình ảnh!");
+        return false;
+      }
+      if (file.size > maxSize) {
+        alert(`File ${file.name} quá lớn. Kích thước tối đa là 10MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    if (selectedImages.length + validFiles.length > maxFiles) {
+      alert(`Chỉ có thể tải tối đa ${maxFiles} hình ảnh!`);
+      return;
+    }
+
+    // Convert files to base64 for preview and sending
+    validFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = {
+          id: Date.now() + Math.random(),
+          file: file,
+          preview: e.target.result,
+          name: file.name,
+          size: file.size,
+        };
+        setSelectedImages((prev) => [...prev, imageData]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // Remove selected image
+  const removeImage = (imageId) => {
+    setSelectedImages((prev) => prev.filter((img) => img.id !== imageId));
+  };
+
+  // Format file size
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-    if (!input.trim() || isLoading || !user || !token) return;
+    if (
+      (!input.trim() && selectedImages.length === 0) ||
+      isLoading ||
+      !user ||
+      !token
+    )
+      return;
 
-    // Cancel any ongoing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-
-    // Create new abort controller
     abortControllerRef.current = new AbortController();
 
-    // Save user message first
+    const messageContent = input.trim();
+    const hasImages = selectedImages.length > 0;
+
+    const images = selectedImages.map((img) => img.file);
+
     const userMessageData = {
       role: "USER",
       userId: user.id,
-      content: input.trim(),
+      content: messageContent || "",
     };
 
-    const userQuery = input.trim();
+    const formDataCreate = new FormData();
+    formDataCreate.append(
+      "message",
+      new Blob([JSON.stringify(userMessageData)], { type: "application/json" })
+    );
+
+    images.forEach((image) => {
+      formDataCreate.append("images", image);
+    });
+
+    const userQuery = messageContent;
+    const imagesToSend = [...selectedImages];
+
     setInput("");
+    setSelectedImages([]);
     setIsLoading(true);
 
     try {
-      // Save user message to database
-      const savedUserMessage = await createMessage(userMessageData, token);
-
+      const savedUserMessage = await createMessage(formDataCreate, token);
       if (savedUserMessage) {
-        // Add user message to UI
         setMessages((prev) => [...prev, savedUserMessage]);
       } else {
-        // If save failed, still show message in UI but mark as failed
         setMessages((prev) => [
           ...prev,
           {
@@ -123,7 +200,6 @@ export default function AIChatbox() {
         ]);
       }
 
-      // Add initial AI message placeholder
       const tempAiMessage = {
         id: `temp-${Date.now()}`,
         role: "ASSISTANT",
@@ -131,20 +207,46 @@ export default function AIChatbox() {
         isLoading: true,
         isTemporary: true,
       };
-
       setMessages((prev) => [...prev, tempAiMessage]);
       setIsStreaming(true);
 
-      // Call the AI API
-      const response = await fetch("http://localhost:5000/ask", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "text/event-stream",
-        },
-        body: JSON.stringify({ query: userQuery }),
-        signal: abortControllerRef.current.signal,
-      });
+      // --- LOGIC PHÂN TÁCH ENDPOINT ĐÃ ĐƯỢC SỬA LẠI Ở ĐÂY ---
+      let endpoint = "";
+      let options = {};
+
+      if (hasImages) {
+        // TRƯỜNG HỢP 1: GỬI KÈM HÌNH ẢNH
+        console.log("Đang gửi yêu cầu có ảnh đến /askimg...");
+        endpoint = "http://localhost:5000/askimg";
+
+        const formData = new FormData();
+        formData.append("query", userQuery);
+        imagesToSend.forEach((image) => {
+          formData.append("images", image.file);
+        });
+
+        options = {
+          method: "POST",
+          body: formData, // Trình duyệt tự động đặt Content-Type là multipart/form-data
+          signal: abortControllerRef.current.signal,
+        };
+      } else {
+        // TRƯỜNG HỢP 2: CHỈ GỬI VĂN BẢN
+        console.log("Đang gửi yêu cầu văn bản đến /ask...");
+        endpoint = "http://localhost:5000/ask";
+
+        options = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Bắt buộc phải có header này
+          },
+          body: JSON.stringify({ query: userQuery }), // Dữ liệu là JSON
+          signal: abortControllerRef.current.signal,
+        };
+      }
+
+      // Gọi API với endpoint và options đã được quyết định
+      const response = await fetch(endpoint, options);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -166,15 +268,20 @@ export default function AIChatbox() {
               if (aiResponseContent) {
                 const aiMessageData = {
                   role: "ASSISTANT",
-                  userId: user.id,
+                  userId: user?.id,
                   content: aiResponseContent,
                 };
 
+                const formData = new FormData();
+                formData.append(
+                  "message",
+                  new Blob([JSON.stringify(aiMessageData)], {
+                    type: "application/json",
+                  })
+                );
+
                 try {
-                  const savedAiMessage = await createMessage(
-                    aiMessageData,
-                    token
-                  );
+                  const savedAiMessage = await createMessage(formData, token);
 
                   // Replace temporary message with saved message
                   setMessages((prev) => {
@@ -236,9 +343,17 @@ export default function AIChatbox() {
                         content: aiResponseContent,
                       };
 
+                      const formData = new FormData();
+                      formData.append(
+                        "message",
+                        new Blob([JSON.stringify(aiMessageData)], {
+                          type: "application/json",
+                        })
+                      );
+
                       try {
                         const savedAiMessage = await createMessage(
-                          aiMessageData,
+                          formData,
                           token
                         );
 
@@ -477,40 +592,62 @@ export default function AIChatbox() {
                     <p>Chào bạn! Tôi có thể giúp gì cho bạn hôm nay?</p>
                   </div>
                 ) : (
-                  messages.map((message) => (
+                  messages?.map((message) => (
                     <div
-                      key={message.id}
-                      className={`message-wrapper ${message.role?.toLowerCase()}`}
+                      key={message?.id}
+                      className={`message-wrapper ${message?.role?.toLowerCase()}`}
                     >
-                      <div className={`message ${message.role?.toLowerCase()}`}>
+                      <div
+                        className={`message ${message?.role?.toLowerCase()}`}
+                      >
                         <div className="message-header">
-                          {message.role === "ASSISTANT" ? (
+                          {message?.role === "ASSISTANT" ? (
                             <Bot size={16} className="sender-icon" />
                           ) : (
                             <User size={16} className="sender-icon" />
                           )}
                           <span className="sender-name">
-                            {message.role === "ASSISTANT" ? "Trợ lý AI" : "Bạn"}
+                            {message?.role === "ASSISTANT"
+                              ? "Trợ lý AI"
+                              : "Bạn"}
                           </span>
                         </div>
                         <div className="message-content">
+                          {/* Show images if they exist */}
+                          {message?.images && message?.images?.length > 0 && (
+                            <div className="message-images">
+                              {message?.images.map((image, index) => (
+                                <div key={image?.id} className="message-image">
+                                  <img
+                                    src={`http://localhost:8080${image?.imageUrl}`}
+                                    alt={image?.name || "Ảnh"}
+                                    className="image-preview"
+                                  />
+                                  {/* <span className="image-info">
+                                    {image.name} ({formatFileSize(image.size)})
+                                  </span> */}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
                           {/* Show loading state for AI messages */}
-                          {message.role === "ASSISTANT" &&
+                          {message?.role === "ASSISTANT" &&
                           message.isLoading &&
-                          (!message.content || message.content === "") ? (
+                          (!message?.content || message?.content === "") ? (
                             <div className="loading-content">
                               <Loader size={16} className="loading-icon" />
                               Đang suy nghĩ...
                             </div>
                           ) : (
                             <>
-                              {message.content}
+                              {message?.content}
                               {/* Show typing indicator when AI is streaming and message is empty or very short */}
-                              {message.role === "ASSISTANT" &&
+                              {message?.role === "ASSISTANT" &&
                                 isStreaming &&
                                 message.isTemporary &&
-                                (!message.content ||
-                                  message.content.length < 3) &&
+                                (!message?.content ||
+                                  message?.content?.length < 3) &&
                                 !message.isLoading && (
                                   <span className="typing-indicator">
                                     <span></span>
@@ -530,6 +667,39 @@ export default function AIChatbox() {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Selected Images Preview */}
+          {selectedImages.length > 0 && (
+            <div className="selected-images-area">
+              <div className="selected-images-header">
+                <span>Hình ảnh đã chọn ({selectedImages.length}/5)</span>
+              </div>
+              <div className="selected-images-list">
+                {selectedImages.map((image) => (
+                  <div key={image?.id} className="selected-image-item">
+                    <img
+                      src={image?.preview}
+                      alt={image?.name}
+                      className="selected-image-preview"
+                    />
+                    <div className="selected-image-info">
+                      <span className="image-name">{image?.name}</span>
+                      <span className="image-size">
+                        {formatFileSize(image?.size)}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => removeImage(image?.id)}
+                      className="remove-image-button"
+                      title="Xóa hình ảnh"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Input Area */}
           <div className="input-area">
             <div className="input-container">
@@ -547,6 +717,29 @@ export default function AIChatbox() {
                 className="message-input"
                 disabled={isLoading || !user || !token}
               />
+
+              {/* Image Upload Button */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="image-upload-button"
+                disabled={
+                  isLoading || !user || !token || selectedImages.length >= 5
+                }
+                title="Tải hình ảnh"
+              >
+                <Image size={18} />
+              </button>
+
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageSelect}
+                style={{ display: "none" }}
+              />
+
               {isStreaming ? (
                 <button
                   onClick={stopStreaming}
@@ -560,7 +753,12 @@ export default function AIChatbox() {
                 <button
                   onClick={handleSubmit}
                   className="send-button"
-                  disabled={!input.trim() || isLoading || !user || !token}
+                  disabled={
+                    (!input.trim() && selectedImages.length === 0) ||
+                    isLoading ||
+                    !user ||
+                    !token
+                  }
                 >
                   {isLoading ? (
                     <Loader size={18} className="loading-icon" />

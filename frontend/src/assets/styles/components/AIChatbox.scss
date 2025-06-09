@@ -5,14 +5,38 @@ $white: #ffffff;
 $gray-50: #f9fafb;
 $gray-200: #e5e7eb;
 $gray-300: #d1d5db;
+$gray-400: #9ca3af;
 $gray-500: #6b7280;
 $gray-600: #4b5563;
 $gray-800: #1f2937;
+$danger-color: #dc2626;
+$danger-color-hover: #b91c1c;
 $border-color: #e5e7eb;
 $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 $border-radius-lg: 0.5rem;
 $border-radius-full: 9999px;
 $z-index-chat: 999999;
+
+// Animations
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
 
 // Chat Component
 .ai-chatbox {
@@ -62,7 +86,7 @@ $z-index-chat: 999999;
     display: flex;
     flex-direction: column;
     width: 24rem;
-    height: 24rem;
+    height: 30rem;
     border: 1px solid $border-color;
     overflow: hidden;
     z-index: $z-index-chat;
@@ -133,33 +157,92 @@ $z-index-chat: 999999;
     background-color: $gray-50;
 
     .login-required {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      color: #6b7280;
+      gap: 16px;
+
+      .login-icon {
+        color: #9ca3af;
+        opacity: 0.7;
+      }
+
+      h4 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #374151;
+      }
+
+      p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+        max-width: 280px;
+      }
+    }
+
+    // Load More Messages
+    .load-more-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+
+      .load-more-button {
+        background-color: $white;
+        color: $primary-color;
+        border: 1px solid $primary-color;
+        padding: 0.5rem 1rem;
+        border-radius: $border-radius-full;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        height: 100%;
-        text-align: center;
-        color: #6b7280;
-        gap: 16px;
-  
-        .login-icon {
-          color: #9ca3af;
-          opacity: 0.7;
+        gap: 0.5rem;
+
+        &:hover {
+          background-color: $primary-color;
+          color: $white;
         }
-  
-        h4 {
-          margin: 0;
-          font-size: 18px;
-          font-weight: 600;
-          color: #374151;
+
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(32, 115, 85, 0.2);
         }
-  
-        p {
-          margin: 0;
-          font-size: 14px;
-          line-height: 1.5;
-          max-width: 280px;
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
+
+        .spinning {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+
+    .loading-messages {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+      color: $gray-500;
+
+      .spinning {
+        animation: spin 1s linear infinite;
+        color: $primary-color;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.875rem;
+      }
     }
 
     // Welcome Message
@@ -240,6 +323,36 @@ $z-index-chat: 999999;
       white-space: pre-wrap;
       font-size: 0.875rem;
       line-height: 1.4;
+
+      // Message Images
+      .message-images {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+
+        .message-image {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+
+          .image-preview {
+            max-width: 5rem;
+            max-height: 8rem;
+            object-fit: cover;
+            border-radius: 0.375rem;
+            border: 1px solid $gray-300;
+          }
+
+          .image-info {
+            font-size: 0.625rem;
+            color: $gray-500;
+            font-style: italic;
+          }
+        }
+      }
       
       // Typing indicator for loading state
       .typing-indicator {
@@ -269,7 +382,7 @@ $z-index-chat: 999999;
       }
 
       // Loading message style
-      &.loading-content {
+      .loading-content {
         color: $gray-500;
         font-style: italic;
         display: flex;
@@ -279,6 +392,99 @@ $z-index-chat: 999999;
         .loading-icon {
           animation: spin 1s linear infinite;
           color: $primary-color;
+        }
+      }
+    }
+  }
+
+  // Selected Images Area
+  .selected-images-area {
+    border-top: 1px solid $border-color;
+    background-color: $white;
+    padding: 0.75rem;
+    max-height: 8rem;
+    overflow-y: auto;
+
+    .selected-images-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+
+      span {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: $gray-600;
+      }
+    }
+
+    .selected-images-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .selected-image-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      background-color: $gray-50;
+      border-radius: $border-radius-lg;
+      border: 1px solid $gray-200;
+
+      .selected-image-preview {
+        width: 2.5rem;
+        height: 2.5rem;
+        object-fit: cover;
+        border-radius: 0.375rem;
+        border: 1px solid $gray-300;
+        flex-shrink: 0;
+      }
+
+      .selected-image-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+        min-width: 0; // Để text truncation hoạt động
+
+        .image-name {
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: $gray-800;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .image-size {
+          font-size: 0.625rem;
+          color: $gray-500;
+        }
+      }
+
+      .remove-image-button {
+        background-color: transparent;
+        color: $gray-500;
+        border: none;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 0.25rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        &:hover {
+          background-color: #fee2e2;
+          color: #dc2626;
+        }
+
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
         }
       }
     }
@@ -316,6 +522,39 @@ $z-index-chat: 999999;
       }
     }
 
+    // Image Upload Button
+    .image-upload-button {
+      background-color: $gray-200;
+      color: $gray-600;
+      padding: 0.5rem;
+      border-radius: $border-radius-full;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.5rem;
+      height: 2.5rem;
+
+      &:hover {
+        background-color: $gray-300;
+        color: $gray-800;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(209, 213, 219, 0.5);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: $gray-200;
+        color: $gray-400;
+      }
+    }
+
     .send-button, .stop-button {
       background-color: $primary-color;
       color: $white;
@@ -350,10 +589,10 @@ $z-index-chat: 999999;
     }
 
     .stop-button {
-      background-color: #dc2626;
+      background-color: $danger-color;
       
       &:hover {
-        background-color: #b91c1c;
+        background-color: $danger-color-hover;
       }
     }
   }
@@ -379,26 +618,5 @@ $z-index-chat: 999999;
       outline: none;
       box-shadow: 0 0 0 2px rgba(32, 115, 85, 0.3), $shadow-lg;
     }
-  }
-}
-
-// Animations
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes typing {
-  0%, 60%, 100% {
-    transform: translateY(0);
-    opacity: 0.4;
-  }
-  30% {
-    transform: translateY(-10px);
-    opacity: 1;
   }
 }
