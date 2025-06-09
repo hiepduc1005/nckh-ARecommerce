@@ -1,5 +1,9 @@
 package com.ecommerce.vn.dto.user;
 
-public class AdminStats {
+import java.math.BigDecimal;
 
+public class AdminStats {
+	private BigDecimal revenue;
+	private long totalsUser;
+	private long totalOrders;
 }

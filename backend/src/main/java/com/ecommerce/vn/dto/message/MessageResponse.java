@@ -1,6 +1,7 @@
 package com.ecommerce.vn.dto.message;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import com.ecommerce.vn.entity.message.MessageRole;
@@ -11,7 +12,16 @@ public class MessageResponse {
 	private MessageRole role;
 	private UUID userId;
 	private String content;
+	private List<MessageImageResponse> messageImages;
 	private LocalDateTime timestamp;
+	
+	
+	public List<MessageImageResponse> getMessageImages() {
+		return messageImages;
+	}
+	public void setMessageImages(List<MessageImageResponse> messageImages) {
+		this.messageImages = messageImages;
+	}
 	public UUID getId() {
 		return id;
 	}

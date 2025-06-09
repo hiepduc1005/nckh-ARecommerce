@@ -232,6 +232,17 @@ public class ProductController {
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
     
+    
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getProducts() {
+        List<Product> products = productService.getAllProducts();
+        List<ProductResponse> productResponses = products.stream()
+        		.map((product) -> 
+        			productConvert.productConvertToProductResponse(product)
+        			).toList();
+        return new ResponseEntity<>(productResponses, HttpStatus.OK);
+    }
+    
     @GetMapping("/featured")
     public ResponseEntity<Page<ProductResponse>> getProductFeatured(
     		@RequestParam(name = "page", defaultValue = "0") int page,
